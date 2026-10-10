@@ -209,11 +209,12 @@ You need to make sure the IDE runner resolves workspace artifacts.
 ## Releases
 
 ```bash
+VERSION=x.y.z
 git checkout master
 # merge appropriately
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=x.y.z
-git commit -am "Version x.y.z"
-git tag -am "Version x.y.z" vx.y.z
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$VERSION
+git commit -am "Version $VERSION"
+git tag -am "Version $VERSION" v$VERSION
 git checkout develop
 git merge master
 mvn versions:set -DnewVersion=1.0.0-SNAPSHOT -DgenerateBackupPoms=false
@@ -241,14 +242,14 @@ mvn verify -Pspotbugs -DskipTests
 Run:
 
 ```shell
-mvn verify -Pcoverage
+mvn clean install -Pcoverage
 ```
 
 This will create the coverage reports, you can see them immediately for each Maven module under its respective
 `target/site/jacoco/index.html`. If you have SonarQube installed, run the analysis with:
 
 ```shell
-mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.token= <your_token>
+mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.token=<your_token>
 ```
 
 #### Quick start with SonarQube
