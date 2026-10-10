@@ -2,7 +2,6 @@ package eu.dietwise.dao.jpa.suggestions;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.Column;
@@ -11,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
 import eu.dietwise.dao.jpa.recommendations.RecommendationEntity;
@@ -43,10 +41,6 @@ public class RuleEntity {
 
 	@Column(name = "active")
 	private boolean active = true;
-
-	@OneToMany(mappedBy = "rule", fetch = LAZY)
-	@OrderColumn(name = "alternative_order")
-	private List<SuggestionTemplateEntity> alternatives;
 
 	@OneToMany(mappedBy = "rule", fetch = LAZY)
 	private Set<RuleTranslationEntity> translations;
@@ -105,14 +99,6 @@ public class RuleEntity {
 
 	public void setRoleOrTechnique(RoleOrTechniqueEntity roleOrTechnique) {
 		this.roleOrTechnique = roleOrTechnique;
-	}
-
-	public List<SuggestionTemplateEntity> getAlternatives() {
-		return alternatives;
-	}
-
-	public void setAlternatives(List<SuggestionTemplateEntity> alternatives) {
-		this.alternatives = alternatives;
 	}
 
 	public Set<RuleTranslationEntity> getTranslations() {

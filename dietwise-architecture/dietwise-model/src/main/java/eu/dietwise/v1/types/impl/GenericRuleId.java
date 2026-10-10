@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import eu.dietwise.v1.types.RuleId;
 
-public class GenericRuleId implements RuleId {
+public final class GenericRuleId implements RuleId {
 	private final String representation;
 
 	public GenericRuleId(String representation) {

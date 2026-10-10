@@ -20,6 +20,11 @@ public record SeasonalityCostGridResponse(
 		List<String> countries,
 		List<Row> rows
 ) {
+	public SeasonalityCostGridResponse {
+		countries = List.copyOf(countries);
+		rows = List.copyOf(rows);
+	}
+
 	/**
 	 * One grid row: an Alternative Ingredient's id, effective name, whether a published master row exists, and its
 	 * per-country seasonality and cost cells keyed by ISO alpha-2 country code.
@@ -31,6 +36,11 @@ public record SeasonalityCostGridResponse(
 			Map<String, SeasonalityCellResponse> seasonality,
 			Map<String, CostCellResponse> cost
 	) {
+		public Row {
+			seasonality = Map.copyOf(seasonality);
+			cost = Map.copyOf(cost);
+		}
+
 		static Row from(SeasonalityCostRow row) {
 			return new Row(
 					row.id().toString(),

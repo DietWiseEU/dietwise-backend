@@ -347,7 +347,7 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<SuggestionTemplateEntity> st = q.from(SuggestionTemplateEntity.class);
 		q.select(cb.count(st)).where(cb.equal(st.get(SuggestionTemplateEntity_.alternativeIngredient).get(AlternativeIngredientEntity_.id), alternativeIngredientId));
-		return em.createQuery(q).getResultList().map(rows -> rows.isEmpty() ? 0L : rows.getFirst());
+		return em.createQuery(q).getSingleResult();
 	}
 
 	private Uni<Long> wcOnlyCountByAlternative(ReactivePersistenceContext em, UUID alternativeIngredientId) {
@@ -361,7 +361,7 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 		q.select(cb.count(wc)).where(cb.and(
 				cb.equal(wc.get(SuggestionTemplateWcEntity_.alternativeIngredientId), alternativeIngredientId),
 				cb.not(cb.exists(master))));
-		return em.createQuery(q).getResultList().map(rows -> rows.isEmpty() ? 0L : rows.getFirst());
+		return em.createQuery(q).getSingleResult();
 	}
 
 	@Override

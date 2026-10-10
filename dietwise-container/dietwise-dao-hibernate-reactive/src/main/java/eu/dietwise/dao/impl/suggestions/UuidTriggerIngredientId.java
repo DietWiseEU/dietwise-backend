@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import eu.dietwise.services.types.suggestions.TriggerIngredientId;
 
-public class UuidTriggerIngredientId implements TriggerIngredientId {
+public final class UuidTriggerIngredientId implements TriggerIngredientId {
 	private final UUID uuid;
 	private String representation;
 

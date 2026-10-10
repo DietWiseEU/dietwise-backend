@@ -31,4 +31,10 @@ public record StagedRule(
 		Map<RecipeLanguage, TranslationState> roleOrTechniqueTranslations,
 		long version
 ) {
+	public StagedRule {
+		changedFields = Set.copyOf(changedFields);
+		rationaleTranslations = Map.copyOf(rationaleTranslations);
+		triggerIngredientTranslations = Map.copyOf(triggerIngredientTranslations);
+		roleOrTechniqueTranslations = Map.copyOf(roleOrTechniqueTranslations);
+	}
 }

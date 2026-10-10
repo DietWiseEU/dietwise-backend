@@ -120,7 +120,6 @@ public class MockReactivePersistenceContextFactory implements ReactivePersistenc
 
 	public static class MockReactivePersistenceTxContext extends MockReactivePersistenceContext implements ReactivePersistenceTxContext {
 		private boolean markedForRollback;
-		private final List<PersistenceAction> actions = new ArrayList<>();
 
 		@Override
 		public boolean isMarkedForRollback() {
@@ -176,10 +175,6 @@ public class MockReactivePersistenceContextFactory implements ReactivePersistenc
 		public <R> ReactiveUpdate createDelete(CriteriaDelete<R> criteriaDelete) {
 			ReactiveUpdate m = mock(ReactiveUpdate.class, RETURNS_DEEP_STUBS);
 			return m;
-		}
-
-		public List<PersistenceAction> getActions() {
-			return List.copyOf(actions);
 		}
 	}
 

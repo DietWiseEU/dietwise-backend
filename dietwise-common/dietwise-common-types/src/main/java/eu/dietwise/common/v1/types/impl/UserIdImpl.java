@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.common.v1.types.UserId;
 
-public class UserIdImpl implements UserId {
+public final class UserIdImpl implements UserId {
 	private final String representation;
 
 	public UserIdImpl(String representation) {

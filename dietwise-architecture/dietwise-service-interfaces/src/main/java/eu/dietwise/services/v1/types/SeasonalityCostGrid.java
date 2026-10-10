@@ -10,4 +10,8 @@ import eu.dietwise.v1.types.Country;
  * seasonality and cost.
  */
 public record SeasonalityCostGrid(List<Country> countries, List<SeasonalityCostRow> rows) {
+	public SeasonalityCostGrid {
+		countries = List.copyOf(countries);
+		rows = List.copyOf(rows);
+	}
 }

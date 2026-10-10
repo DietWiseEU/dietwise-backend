@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.v1.types.RoleOrTechnique;
 
-public class RoleOrTechniqueImpl implements RoleOrTechnique {
+public final class RoleOrTechniqueImpl implements RoleOrTechnique {
 	private final String representation;
 
 	public RoleOrTechniqueImpl(String representation) {

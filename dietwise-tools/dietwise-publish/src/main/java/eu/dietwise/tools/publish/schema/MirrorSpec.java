@@ -12,6 +12,10 @@ public record MirrorSpec(TableSpec master, TableSpec wc, PublishKind kind, int o
 
 	private static final String VERSION = "version";
 
+	public MirrorSpec {
+		parentRefs = List.copyOf(parentRefs);
+	}
+
 	public MirrorSpec(TableSpec master, TableSpec wc, PublishKind kind, int order) {
 		this(master, wc, kind, order, List.of());
 	}

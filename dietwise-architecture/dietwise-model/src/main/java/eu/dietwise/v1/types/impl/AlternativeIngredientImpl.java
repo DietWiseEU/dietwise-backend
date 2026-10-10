@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.v1.types.AlternativeIngredient;
 
-public class AlternativeIngredientImpl implements AlternativeIngredient {
+public final class AlternativeIngredientImpl implements AlternativeIngredient {
 	private final String representation;
 
 	public AlternativeIngredientImpl(String representation) {

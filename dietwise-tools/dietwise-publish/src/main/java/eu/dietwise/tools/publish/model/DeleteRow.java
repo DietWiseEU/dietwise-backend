@@ -8,6 +8,11 @@ import java.util.List;
  */
 public record DeleteRow(String table, List<Cell> row, List<String> primaryKey) implements Change {
 
+	public DeleteRow {
+		row = List.copyOf(row);
+		primaryKey = List.copyOf(primaryKey);
+	}
+
 	/** The cells forming the primary key, used to locate the row to delete. */
 	public List<Cell> primaryKeyCells() {
 		return row.stream().filter(cell -> primaryKey.contains(cell.column())).toList();

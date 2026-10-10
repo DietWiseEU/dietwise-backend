@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.v1.types.TriggerIngredient;
 
-public class TriggerIngredientImpl implements TriggerIngredient {
+public final class TriggerIngredientImpl implements TriggerIngredient {
 	private final String representation;
 
 	public TriggerIngredientImpl(String representation) {

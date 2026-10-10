@@ -84,8 +84,7 @@ public final class PublishPlanner {
 		inserts.sort(Comparator.comparingInt(insert -> orderByTable.get(insert.table())));
 		deletes.sort(Comparator.comparingInt((DeleteRow delete) -> orderByTable.get(delete.table())).reversed());
 
-		return new PublishPlan(List.copyOf(inserts), List.copyOf(updates), List.copyOf(deletes),
-				List.copyOf(workingCopy), fingerprint);
+		return new PublishPlan(inserts, updates, deletes, workingCopy, fingerprint);
 	}
 
 	/**

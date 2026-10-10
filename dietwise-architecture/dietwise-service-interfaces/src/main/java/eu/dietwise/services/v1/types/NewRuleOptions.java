@@ -13,4 +13,9 @@ public record NewRuleOptions(
 		List<ReferenceOption> triggerIngredients,
 		List<ReferenceOption> rolesOrTechniques
 ) {
+	public NewRuleOptions {
+		recommendations = List.copyOf(recommendations);
+		triggerIngredients = List.copyOf(triggerIngredients);
+		rolesOrTechniques = List.copyOf(rolesOrTechniques);
+	}
 }

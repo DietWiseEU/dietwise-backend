@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.v1.types.Recommendation;
 
-public class RecommendationImpl implements Recommendation {
+public final class RecommendationImpl implements Recommendation {
 	private final String representation;
 
 	public RecommendationImpl(String representation) {

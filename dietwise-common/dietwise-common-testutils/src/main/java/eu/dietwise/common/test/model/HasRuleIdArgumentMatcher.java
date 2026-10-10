@@ -6,7 +6,7 @@ import eu.dietwise.v1.types.HasRuleId;
 import eu.dietwise.v1.types.RuleId;
 import org.mockito.ArgumentMatcher;
 
-public class HasRuleIdArgumentMatcher implements ArgumentMatcher<HasRuleId> {
+public final class HasRuleIdArgumentMatcher implements ArgumentMatcher<HasRuleId> {
 	private final RuleId ruleId;
 
 	public HasRuleIdArgumentMatcher(RuleId ruleId) {

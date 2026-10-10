@@ -3,6 +3,7 @@ package eu.dietwise.services.v1.types;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import eu.dietwise.common.types.SuggestionTemplateField;
 import eu.dietwise.v1.model.SuggestionTemplate;
@@ -33,4 +34,9 @@ public record StagedSuggestionTemplate(
 		boolean published,
 		long version
 ) {
+	public StagedSuggestionTemplate {
+		changedFields = Set.copyOf(changedFields);
+		translations = Map.copyOf(translations.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> Map.copyOf(entry.getValue()))));
+		alternativeIngredientTranslations = Map.copyOf(alternativeIngredientTranslations);
+	}
 }

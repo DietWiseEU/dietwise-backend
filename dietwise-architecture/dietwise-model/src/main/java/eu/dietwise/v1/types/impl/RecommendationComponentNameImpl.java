@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.v1.types.RecommendationComponentName;
 
-public class RecommendationComponentNameImpl implements RecommendationComponentName {
+public final class RecommendationComponentNameImpl implements RecommendationComponentName {
 	private final String representation;
 
 	public RecommendationComponentNameImpl(String representation) {
@@ -18,7 +18,7 @@ public class RecommendationComponentNameImpl implements RecommendationComponentN
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof RecommendationComponentNameImpl that)) return false;
+		if (!(o instanceof RecommendationComponentName that)) return false;
 		return Objects.equals(representation, that.asString());
 	}
 

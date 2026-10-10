@@ -15,9 +15,8 @@ import org.hibernate.reactive.mutiny.Mutiny;
  * these helpers keeps such assertions independent of it.
  * <p>
  * The rows are written with native SQL because {@code DW_SUGGESTION_TEMPLATE.alternative_order} is {@code NOT NULL}
- * and is owned by the {@code @OrderColumn} on {@code RuleEntity.alternatives}: persisting the entity graph inserts a
- * template without that column and then updates it, which trips the not-null constraint. Native SQL sets the order
- * directly. Each Rule is given its own Role or Technique so the (recommendation, trigger, role) business key stays
+ * but mapped read-only on {@code SuggestionTemplateEntity}: persisting the entity would insert a template without that
+ * column, which trips the not-null constraint. Native SQL sets the order directly. Each Rule is given its own Role or Technique so the (recommendation, trigger, role) business key stays
  * unique.
  */
 final class SuggestionTemplateFixtures {

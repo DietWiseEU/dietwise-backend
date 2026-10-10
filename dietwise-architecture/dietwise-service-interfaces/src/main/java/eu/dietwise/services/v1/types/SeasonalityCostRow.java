@@ -17,4 +17,8 @@ public record SeasonalityCostRow(
 		Map<Country, SeasonalityCell> seasonality,
 		Map<Country, CostCell> cost
 ) {
+	public SeasonalityCostRow {
+		seasonality = Map.copyOf(seasonality);
+		cost = Map.copyOf(cost);
+	}
 }

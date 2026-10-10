@@ -27,4 +27,9 @@ public record StagedAlternativeIngredient(
 		Set<UUID> linkedRecommendationIds,
 		Set<UUID> stagedRecommendationIds
 ) {
+	public StagedAlternativeIngredient {
+		translations = Map.copyOf(translations);
+		linkedRecommendationIds = Set.copyOf(linkedRecommendationIds);
+		stagedRecommendationIds = Set.copyOf(stagedRecommendationIds);
+	}
 }

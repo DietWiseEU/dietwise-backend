@@ -22,6 +22,11 @@ public record AlternativeIngredientGridResponse(
 		List<Column> columns,
 		List<Ingredient> ingredients
 ) {
+	public AlternativeIngredientGridResponse {
+		columns = List.copyOf(columns);
+		ingredients = List.copyOf(ingredients);
+	}
+
 	/**
 	 * One grid column: a Recommendation's id, the component for scoring shown in its header and its weight
 	 * ({@code ENCOURAGED} or {@code LIMITED}).
@@ -46,6 +51,12 @@ public record AlternativeIngredientGridResponse(
 			List<String> linkedRecommendationIds,
 			List<String> stagedRecommendationIds
 	) {
+		public Ingredient {
+			translations = Map.copyOf(translations);
+			linkedRecommendationIds = List.copyOf(linkedRecommendationIds);
+			stagedRecommendationIds = List.copyOf(stagedRecommendationIds);
+		}
+
 		static Ingredient from(StagedAlternativeIngredient ingredient) {
 			return new Ingredient(
 					ingredient.id().toString(),

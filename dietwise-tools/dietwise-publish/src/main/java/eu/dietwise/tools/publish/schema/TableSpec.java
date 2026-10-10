@@ -8,6 +8,11 @@ import java.util.List;
  */
 public record TableSpec(String name, List<ColumnSpec> columns, List<String> primaryKey) {
 
+	public TableSpec {
+		columns = List.copyOf(columns);
+		primaryKey = List.copyOf(primaryKey);
+	}
+
 	public List<String> columnNames() {
 		return columns.stream().map(ColumnSpec::name).toList();
 	}

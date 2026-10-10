@@ -7,4 +7,7 @@ import java.util.List;
  * every captured row is re-inserted to restore the Working Copy.
  */
 public record TableSnapshot(String table, List<List<Cell>> rows) {
+	public TableSnapshot {
+		rows = List.copyOf(rows.stream().map(List::copyOf).toList());
+	}
 }

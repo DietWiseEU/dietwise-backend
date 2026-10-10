@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import eu.dietwise.services.types.suggestions.RoleOrTechniqueId;
 
-public class UuidRoleOrTechniqueId implements RoleOrTechniqueId {
+public final class UuidRoleOrTechniqueId implements RoleOrTechniqueId {
 	private final UUID uuid;
 	private String representation;
 

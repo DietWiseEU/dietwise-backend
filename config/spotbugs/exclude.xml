@@ -16,20 +16,26 @@
 		<Class name="~.*\..+Entity_.*"/>
 		<Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD,UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD"/>
 	</Match>
+	<!--
+		Why? Service implementations receive their collaborators (DAOs, the shared Jackson ObjectMapper, the Keycloak admin
+		client) through constructor injection; storing a shared bean is the point of dependency injection, not an exposed
+		internal representation.
+	-->
 	<Match>
-		<Class name="eu.dietwise.services.v1.extraction.impl.MarkdownRecipeExtractionServiceImpl"/>
-		<Bug pattern="EI_EXPOSE_REP2"/>
-	</Match>
-	<Match>
-		<Class name="eu.dietwise.services.v1.extraction.impl.RecipeJsonNormalizerImpl"/>
-		<Bug pattern="EI_EXPOSE_REP2"/>
-	</Match>
-	<Match>
-		<Class name="eu.dietwise.services.v1.impl.StatisticsServiceImpl"/>
+		<Class name="~eu\.dietwise\.services\..*Impl"/>
+		<Method name="&lt;init&gt;"/>
 		<Bug pattern="EI_EXPOSE_REP2"/>
 	</Match>
 	<Match>
 		<Class name="eu.dietwise.services.v1.impl.RecipeAssessmentServiceImpl"/>
 		<Bug pattern="PREDICTABLE_RANDOM"/>
+	</Match>
+	<!--
+		Why? The query's table and column names come only from the hard-coded Tables registry, never from external
+		input, and JDBC cannot bind identifiers as parameters.
+	-->
+	<Match>
+		<Class name="eu.dietwise.tools.publish.DatabaseReader"/>
+		<Bug pattern="SQL_INJECTION_JDBC,SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
 	</Match>
 </FindBugsFilter>

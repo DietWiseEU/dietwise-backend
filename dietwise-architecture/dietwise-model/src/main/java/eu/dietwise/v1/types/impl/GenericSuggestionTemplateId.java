@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import eu.dietwise.v1.types.SuggestionTemplateId;
 
-public class GenericSuggestionTemplateId implements SuggestionTemplateId {
+public final class GenericSuggestionTemplateId implements SuggestionTemplateId {
 	private final String representation;
 
 	public GenericSuggestionTemplateId(String representation) {

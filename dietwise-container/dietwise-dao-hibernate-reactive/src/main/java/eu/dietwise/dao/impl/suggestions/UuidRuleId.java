@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import eu.dietwise.v1.types.RuleId;
 
-public class UuidRuleId implements RuleId {
+public final class UuidRuleId implements RuleId {
 	private final UUID uuid;
 	private String representation;
 

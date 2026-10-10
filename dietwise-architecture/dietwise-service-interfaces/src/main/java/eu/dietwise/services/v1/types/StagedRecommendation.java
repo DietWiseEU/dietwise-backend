@@ -27,4 +27,7 @@ public record StagedRecommendation(
 		long version,
 		Map<RecipeLanguage, TranslationState> translations
 ) {
+	public StagedRecommendation {
+		translations = Map.copyOf(translations);
+	}
 }

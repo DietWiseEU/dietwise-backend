@@ -28,6 +28,10 @@ public record RecommendationResponse(
 		long version,
 		Map<String, String> translations
 ) {
+	public RecommendationResponse {
+		translations = Map.copyOf(translations);
+	}
+
 	public static RecommendationResponse from(StagedRecommendation recommendation) {
 		return new RecommendationResponse(
 				recommendation.id().toString(),

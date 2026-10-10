@@ -7,4 +7,8 @@ import java.util.List;
  * columns back to their {@code before} values.
  */
 public record UpdateRow(String table, List<Cell> primaryKey, List<ColumnChange> changes) implements Change {
+	public UpdateRow {
+		primaryKey = List.copyOf(primaryKey);
+		changes = List.copyOf(changes);
+	}
 }

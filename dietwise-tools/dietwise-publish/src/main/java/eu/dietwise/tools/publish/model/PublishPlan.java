@@ -17,6 +17,13 @@ public record PublishPlan(
 		List<TableSnapshot> workingCopy,
 		long workingCopyFingerprint) {
 
+	public PublishPlan {
+		inserts = List.copyOf(inserts);
+		updates = List.copyOf(updates);
+		deletes = List.copyOf(deletes);
+		workingCopy = List.copyOf(workingCopy);
+	}
+
 	public boolean isEmpty() {
 		return inserts.isEmpty() && updates.isEmpty() && deletes.isEmpty() && workingCopy.isEmpty();
 	}

@@ -34,6 +34,13 @@ public record RuleResponse(
 		Map<String, String> roleOrTechniqueTranslations,
 		long version
 ) {
+	public RuleResponse {
+		changedFields = List.copyOf(changedFields);
+		rationaleTranslations = Map.copyOf(rationaleTranslations);
+		triggerIngredientTranslations = Map.copyOf(triggerIngredientTranslations);
+		roleOrTechniqueTranslations = Map.copyOf(roleOrTechniqueTranslations);
+	}
+
 	public static RuleResponse from(StagedRule staged) {
 		Rule rule = staged.rule();
 		RoleOrTechnique roleOrTechnique = rule.getRoleOrTechnique();
@@ -47,7 +54,7 @@ public record RuleResponse(
 				rule.getRationale(),
 				rule.isActive(),
 				staged.changeState().name(),
-				staged.changedFields().stream().map(Enum::name).toList(),
+				staged.changedFields().stream().sorted().map(Enum::name).toList(),
 				toStateNames(staged.rationaleTranslations()),
 				toStateNames(staged.triggerIngredientTranslations()),
 				toStateNames(staged.roleOrTechniqueTranslations()),

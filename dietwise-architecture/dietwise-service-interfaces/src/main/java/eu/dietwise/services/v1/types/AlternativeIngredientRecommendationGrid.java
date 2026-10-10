@@ -12,4 +12,8 @@ public record AlternativeIngredientRecommendationGrid(
 		List<RecommendationColumn> columns,
 		List<StagedAlternativeIngredient> ingredients
 ) {
+	public AlternativeIngredientRecommendationGrid {
+		columns = List.copyOf(columns);
+		ingredients = List.copyOf(ingredients);
+	}
 }

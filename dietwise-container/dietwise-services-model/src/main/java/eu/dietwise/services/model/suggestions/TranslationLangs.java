@@ -16,6 +16,12 @@ import eu.dietwise.v1.types.RecipeLanguage;
  */
 public record TranslationLangs(Set<RecipeLanguage> full, Set<RecipeLanguage> partial, Set<RecipeLanguage> staged) {
 
+	public TranslationLangs {
+		full = Set.copyOf(full);
+		partial = Set.copyOf(partial);
+		staged = Set.copyOf(staged);
+	}
+
 	/**
 	 * Classifies each language by how many of its translatable fields carry text in the effective translation — the
 	 * Working Copy field values when a change is staged for that language, otherwise the published master field values.
@@ -40,8 +46,6 @@ public record TranslationLangs(Set<RecipeLanguage> full, Set<RecipeLanguage> par
 			}
 			(filled == effective.size() ? full : partial).add(lang);
 		}
-		Set<RecipeLanguage> stagedLangs = EnumSet.noneOf(RecipeLanguage.class);
-		stagedLangs.addAll(staged);
-		return new TranslationLangs(full, partial, stagedLangs);
+		return new TranslationLangs(full, partial, staged);
 	}
 }

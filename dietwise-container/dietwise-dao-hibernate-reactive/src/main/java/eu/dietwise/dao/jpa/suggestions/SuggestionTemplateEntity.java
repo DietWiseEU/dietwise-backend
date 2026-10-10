@@ -40,8 +40,8 @@ public class SuggestionTemplateEntity {
 	private boolean active = true;
 
 	/**
-	 * The position of this template among its Rule's alternatives. Written by the {@link RuleEntity#alternatives}
-	 * collection's {@code @OrderColumn}; mapped read-only here so a query can order templates by it directly.
+	 * The position of this template among its Rule's alternatives. Written outside Hibernate, by the data changelogs
+	 * and the publish tool; mapped read-only here so a query can order templates by it directly.
 	 */
 	@Column(name = "alternative_order", insertable = false, updatable = false)
 	private int alternativeOrder;

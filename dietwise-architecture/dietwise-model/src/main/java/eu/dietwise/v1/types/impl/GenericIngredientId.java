@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import eu.dietwise.v1.types.IngredientId;
 
-public class GenericIngredientId implements IngredientId {
+public final class GenericIngredientId implements IngredientId {
 	private final String representation;
 
 	public GenericIngredientId(String representation) {

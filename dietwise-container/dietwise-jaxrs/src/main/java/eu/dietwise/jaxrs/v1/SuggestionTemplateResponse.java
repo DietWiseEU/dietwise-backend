@@ -31,6 +31,12 @@ public record SuggestionTemplateResponse(
 		boolean published,
 		long version
 ) {
+	public SuggestionTemplateResponse {
+		changedFields = List.copyOf(changedFields);
+		translations = Map.copyOf(translations.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> Map.copyOf(entry.getValue()))));
+		alternativeIngredientTranslations = Map.copyOf(alternativeIngredientTranslations);
+	}
+
 	public static SuggestionTemplateResponse from(StagedSuggestionTemplate staged) {
 		var template = staged.template();
 		return new SuggestionTemplateResponse(
@@ -40,7 +46,7 @@ public record SuggestionTemplateResponse(
 				template.getRestriction().orElse(null),
 				template.getEquivalence().orElse(null),
 				template.getTechniqueNotes().orElse(null),
-				staged.changedFields().stream().map(Enum::name).toList(),
+				staged.changedFields().stream().sorted().map(Enum::name).toList(),
 				toTranslationNames(staged),
 				toStateNames(staged.alternativeIngredientTranslations()),
 				staged.active(),
