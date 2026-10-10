@@ -314,7 +314,7 @@
 
 	<profiles>
 		<profile>
-			<id>jacoco</id>
+			<id>coverage</id>
 
 			<build>
 				<pluginManagement>

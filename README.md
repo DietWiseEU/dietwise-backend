@@ -235,3 +235,82 @@ mvn verify -Powasp -DskipTests
 ```bash
 mvn verify -Pspotbugs -DskipTests
 ```
+
+### Coverage & code quality with SonarQube
+
+Run:
+
+```shell
+mvn verify -Pcoverage
+```
+
+This will create the coverage reports, you can see them immediately for each Maven module under its respective
+`target/site/jacoco/index.html`. If you have SonarQube installed, run the analysis with:
+
+```shell
+mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.token= <your_token>
+```
+
+#### Quick start with SonarQube
+
+##### Running in Docker with default DB (H2)
+
+This is the fastest start option, *but it is hard to upgrade to a newer version*! **NOT RECOMMENDED** Full info
+[here](https://docs.sonarsource.com/sonarqube-community-build/server-installation/from-docker-image/set-up-and-start-container)
+and [here](https://hub.docker.com/_/sonarqube).
+
+##### Running in Docker Compose with Postgres
+
+The first link above points to [this Docker Compose file](https://github.com/SonarSource/docker-sonarqube/blob/master/example-compose-files/sq-with-postgres/docker-compose.yml).
+
+A simplified configuration is:
+
+```yaml
+services:
+  sonarqube:
+    container_name: sonar
+    image: sonarqube:community
+    ports:
+      - "9000:9000"
+    depends_on:
+      - db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - sonar-network
+  db:
+    container_name: sonar_db
+    image: postgres:18
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - postgresql:/var/lib/postgresql
+    networks:
+      - sonar-network
+
+volumes:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+
+
+networks:
+  sonar-network:
+    driver: bridge
+```
+
+No matter how you did it, open `http://localhost:9000`. The first time, it will ask you to change the admin password
+(default is `admin`). Then go to "My Account" (from menu top right), "Security", "Generate Tokens". Generate a Global
+Analysis Token that never expires and use it in the `-Dsonar.token`.
