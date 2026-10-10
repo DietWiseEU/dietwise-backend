@@ -7,7 +7,7 @@ public abstract class AppSecurityException extends RuntimeException {
 	/**
 	 * Default constructor.
 	 */
-	public AppSecurityException() {
+	protected AppSecurityException() {
 		super();
 	}
 
@@ -16,7 +16,7 @@ public abstract class AppSecurityException extends RuntimeException {
 	 * 
 	 * @param message The message
 	 */
-	public AppSecurityException(String message) {
+	protected AppSecurityException(String message) {
 		super(message);
 	}
 
@@ -25,7 +25,7 @@ public abstract class AppSecurityException extends RuntimeException {
 	 * 
 	 * @param cause The cause
 	 */
-	public AppSecurityException(Throwable cause) {
+	protected AppSecurityException(Throwable cause) {
 		super(cause);
 	}
 
@@ -35,7 +35,7 @@ public abstract class AppSecurityException extends RuntimeException {
 	 * @param message The message
 	 * @param cause   The cause
 	 */
-	public AppSecurityException(String message, Throwable cause) {
+	protected AppSecurityException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }

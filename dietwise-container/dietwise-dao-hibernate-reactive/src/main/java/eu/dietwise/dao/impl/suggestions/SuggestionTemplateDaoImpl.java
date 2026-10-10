@@ -623,9 +623,14 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 
 	private static boolean matchesMasterAfterSet(SuggestionTemplateTranslationWcEntity existing, SuggestionTemplateField field, String value, SuggestionTemplateTranslationEntity master) {
 		for (SuggestionTemplateField f : SuggestionTemplateField.values()) {
-			String effective = f == field ? value
-					: existing != null ? wcField(existing, f)
-					  : masterTranslationField(master, f);
+			String effective;
+			if (f == field) {
+				effective = value;
+			} else if (existing != null) {
+				effective = wcField(existing, f);
+			} else {
+				effective = masterTranslationField(master, f);
+			}
 			if (!Objects.equals(effective, masterTranslationField(master, f))) {
 				return false;
 			}

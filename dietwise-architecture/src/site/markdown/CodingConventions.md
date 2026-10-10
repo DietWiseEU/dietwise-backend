@@ -19,8 +19,27 @@
 actually used. This allows us to have e.g., project-specific test modules that depend on JUnit in compile scope.
 3. Define the version of dependencies in properties, even if used only in a single dependency. This makes it easy to
 upgrade dependencies with `mvn -N versions:display-property-updates`.
-4. If a project (Maven module) uses artifacts from a dependency directly, it's preferable to declare the dependency
+4. If a project (Maven module) uses artifacts from a dependency directly, it must declare the dependency
 directly rather than rely on transitive dependencies.
+5. Mutiny (`io.smallrye.mutiny`) is exempt from the rule that keeps frameworks out of the non-deployable modules, and
+	may be declared in any module. It is a datatype library rather than a framework — a handful of small jars over
+	`java.util.concurrent.Flow`, with no CDI, no reflection and no container — so classify it under SPECS and reach for
+	`Uni` and `Multi` without ceremony. The rule is really about CDI, JPA, JAX-RS, Hibernate and Quarkus itself.
+	- The exemption removes a build obstacle; it is not an invitation to make the domain model asynchronous. A service
+	  interface returns a `Uni` because the work is genuinely asynchronous. A data type has no reason to, since
+	  asynchrony belongs to the code that talks to a database or the network.
+
+## For Java code
+
+1. Balance the branches in a method body: instead of `if (condition) { doSomething(); return x; } doSomethingElse(); return y;`,
+   prefer `if (condition) { doSomething(); return x; } else { doSomethingElse(); return y; }`. Keep the `return` statement at the same depth in branches.
+	- EXCEPTION: Fast-fail tests at the beginning of the method: `if (arg == null) return null; if (condition) ...`
+2. Text in logging statements, exceptions:
+	- Try to put variables at the end of the message so that when someone searches for a text in the logs, they will find exactly what they want.
+
+		Example, GOOD: `log.info("User logged in: {}", username);`. Here I can search the code for `"User logged in:"` and find this code.
+
+		Example, BAD: `log.info("User {} logged in", username);`. Here the constant strings are `"User "` and `" logged in"`. Both could be encountered in other places too, so searching for them does not uniquely identify the code that caused the log.
 
 # Naming conventions
 

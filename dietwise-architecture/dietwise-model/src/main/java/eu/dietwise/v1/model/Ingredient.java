@@ -1,5 +1,6 @@
 package eu.dietwise.v1.model;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import eu.dietwise.v1.types.HasIngredientId;
@@ -8,7 +9,7 @@ import eu.dietwise.v1.types.TriggerIngredient;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface Ingredient extends HasIngredientId {
+public interface Ingredient extends HasIngredientId, Serializable {
 	String getNameInRecipe();
 
 	Optional<TriggerIngredient> getTriggerIngredient();

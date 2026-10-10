@@ -1,5 +1,6 @@
 package eu.dietwise.common.dao.reactive;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public interface ReactiveQuery<R> {
 	 *
 	 * @param id An optional id to be used only if a matching entity is not found for customizing the resulting exception
 	 */
-	Uni<R> getSingleResult(Object id);
+	Uni<R> getSingleResult(Serializable id);
 	Uni<Optional<R>> getSingleOptionalResult();
 	ReactiveQuery<R> setFirstResult(int firstResult);
 	ReactiveQuery<R> setMaxResults(int maxResults);

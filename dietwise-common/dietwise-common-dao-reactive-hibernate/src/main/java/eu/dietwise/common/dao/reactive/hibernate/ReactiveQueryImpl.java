@@ -1,5 +1,6 @@
 package eu.dietwise.common.dao.reactive.hibernate;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import jakarta.persistence.NoResultException;
@@ -31,13 +32,13 @@ class ReactiveQueryImpl<R> implements ReactiveQuery<R> {
 	}
 
 	@Override
-	public Uni<R> getSingleResult(Object id) {
+	public Uni<R> getSingleResult(Serializable id) {
 		return query.getSingleResult()
 				.onFailure(NoResultException.class)
 				.transform(nre -> makeEntityNotFoundException(resultType, id, nre));
 	}
 
-	private EntityNotFoundException makeEntityNotFoundException(Class<?> entityClass, Object entityId, Throwable cause) {
+	private EntityNotFoundException makeEntityNotFoundException(Class<?> entityClass, Serializable entityId, Throwable cause) {
 		if (entityClass != null && entityId != null) {
 			return new EntityNotFoundException(entityClass, entityId, cause);
 		} else {

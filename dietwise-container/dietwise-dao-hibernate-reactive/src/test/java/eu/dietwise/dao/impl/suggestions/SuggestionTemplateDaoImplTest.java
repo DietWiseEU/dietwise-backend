@@ -160,7 +160,13 @@ class SuggestionTemplateDaoImplTest {
 			new HibernateReactiveExtension(postgres::getJdbcUrl, postgres.getUsername(), postgres.getPassword());
 
 	@BeforeAll
-	static void seedDeactivateActivateFixtures(Mutiny.SessionFactory sessionFactory) {
+	static void beforeAll(Mutiny.SessionFactory sessionFactory) {
+		seedDeactivateActivateFixtures(sessionFactory);
+		seedAddDiscardFixtures(sessionFactory);
+		seedChipFixtures(sessionFactory);
+	}
+
+	private static void seedDeactivateActivateFixtures(Mutiny.SessionFactory sessionFactory) {
 		sessionFactory.withTransaction(session -> SuggestionTemplateFixtures.insertRuleWithTemplates(
 						session, TOGGLE_RULE_ID, DECREASE_RED_MEAT_RECOMMENDATION_ID, BEEF_ID, "Issue 14 toggle role",
 						List.of(
@@ -171,8 +177,7 @@ class SuggestionTemplateDaoImplTest {
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 	}
 
-	@BeforeAll
-	static void seedAddDiscardFixtures(Mutiny.SessionFactory sessionFactory) {
+	private static void seedAddDiscardFixtures(Mutiny.SessionFactory sessionFactory) {
 		sessionFactory.withTransaction(session -> SuggestionTemplateFixtures.insertRuleWithTemplates(
 								session, ADD_RULE_ID, DECREASE_RED_MEAT_RECOMMENDATION_ID, BEEF_ID, "Issue 15 add role",
 								List.of(
@@ -195,8 +200,7 @@ class SuggestionTemplateDaoImplTest {
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 	}
 
-	@BeforeAll
-	static void seedChipFixtures(Mutiny.SessionFactory sessionFactory) {
+	private static void seedChipFixtures(Mutiny.SessionFactory sessionFactory) {
 		sessionFactory.withTransaction(session -> {
 			var chain = SuggestionTemplateFixtures.insertRuleWithTemplates(
 					session, CHIP_RULE_ID, DECREASE_RED_MEAT_RECOMMENDATION_ID, BEEF_ID, "Chip role",

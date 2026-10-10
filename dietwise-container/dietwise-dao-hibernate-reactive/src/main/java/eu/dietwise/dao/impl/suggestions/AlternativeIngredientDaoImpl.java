@@ -175,11 +175,19 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 
 	@Override
 	public Uni<Void> revertAlternativeIngredient(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
-		return tx.find(AlternativeIngredientWcEntity.class, id).flatMap(existing -> existing == null
-				? Uni.createFrom().voidItem()
-				: tx.find(AlternativeIngredientEntity.class, id).flatMap(master -> master == null
-																				   ? Uni.createFrom().failure(new EntityNotFoundException(AlternativeIngredientEntity.class, id, "No published Alternative Ingredient to revert"))
-																				   : deleteStaged(tx, id, baseVersion)));
+		return tx.find(AlternativeIngredientWcEntity.class, id).flatMap(existing -> {
+			if (existing == null) {
+				return Uni.createFrom().voidItem();
+			} else {
+				return tx.find(AlternativeIngredientEntity.class, id).flatMap(master -> {
+					if (master == null) {
+						return Uni.createFrom().failure(new EntityNotFoundException(AlternativeIngredientEntity.class, id, "No published Alternative Ingredient to revert"));
+					} else {
+						return deleteStaged(tx, id, baseVersion);
+					}
+				});
+			}
+		});
 	}
 
 	@Override

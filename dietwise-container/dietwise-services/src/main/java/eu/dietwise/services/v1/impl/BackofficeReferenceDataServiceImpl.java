@@ -51,7 +51,7 @@ public class BackofficeReferenceDataServiceImpl implements BackofficeReferenceDa
 	public Uni<ReferenceOption> createTriggerIngredient(User user, String name) {
 		authorization.requireAdmin(user);
 		return persistenceContextFactory.withTransaction(tx -> triggerIngredientDao.listOptions(tx).flatMap(options -> nameExists(options, name)
-				? Uni.createFrom().failure(new DuplicateBusinessKeyException("A Trigger Ingredient named '" + name + "' already exists"))
+				? Uni.createFrom().failure(new DuplicateBusinessKeyException("Already existing Trigger Ingredient named '" + name + "'"))
 				: triggerIngredientDao.createTriggerIngredient(tx, name).map(id -> new ReferenceOption(id, name))));
 	}
 
@@ -65,7 +65,7 @@ public class BackofficeReferenceDataServiceImpl implements BackofficeReferenceDa
 	public Uni<Void> editTriggerIngredient(User user, UUID id, String name, String explanationForLlm, long baseVersion) {
 		authorization.requireAdmin(user);
 		return persistenceContextFactory.withTransaction(tx -> triggerIngredientDao.listOptions(tx).flatMap(options -> nameTaken(options, id, name)
-				? Uni.createFrom().failure(new DuplicateBusinessKeyException("A Trigger Ingredient named '" + name + "' already exists"))
+				? Uni.createFrom().failure(new DuplicateBusinessKeyException("Already existing Trigger Ingredient named '" + name + "'"))
 				: triggerIngredientDao.editTriggerIngredient(tx, id, name, explanationForLlm, baseVersion)));
 	}
 
@@ -99,7 +99,7 @@ public class BackofficeReferenceDataServiceImpl implements BackofficeReferenceDa
 	public Uni<ReferenceOption> createRoleOrTechnique(User user, String name) {
 		authorization.requireAdmin(user);
 		return persistenceContextFactory.withTransaction(tx -> roleOrTechniqueDao.listOptions(tx).flatMap(options -> nameExists(options, name)
-				? Uni.createFrom().failure(new DuplicateBusinessKeyException("A Role or Technique named '" + name + "' already exists"))
+				? Uni.createFrom().failure(new DuplicateBusinessKeyException("Already existing Role or Technique named '" + name + "'"))
 				: roleOrTechniqueDao.createRoleOrTechnique(tx, name).map(id -> new ReferenceOption(id, name))));
 	}
 
@@ -113,7 +113,7 @@ public class BackofficeReferenceDataServiceImpl implements BackofficeReferenceDa
 	public Uni<Void> editRoleOrTechnique(User user, UUID id, String name, String explanationForLlm, long baseVersion) {
 		authorization.requireAdmin(user);
 		return persistenceContextFactory.withTransaction(tx -> roleOrTechniqueDao.listOptions(tx).flatMap(options -> nameTaken(options, id, name)
-				? Uni.createFrom().failure(new DuplicateBusinessKeyException("A Role or Technique named '" + name + "' already exists"))
+				? Uni.createFrom().failure(new DuplicateBusinessKeyException("Already existing Role or Technique named '" + name + "'"))
 				: roleOrTechniqueDao.editRoleOrTechnique(tx, id, name, explanationForLlm, baseVersion)));
 	}
 
@@ -147,7 +147,7 @@ public class BackofficeReferenceDataServiceImpl implements BackofficeReferenceDa
 	public Uni<ReferenceOption> createAlternativeIngredient(User user, String name) {
 		authorization.requireAdmin(user);
 		return persistenceContextFactory.withTransaction(tx -> alternativeIngredientDao.listOptions(tx).flatMap(options -> nameExists(options, name)
-				? Uni.createFrom().failure(new DuplicateBusinessKeyException("An Alternative Ingredient named '" + name + "' already exists"))
+				? Uni.createFrom().failure(new DuplicateBusinessKeyException("Already existing Alternative Ingredient named '" + name + "'"))
 				: alternativeIngredientDao.createAlternativeIngredient(tx, name).map(id -> new ReferenceOption(id, name))));
 	}
 
@@ -165,7 +165,7 @@ public class BackofficeReferenceDataServiceImpl implements BackofficeReferenceDa
 	public Uni<Void> editAlternativeIngredient(User user, UUID id, String name, String explanationForLlm, long baseVersion) {
 		authorization.requireAdmin(user);
 		return persistenceContextFactory.withTransaction(tx -> alternativeIngredientDao.listOptions(tx).flatMap(options -> nameTaken(options, id, name)
-				? Uni.createFrom().failure(new DuplicateBusinessKeyException("An Alternative Ingredient named '" + name + "' already exists"))
+				? Uni.createFrom().failure(new DuplicateBusinessKeyException("Already existing Alternative Ingredient named '" + name + "'"))
 				: alternativeIngredientDao.editAlternativeIngredient(tx, id, name, explanationForLlm, baseVersion)));
 	}
 

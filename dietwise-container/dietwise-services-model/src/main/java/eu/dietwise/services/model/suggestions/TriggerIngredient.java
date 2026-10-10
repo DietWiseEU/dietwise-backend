@@ -1,12 +1,13 @@
 package eu.dietwise.services.model.suggestions;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import eu.dietwise.services.types.suggestions.HasTriggerIngredientId;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface TriggerIngredient extends HasTriggerIngredientId {
+public interface TriggerIngredient extends HasTriggerIngredientId, Serializable {
 	String getName();
 
 	Optional<String> getExplanationForLlm();

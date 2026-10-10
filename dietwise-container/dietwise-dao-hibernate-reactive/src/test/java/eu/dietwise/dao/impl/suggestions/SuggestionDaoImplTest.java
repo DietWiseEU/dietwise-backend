@@ -85,7 +85,12 @@ class SuggestionDaoImplTest {
 			new HibernateReactiveExtension(postgres::getJdbcUrl, postgres.getUsername(), postgres.getPassword());
 
 	@BeforeAll
-	static void seedActiveFilterFixtures(Mutiny.SessionFactory sessionFactory) {
+	static void beforeAll(Mutiny.SessionFactory sessionFactory) {
+		seedActiveFilterFixtures(sessionFactory);
+		seedCountryFixtures(sessionFactory);
+	}
+
+	private static void seedActiveFilterFixtures(Mutiny.SessionFactory sessionFactory) {
 		sessionFactory.withTransaction(session -> SuggestionTemplateFixtures.insertRuleWithTemplates(
 								session, PARTIAL_ACTIVE_RULE_ID, DECREASE_RED_MEAT_RECOMMENDATION_ID, BEEF_ID, "Issue 14 partial-filter role",
 								List.of(
@@ -100,8 +105,7 @@ class SuggestionDaoImplTest {
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 	}
 
-	@BeforeAll
-	static void seedCountryFixtures(Mutiny.SessionFactory sessionFactory) {
+	private static void seedCountryFixtures(Mutiny.SessionFactory sessionFactory) {
 		sessionFactory.withTransaction(session -> SuggestionTemplateFixtures.insertAlternativeIngredient(
 								session, COUNTRY_DATA_ALTERNATIVE_ID, "Country-filter alternative with seasonality and cost")
 						.chain(() -> SuggestionTemplateFixtures.insertAlternativeIngredient(

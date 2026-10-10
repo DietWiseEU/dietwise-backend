@@ -24,6 +24,7 @@ import eu.dietwise.common.dao.reactive.ReactivePersistenceContext;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.types.ReferenceDetails;
 import eu.dietwise.common.types.ReferenceOption;
+import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.dao.jpa.suggestions.RoleOrTechniqueEntity;
 import eu.dietwise.dao.jpa.suggestions.RoleOrTechniqueEntity_;
 import eu.dietwise.dao.jpa.suggestions.RoleOrTechniqueTranslationEntity;
@@ -37,7 +38,6 @@ import eu.dietwise.dao.jpa.suggestions.RoleOrTechniqueWcEntity_;
 import eu.dietwise.dao.suggestions.RoleOrTechniqueDao;
 import eu.dietwise.services.model.suggestions.ImmutableRoleOrTechnique;
 import eu.dietwise.services.model.suggestions.RoleOrTechnique;
-import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.v1.types.RecipeLanguage;
 import io.smallrye.mutiny.Uni;
@@ -105,11 +105,18 @@ public class RoleOrTechniqueDaoImpl implements RoleOrTechniqueDao {
 
 	@Override
 	public Uni<Void> revertRoleOrTechnique(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
-		return tx.find(RoleOrTechniqueWcEntity.class, id).flatMap(existing -> existing == null
-				? Uni.createFrom().voidItem()
-				: tx.find(RoleOrTechniqueEntity.class, id).flatMap(master -> master == null
-						? Uni.createFrom().failure(new EntityNotFoundException(RoleOrTechniqueEntity.class, id, "No published Role or Technique to revert"))
-						: deleteStaged(tx, id, baseVersion)));
+		return tx.find(RoleOrTechniqueWcEntity.class, id).flatMap(existing -> {
+			if (existing == null) {
+				return Uni.createFrom().voidItem();
+			} else {
+				return tx.find(RoleOrTechniqueEntity.class, id).flatMap(master -> {
+					if (master == null) {
+						return Uni.createFrom().failure(new EntityNotFoundException(RoleOrTechniqueEntity.class, id, "No published Role or Technique to revert"));
+					}
+					return deleteStaged(tx, id, baseVersion);
+				});
+			}
+		});
 	}
 
 	@Override

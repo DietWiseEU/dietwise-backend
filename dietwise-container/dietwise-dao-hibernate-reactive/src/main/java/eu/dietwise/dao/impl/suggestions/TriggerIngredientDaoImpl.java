@@ -26,6 +26,7 @@ import eu.dietwise.common.dao.reactive.ReactivePersistenceContext;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.types.ReferenceDetails;
 import eu.dietwise.common.types.ReferenceOption;
+import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity_;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientTranslationEntity;
@@ -38,7 +39,6 @@ import eu.dietwise.dao.jpa.suggestions.TriggerIngredientWcEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientWcEntity_;
 import eu.dietwise.dao.suggestions.TriggerIngredientDao;
 import eu.dietwise.services.model.suggestions.ImmutableTriggerIngredient;
-import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.services.model.suggestions.TriggerIngredient;
 import eu.dietwise.v1.types.RecipeLanguage;
@@ -107,11 +107,18 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 
 	@Override
 	public Uni<Void> revertTriggerIngredient(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
-		return tx.find(TriggerIngredientWcEntity.class, id).flatMap(existing -> existing == null
-				? Uni.createFrom().voidItem()
-				: tx.find(TriggerIngredientEntity.class, id).flatMap(master -> master == null
-						? Uni.createFrom().failure(new EntityNotFoundException(TriggerIngredientEntity.class, id, "No published Trigger Ingredient to revert"))
-						: deleteStaged(tx, id, baseVersion)));
+		return tx.find(TriggerIngredientWcEntity.class, id).flatMap(existing -> {
+			if (existing == null) {
+				return Uni.createFrom().voidItem();
+			} else {
+				return tx.find(TriggerIngredientEntity.class, id).flatMap(master -> {
+					if (master == null) {
+						return Uni.createFrom().failure(new EntityNotFoundException(TriggerIngredientEntity.class, id, "No published Trigger Ingredient to revert"));
+					}
+					return deleteStaged(tx, id, baseVersion);
+				});
+			}
+		});
 	}
 
 	@Override
