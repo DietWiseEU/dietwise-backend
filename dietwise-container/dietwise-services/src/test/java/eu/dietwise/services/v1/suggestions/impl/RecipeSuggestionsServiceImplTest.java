@@ -82,6 +82,7 @@ class RecipeSuggestionsServiceImplTest {
 	private static final String INGREDIENT_NAME = "flour";
 	private static final String ROLE_MARKDOWN = "- binder";
 	private static final String INSTRUCTIONS_MARKDOWN = "- mix";
+	private static final String RECOMMENDATIONS_MARKDOWN = "- fiber\n- sodium";
 	private static final SuggestionTemplateId FIRST_SUGGESTION_ID =
 			new GenericSuggestionTemplateId("00000000-0000-0000-0000-000000000001");
 	private static final SuggestionTemplateId SECOND_SUGGESTION_ID =
@@ -206,16 +207,19 @@ class RecipeSuggestionsServiceImplTest {
 	}
 
 	@Test
-	void makeSuggestionsGivesNoComponentsToAnIngredientMatchingNoTriggerIngredient() {
+	void makeSuggestionsAsksTheAiForTheComponentsOfAnIngredientMatchingNoTriggerIngredient() {
 		var hasUserId = hasUserId();
 		stubTheDataAndTheMatchingOfTheIngredient(hasUserId, ImmutablePersonalInfo.builder().build(), mock(RoleOrTechnique.class), "unknown");
+		when(suggestionsAiFacade.convertRecommendationsToMarkdownList(any())).thenReturn(RECOMMENDATIONS_MARKDOWN);
+		when(suggestionsAiFacade.matchIngredientsWithRecommendations(RecipeLanguage.EN, RECOMMENDATIONS_MARKDOWN, INGREDIENT_NAME))
+				.thenReturn(Uni.createFrom().item(Set.of(" Fiber ", "a component the model invented")));
 		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()))).thenReturn(Uni.createFrom().item(List.of()));
 
 		MakeSuggestionsResult result = sut.makeSuggestions(CORRELATION_ID, hasUserId, RecipeLanguage.EN, RECIPE, null)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 
 		assertThat(result.message().suggestions()).isEmpty();
-		assertThat(result.recommendations()).containsExactly(entry(INGREDIENT_ID, Set.of()));
+		assertThat(result.recommendations()).containsExactly(entry(INGREDIENT_ID, Set.of(COMPONENT_FIBER)));
 		assertThat(result.primaryComponents()).isEmpty();
 		verify(ruleDao, never()).findByTriggerIngredient(any(), any(), any());
 	}

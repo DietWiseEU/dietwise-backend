@@ -6,6 +6,7 @@ import static eu.dietwise.common.utils.UniComprehensions.forcm;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -153,10 +154,33 @@ public class RecipeSuggestionsServiceImpl implements RecipeSuggestionsService {
 				determineRoleOrTechnique(correlationId, recipe, lang, data, ingredient),
 				determineTriggerIngredient(correlationId, lang, data, ingredient),
 				(role, triggerIngredient) -> processIngredientOfTriggerIngredient(tx, correlationId, recipe, lang, data, ingredient, role, triggerIngredient)
-		).onFailure(NonFatalIngredientProcessingException.class).recoverWithItem(t -> {
+		).onFailure(TriggerIngredientFromAiNotInDbException.class).recoverWithUni(() -> processIngredientWithoutTriggerIngredient(correlationId, lang, data, ingredient))
+		.onFailure(NonFatalIngredientProcessingException.class).recoverWithItem(t -> {
 			LOG.warn("Failed to process ingredient <{}>: {} -> {}", correlationId, ingredient.getNameInRecipe(), t.getMessage());
 			return SuggestionsAndComponents.empty(ingredient);
 		});
+	}
+
+	/**
+	 * An ingredient that matches no Trigger Ingredient suggests nothing; the AI determines the components it contributes
+	 * to the score of the recipe.
+	 */
+	private Uni<SuggestionsAndComponents> processIngredientWithoutTriggerIngredient(
+			UUID correlationId,
+			RecipeLanguage lang,
+			RecipeSuggestionNecessaryData data,
+			Ingredient ingredient
+	) {
+		String availableRecommendationsAsMarkdownList = suggestionsAiFacade.convertRecommendationsToMarkdownList(data.recommendations().values());
+		return suggestionsAiFacade.matchIngredientsWithRecommendations(lang, availableRecommendationsAsMarkdownList, ingredient.getNameInRecipe())
+				.map(componentNames -> {
+					LOG.info("matchIngredientsWithRecommendations without trigger ingredient for <{}>: {} -> {}", correlationId, ingredient.getNameInRecipe(), componentNames);
+					Set<RecommendationComponent> components = componentNames.stream()
+							.map(name -> data.recommendations().get(name.trim().toLowerCase()))
+							.filter(Objects::nonNull)
+							.collect(Collectors.toSet());
+					return SuggestionsAndComponents.withoutSuggestions(ingredient, components);
+				});
 	}
 
 	/**

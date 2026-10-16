@@ -202,8 +202,10 @@ public class SuggestionsAiFacadeImpl implements SuggestionsAiFacade {
 	private Set<String> postProcessRecommendationsFromAi(String ingredientNameInRecipe, String recommendationsFromAi) {
 		LOG.debug("matchIngredientsWithRecommendations responded for ingredient <{}>: {}", ingredientNameInRecipe, recommendationsFromAi);
 		if (recommendationsFromAi == null) return Collections.emptySet();
-		recommendationsFromAi = recommendationsFromAi.trim();
-		return Set.of(recommendationsFromAi.split("\\r?\\n"));
+		return recommendationsFromAi.lines()
+				.map(line -> line.replaceFirst("^\\s*[-*]\\s+", "").trim())
+				.filter(line -> !line.isEmpty())
+				.collect(Collectors.toSet());
 	}
 
 	@Override

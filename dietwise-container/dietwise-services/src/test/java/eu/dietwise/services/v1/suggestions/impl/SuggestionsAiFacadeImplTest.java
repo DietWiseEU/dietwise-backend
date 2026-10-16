@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 import eu.dietwise.dao.recommendations.RecommendationDao;
 import eu.dietwise.dao.suggestions.AlternativeIngredientDao;
@@ -71,7 +72,27 @@ class SuggestionsAiFacadeImplTest {
 		assertThat(promptCaptor.getValue()).contains("Decrease red meat");
 	}
 
+	@Test
+	void matchIngredientsWithRecommendationsReadsOneComponentPerLineToleratingListMarkersBlankLinesAndRepeats() {
+		var ingredientMatchInRecommendationsAiSelector = mock(IngredientMatchInRecommendationsAiSelector.class);
+		var sut = facadeWith(findBestRuleAiSelector, ingredientMatchInRecommendationsAiSelector);
+		when(ingredientMatchInRecommendationsAiSelector.matchIngredientsWithRecommendations(RecipeLanguage.EN, "- fiber\n- vegetables", "spinach"))
+				.thenReturn("- fiber\n\n  vegetables \n* fiber\n");
+
+		Set<String> components = sut.matchIngredientsWithRecommendations(RecipeLanguage.EN, "- fiber\n- vegetables", "spinach")
+				.await().atMost(AWAIT);
+
+		assertThat(components).containsExactlyInAnyOrder("fiber", "vegetables");
+	}
+
 	private static SuggestionsAiFacadeImpl facadeWith(FindBestRuleAiSelector findBestRuleAiSelector) {
+		return facadeWith(findBestRuleAiSelector, mock(IngredientMatchInRecommendationsAiSelector.class));
+	}
+
+	private static SuggestionsAiFacadeImpl facadeWith(
+			FindBestRuleAiSelector findBestRuleAiSelector,
+			IngredientMatchInRecommendationsAiSelector ingredientMatchInRecommendationsAiSelector
+	) {
 		return new SuggestionsAiFacadeImpl(
 				mock(RoleOrTechniqueDao.class),
 				mock(TriggerIngredientDao.class),
@@ -79,7 +100,7 @@ class SuggestionsAiFacadeImplTest {
 				mock(RecommendationDao.class),
 				mock(IngredientRoleAiSelector.class),
 				mock(TriggerIngredientMatcherAiSelector.class),
-				mock(IngredientMatchInRecommendationsAiSelector.class),
+				ingredientMatchInRecommendationsAiSelector,
 				findBestRuleAiSelector,
 				mock(AlternativeSuggestionAiSelector.class),
 				new I18nMessages(),
