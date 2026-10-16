@@ -23,8 +23,18 @@ A set of ingredients and instructions extracted from a web page. Extracted fresh
 An item in a recipe's ingredient list. Not stably identifiable across assessments — its in-recipe id is regenerated every extraction.
 
 **TriggerIngredient**:
-Master data naming an ingredient (or class of ingredients) whose presence in a recipe can trigger a substitution Rule.
+Master data naming an ingredient (or class of ingredients) whose presence in a recipe can trigger a substitution Rule. It also carries the Components a recipe ingredient matched to it contributes to the score of the recipe, curated by the scientific partners.
 _Avoid_: trigger
+
+**Scoring-only TriggerIngredient**:
+A TriggerIngredient without active Rules. It suggests nothing, but its Components still count in the score of the recipe. A supported convention, not an error.
+
+**Component**:
+A GBD Recommendation as used for scoring, named by its component for scoring and either ENCOURAGED (raises the score) or LIMITED (lowers it). Identified by the Recommendation's master name, which is language-independent; the component name itself is localized.
+_Avoid_: dietary component, recommendation component
+
+**Primary component**:
+For one ingredient of one assessed recipe, the Component of the Recommendation of the Rule selected for it. Always among the ingredient's Components; absent when no Rule was selected.
 
 **AlternativeIngredient**:
 Master data naming a healthier or more sustainable substitute that a Suggestion proposes in place of a recipe ingredient.
