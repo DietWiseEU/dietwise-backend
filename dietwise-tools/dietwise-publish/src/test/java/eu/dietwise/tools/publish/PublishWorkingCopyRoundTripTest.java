@@ -42,6 +42,7 @@ class PublishWorkingCopyRoundTripTest {
 	private static final String RULE1 = "00000000-0000-0000-0000-0000000000f1";
 	private static final String TEMPLATE_ORPHAN = "00000000-0000-0000-0000-0000000000b1";
 	private static final String MISSING_RULE = "00000000-0000-0000-0000-0000000000ff";
+	private static final String MISSING_TRIGGER_INGREDIENT = "00000000-0000-0000-0000-0000000000fe";
 
 	private static final String CHANGELOG_FILE = "publish.xml";
 
@@ -95,6 +96,14 @@ class PublishWorkingCopyRoundTripTest {
 				+ "recommendation_id,present) VALUES ('" + ALT1 + "','" + REC1 + "',true)");
 		exec(connection, "INSERT INTO dw_alternative_ingredient_seasonality_wc(alternative_ingredient_id,country,"
 				+ "month_from,month_to,version) VALUES ('" + ALT1 + "','GR',NULL,NULL,2)");
+		// staged: a component-for-scoring link of the trigger ingredient staged in this same publish
+		exec(connection, "INSERT INTO dw_trigger_ingredient_components_for_scoring_wc(trigger_ingredient_id,"
+				+ "recommendation_id,present) VALUES ('" + TI2 + "','" + REC1 + "',true)");
+
+		// staged: a component-for-scoring link of a trigger ingredient that exists nowhere; it must be dropped - never
+		// published to master and never restored on rollback
+		exec(connection, "INSERT INTO dw_trigger_ingredient_components_for_scoring_wc(trigger_ingredient_id,"
+				+ "recommendation_id,present) VALUES ('" + MISSING_TRIGGER_INGREDIENT + "','" + REC1 + "',true)");
 
 		// staged: a suggestion template whose Rule exists nowhere (an orphan, as found in real data); it must be
 		// dropped - never published to master and never restored on rollback
@@ -116,6 +125,11 @@ class PublishWorkingCopyRoundTripTest {
 				+ "alternative_ingredient_id='" + ALT1 + "' AND recommendation_id='" + REC1 + "'")).isEqualTo(1);
 		assertThat(count(connection, "SELECT count(*) FROM dw_alternative_ingredient_seasonality WHERE "
 				+ "alternative_ingredient_id='" + ALT1 + "' AND country='GR'")).isEqualTo(0);
+		assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient_components_for_scoring WHERE "
+				+ "trigger_ingredient_id='" + TI2 + "' AND recommendation_id='" + REC1 + "'")).isEqualTo(1);
+		// the orphan trigger ingredient link was dropped: not published to master
+		assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient_components_for_scoring WHERE "
+				+ "trigger_ingredient_id='" + MISSING_TRIGGER_INGREDIENT + "'")).isZero();
 		// the orphan template was dropped: not published to master
 		assertThat(count(connection, "SELECT count(*) FROM dw_suggestion_template WHERE id='" + TEMPLATE_ORPHAN + "'"))
 				.isZero();
@@ -133,8 +147,14 @@ class PublishWorkingCopyRoundTripTest {
 				+ "alternative_ingredient_id='" + ALT1 + "' AND recommendation_id='" + REC1 + "'")).isEqualTo(0);
 		assertThat(scalar(connection, "SELECT month_from FROM dw_alternative_ingredient_seasonality WHERE "
 				+ "alternative_ingredient_id='" + ALT1 + "' AND country='GR'")).isEqualTo("3");
-		// the Working Copy is restored to its four publishable staged rows; the dropped rows are not brought back
-		assertThat(totalWorkingCopyRows(connection)).isEqualTo(4);
+		assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient_components_for_scoring WHERE "
+				+ "trigger_ingredient_id='" + TI2 + "' AND recommendation_id='" + REC1 + "'")).isZero();
+		// the Working Copy is restored to its five publishable staged rows; the dropped rows are not brought back
+		assertThat(totalWorkingCopyRows(connection)).isEqualTo(5);
+		assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient_components_for_scoring_wc WHERE "
+				+ "trigger_ingredient_id='" + TI2 + "' AND recommendation_id='" + REC1 + "'")).isEqualTo(1);
+		assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient_components_for_scoring_wc WHERE "
+				+ "trigger_ingredient_id='" + MISSING_TRIGGER_INGREDIENT + "'")).isZero();
 		assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient_wc WHERE id='" + TI2 + "'")).isEqualTo(1);
 		assertThat(scalar(connection, "SELECT month_from FROM dw_alternative_ingredient_seasonality_wc WHERE "
 				+ "alternative_ingredient_id='" + ALT1 + "' AND country='GR'")).isNull();

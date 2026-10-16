@@ -3,13 +3,10 @@ package eu.dietwise.services.v1.impl;
 import static eu.dietwise.common.utils.UniComprehensions.forc;
 import static eu.dietwise.common.utils.UniComprehensions.forcm;
 
-import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import eu.dietwise.common.dao.EntityInUseException;
@@ -27,14 +24,10 @@ import eu.dietwise.services.v1.BackofficeAlternativeIngredientsService;
 import eu.dietwise.services.v1.types.AlternativeIngredientRecommendationGrid;
 import eu.dietwise.services.v1.types.RecommendationColumn;
 import eu.dietwise.services.v1.types.StagedAlternativeIngredient;
-import eu.dietwise.v1.types.TypeOfRecommendation;
 import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
 public class BackofficeAlternativeIngredientsServiceImpl implements BackofficeAlternativeIngredientsService {
-	/** The grid shows the ENCOURAGED columns first, then the LIMITED ones; each group keeps the order of the Recommendations. */
-	private static final List<TypeOfRecommendation> COLUMN_GROUP_ORDER = List.of(TypeOfRecommendation.ENCOURAGED, TypeOfRecommendation.LIMITED);
-
 	private final AlternativeIngredientDao alternativeIngredientDao;
 	private final RecommendationDao recommendationDao;
 	private final SuggestionTemplateDao suggestionTemplateDao;
@@ -105,11 +98,8 @@ public class BackofficeAlternativeIngredientsServiceImpl implements BackofficeAl
 			Map<UUID, Set<UUID>> masterLinks,
 			Map<UUID, Map<UUID, Boolean>> stagedLinks
 	) {
-		List<RecommendationColumn> columns = recommendations.stream()
-				.map(recommendation -> new RecommendationColumn(recommendation.id(), recommendation.componentForScoring(), recommendation.typeOfRecommendation()))
-				.sorted(Comparator.comparingInt(column -> COLUMN_GROUP_ORDER.indexOf(column.typeOfRecommendation())))
-				.toList();
-		Set<UUID> columnIds = columns.stream().map(RecommendationColumn::id).collect(Collectors.toSet());
+		List<RecommendationColumn> columns = RecommendationColumns.inDisplayOrder(recommendations);
+		Set<UUID> columnIds = RecommendationColumns.ids(columns);
 		List<StagedAlternativeIngredient> rows = ingredients.stream()
 				.map(ingredient -> toRow(ingredient, columnIds, langsById.get(ingredient.id()), masterLinks.get(ingredient.id()), stagedLinks.get(ingredient.id())))
 				.toList();
@@ -129,14 +119,7 @@ public class BackofficeAlternativeIngredientsServiceImpl implements BackofficeAl
 				ingredient.published(),
 				ingredient.version(),
 				BackofficeTranslations.translationStates(langs),
-				retainColumns(masterLinks, columnIds),
-				retainColumns(stagedLinks == null ? null : stagedLinks.keySet(), columnIds));
-	}
-
-	private static Set<UUID> retainColumns(Set<UUID> ids, Set<UUID> columnIds) {
-		if (ids == null) {
-			return Set.of();
-		}
-		return ids.stream().filter(columnIds::contains).collect(Collectors.toCollection(LinkedHashSet::new));
+				RecommendationColumns.retainColumns(masterLinks, columnIds),
+				RecommendationColumns.retainColumns(stagedLinks == null ? null : stagedLinks.keySet(), columnIds));
 	}
 }

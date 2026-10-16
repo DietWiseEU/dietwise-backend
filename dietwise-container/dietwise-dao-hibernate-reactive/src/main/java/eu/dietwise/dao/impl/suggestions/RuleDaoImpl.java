@@ -2,7 +2,6 @@ package eu.dietwise.dao.impl.suggestions;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-
 import static eu.dietwise.common.utils.UniComprehensions.forcm;
 
 import java.util.Arrays;
@@ -34,6 +33,7 @@ import eu.dietwise.common.dao.StaleVersionException;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceContext;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.types.VersionedText;
+import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.dao.jpa.recommendations.RecommendationEntity;
 import eu.dietwise.dao.jpa.recommendations.RecommendationEntity_;
 import eu.dietwise.dao.jpa.suggestions.RoleOrTechniqueEntity;
@@ -43,11 +43,11 @@ import eu.dietwise.dao.jpa.suggestions.RoleOrTechniqueWcEntity_;
 import eu.dietwise.dao.jpa.suggestions.RuleEntity;
 import eu.dietwise.dao.jpa.suggestions.RuleEntity_;
 import eu.dietwise.dao.jpa.suggestions.RuleTranslationEntity;
-import eu.dietwise.dao.jpa.suggestions.RuleTranslationEntity_;
 import eu.dietwise.dao.jpa.suggestions.RuleTranslationEntityId;
+import eu.dietwise.dao.jpa.suggestions.RuleTranslationEntity_;
 import eu.dietwise.dao.jpa.suggestions.RuleTranslationWcEntity;
-import eu.dietwise.dao.jpa.suggestions.RuleTranslationWcEntity_;
 import eu.dietwise.dao.jpa.suggestions.RuleTranslationWcEntityId;
+import eu.dietwise.dao.jpa.suggestions.RuleTranslationWcEntity_;
 import eu.dietwise.dao.jpa.suggestions.RuleWcEntity;
 import eu.dietwise.dao.jpa.suggestions.RuleWcEntity_;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity;
@@ -55,12 +55,11 @@ import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity_;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientWcEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientWcEntity_;
 import eu.dietwise.dao.suggestions.RuleDao;
-import eu.dietwise.dao.impl.translations.GridTranslations;
-import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.services.model.suggestions.RuleBusinessKey;
 import eu.dietwise.services.model.suggestions.RuleReferences;
 import eu.dietwise.services.model.suggestions.StagedNewRule;
 import eu.dietwise.services.model.suggestions.StagedRuleOverlay;
+import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.services.types.suggestions.HasTriggerIngredientId;
 import eu.dietwise.v1.model.ImmutableRule;
 import eu.dietwise.v1.model.Rule;
@@ -292,6 +291,62 @@ public class RuleDaoImpl implements RuleDao {
 			merged.putAll(workingCopy);
 			return merged;
 		}));
+	}
+
+	@Override
+	public Uni<Map<UUID, Set<UUID>>> findActiveRecommendationIdsByTriggerIngredient(ReactivePersistenceContext em) {
+		return forcm(
+				masterRecommendationAssignments(em),
+				_ -> workingCopyRecommendationAssignments(em),
+				(master, workingCopy) -> {
+					Map<UUID, RecommendationAssignment> merged = new HashMap<>(master);
+					merged.putAll(workingCopy);
+					Map<UUID, Set<UUID>> byTriggerIngredient = new HashMap<>();
+					merged.values().stream()
+							.filter(RecommendationAssignment::active)
+							.forEach(assignment -> byTriggerIngredient.computeIfAbsent(assignment.triggerIngredientId(), _ -> new HashSet<>())
+									.add(assignment.recommendationId()));
+					return byTriggerIngredient;
+				});
+	}
+
+	/**
+	 * Which Recommendation a Rule assigns to which Trigger Ingredient, and whether the Rule is active.
+	 */
+	private record RecommendationAssignment(UUID triggerIngredientId, UUID recommendationId, boolean active) {
+	}
+
+	private Uni<Map<UUID, RecommendationAssignment>> masterRecommendationAssignments(ReactivePersistenceContext em) {
+		var cb = em.getCriteriaBuilder();
+		CriteriaQuery<Tuple> q = cb.createTupleQuery();
+		Root<RuleEntity> rule = q.from(RuleEntity.class);
+		q.select(cb.tuple(
+				rule.get(RuleEntity_.id),
+				rule.get(RuleEntity_.triggerIngredient).get(TriggerIngredientEntity_.id),
+				rule.get(RuleEntity_.recommendation).get(RecommendationEntity_.id),
+				rule.get(RuleEntity_.active)
+		));
+		return em.createQuery(q).getResultList().map(RuleDaoImpl::toRecommendationAssignments);
+	}
+
+	private Uni<Map<UUID, RecommendationAssignment>> workingCopyRecommendationAssignments(ReactivePersistenceContext em) {
+		var cb = em.getCriteriaBuilder();
+		CriteriaQuery<Tuple> q = cb.createTupleQuery();
+		Root<RuleWcEntity> wc = q.from(RuleWcEntity.class);
+		q.select(cb.tuple(
+				wc.get(RuleWcEntity_.id),
+				wc.get(RuleWcEntity_.triggerIngredientId),
+				wc.get(RuleWcEntity_.recommendationId),
+				wc.get(RuleWcEntity_.active)
+		));
+		return em.createQuery(q).getResultList().map(RuleDaoImpl::toRecommendationAssignments);
+	}
+
+	private static Map<UUID, RecommendationAssignment> toRecommendationAssignments(List<Tuple> rows) {
+		return rows.stream().collect(toMap(
+				tuple -> tuple.get(0, UUID.class),
+				tuple -> new RecommendationAssignment(tuple.get(1, UUID.class), tuple.get(2, UUID.class), tuple.get(3, Boolean.class))
+		));
 	}
 
 	private Uni<Map<UUID, RuleReferences>> masterReferenceIds(ReactivePersistenceContext em) {

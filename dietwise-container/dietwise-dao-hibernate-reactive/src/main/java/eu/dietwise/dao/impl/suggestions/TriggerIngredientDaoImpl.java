@@ -1,16 +1,21 @@
 package eu.dietwise.dao.impl.suggestions;
 
 import static eu.dietwise.common.utils.UniComprehensions.forc;
+import static eu.dietwise.common.utils.UniComprehensions.forcm;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -27,6 +32,10 @@ import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.types.ReferenceDetails;
 import eu.dietwise.common.types.ReferenceOption;
 import eu.dietwise.dao.impl.translations.GridTranslations;
+import eu.dietwise.dao.jpa.recommendations.RecommendationEntity_;
+import eu.dietwise.dao.jpa.suggestions.TriggerIngredientComponentForScoringWcEntity;
+import eu.dietwise.dao.jpa.suggestions.TriggerIngredientComponentForScoringWcEntityId;
+import eu.dietwise.dao.jpa.suggestions.TriggerIngredientComponentForScoringWcEntity_;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity_;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientTranslationEntity;
@@ -38,6 +47,7 @@ import eu.dietwise.dao.jpa.suggestions.TriggerIngredientTranslationWcEntity_;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientWcEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientWcEntity_;
 import eu.dietwise.dao.suggestions.TriggerIngredientDao;
+import eu.dietwise.services.model.suggestions.BackofficeTriggerIngredient;
 import eu.dietwise.services.model.suggestions.ImmutableTriggerIngredient;
 import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.services.model.suggestions.TriggerIngredient;
@@ -63,6 +73,56 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	@Override
 	public Uni<List<ReferenceOption>> listOptions(ReactivePersistenceContext em) {
 		return masterOptions(em).flatMap(master -> mirrorOptions(em).map(mirror -> mergeOptions(master, mirror)));
+	}
+
+	@Override
+	public Uni<List<BackofficeTriggerIngredient>> listForBackoffice(ReactivePersistenceContext em) {
+		return forcm(
+				masterNamesById(em),
+				master -> mirrorRowsById(em),
+				TriggerIngredientDaoImpl::mergeBackoffice
+		);
+	}
+
+	@Override
+	public Uni<Map<UUID, Set<UUID>>> findMasterRecommendationLinks(ReactivePersistenceContext em) {
+		var cb = em.getCriteriaBuilder();
+		CriteriaQuery<Tuple> q = cb.createTupleQuery();
+		Root<TriggerIngredientEntity> ti = q.from(TriggerIngredientEntity.class);
+		var rec = ti.join(TriggerIngredientEntity_.componentsForScoring);
+		q.select(cb.tuple(ti.get(TriggerIngredientEntity_.id), rec.get(RecommendationEntity_.id)));
+		return em.createQuery(q).getResultList().map(rows -> {
+			Map<UUID, Set<UUID>> byId = new HashMap<>();
+			for (Tuple row : rows) {
+				byId.computeIfAbsent(row.get(0, UUID.class), _ -> new HashSet<>()).add(row.get(1, UUID.class));
+			}
+			return byId;
+		});
+	}
+
+	@Override
+	public Uni<Map<UUID, Map<UUID, Boolean>>> findStagedRecommendationLinks(ReactivePersistenceContext em) {
+		var cb = em.getCriteriaBuilder();
+		var q = cb.createQuery(TriggerIngredientComponentForScoringWcEntity.class);
+		q.from(TriggerIngredientComponentForScoringWcEntity.class);
+		return em.createQuery(q).getResultList().map(rows -> {
+			Map<UUID, Map<UUID, Boolean>> byId = new HashMap<>();
+			for (TriggerIngredientComponentForScoringWcEntity row : rows) {
+				byId.computeIfAbsent(row.getTriggerIngredientId(), _ -> new HashMap<>())
+						.put(row.getRecommendationId(), row.isPresent());
+			}
+			return byId;
+		});
+	}
+
+	@Override
+	public Uni<Void> toggleRecommendationLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId, boolean present) {
+		var workingCopyId = new TriggerIngredientComponentForScoringWcEntityId(triggerIngredientId, recommendationId);
+		return forc(
+				tx.find(TriggerIngredientComponentForScoringWcEntity.class, workingCopyId),
+				_ -> masterHasLink(tx, triggerIngredientId, recommendationId),
+				(existing, masterHasLink) -> applyToggle(tx, triggerIngredientId, recommendationId, present, existing, masterHasLink)
+		);
 	}
 
 	@Override
@@ -345,6 +405,91 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 		master.forEach(option -> byId.put(option.id(), option));
 		mirror.forEach(option -> byId.put(option.id(), option));
 		return byId.values().stream().sorted(Comparator.comparing(ReferenceOption::name)).toList();
+	}
+
+	private Uni<Map<UUID, String>> masterNamesById(ReactivePersistenceContext em) {
+		var cb = em.getCriteriaBuilder();
+		CriteriaQuery<Tuple> q = cb.createTupleQuery();
+		Root<TriggerIngredientEntity> root = q.from(TriggerIngredientEntity.class);
+		q.select(cb.tuple(root.get(TriggerIngredientEntity_.id), root.get(TriggerIngredientEntity_.name)));
+		return em.createQuery(q).getResultList().map(rows -> {
+			Map<UUID, String> byId = new HashMap<>();
+			for (Tuple row : rows) {
+				byId.put(row.get(0, UUID.class), row.get(1, String.class));
+			}
+			return byId;
+		});
+	}
+
+	private Uni<Map<UUID, TriggerIngredientWcEntity>> mirrorRowsById(ReactivePersistenceContext em) {
+		var cb = em.getCriteriaBuilder();
+		var q = cb.createQuery(TriggerIngredientWcEntity.class);
+		q.from(TriggerIngredientWcEntity.class);
+		return em.createQuery(q).getResultList().map(list -> list.stream()
+				.collect(Collectors.toMap(TriggerIngredientWcEntity::getId, w -> w)));
+	}
+
+	private static List<BackofficeTriggerIngredient> mergeBackoffice(Map<UUID, String> master, Map<UUID, TriggerIngredientWcEntity> mirror) {
+		Set<UUID> ids = new HashSet<>(master.keySet());
+		ids.addAll(mirror.keySet());
+		return ids.stream().map(id -> {
+			TriggerIngredientWcEntity wc = mirror.get(id);
+			boolean published = master.containsKey(id);
+			return wc != null
+					? new BackofficeTriggerIngredient(id, wc.getName(), published, wc.getVersion())
+					: new BackofficeTriggerIngredient(id, master.get(id), true, 0L);
+		}).sorted(Comparator.comparing(BackofficeTriggerIngredient::name)).toList();
+	}
+
+	private Uni<Boolean> masterHasLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId) {
+		var cb = tx.getCriteriaBuilder();
+		CriteriaQuery<UUID> q = cb.createQuery(UUID.class);
+		Root<TriggerIngredientEntity> ti = q.from(TriggerIngredientEntity.class);
+		var rec = ti.join(TriggerIngredientEntity_.componentsForScoring);
+		q.select(ti.get(TriggerIngredientEntity_.id)).where(cb.and(
+				cb.equal(ti.get(TriggerIngredientEntity_.id), triggerIngredientId),
+				cb.equal(rec.get(RecommendationEntity_.id), recommendationId)));
+		return tx.createQuery(q).getResultList().map(rows -> !rows.isEmpty());
+	}
+
+	private Uni<Void> applyToggle(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId, boolean present, TriggerIngredientComponentForScoringWcEntity existing, boolean masterHasLink) {
+		return switch (StagedLinkChange.of(present, existing == null ? null : existing.isPresent(), masterHasLink)) {
+			case NONE -> Uni.createFrom().voidItem();
+			case SEED -> seedStagedLink(tx, triggerIngredientId, recommendationId, present);
+			case UPDATE -> updateStagedLink(tx, triggerIngredientId, recommendationId, present);
+			case DELETE -> deleteStagedLink(tx, triggerIngredientId, recommendationId);
+		};
+	}
+
+	private Uni<Void> seedStagedLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId, boolean present) {
+		var entity = new TriggerIngredientComponentForScoringWcEntity();
+		entity.setTriggerIngredientId(triggerIngredientId);
+		entity.setRecommendationId(recommendationId);
+		entity.setPresent(present);
+		return tx.persist(entity).replaceWithVoid();
+	}
+
+	private Uni<Void> updateStagedLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId, boolean present) {
+		var cb = tx.getCriteriaBuilder();
+		CriteriaUpdate<TriggerIngredientComponentForScoringWcEntity> cu = cb.createCriteriaUpdate(TriggerIngredientComponentForScoringWcEntity.class);
+		Root<TriggerIngredientComponentForScoringWcEntity> wc = cu.getRoot();
+		cu.set(wc.get(TriggerIngredientComponentForScoringWcEntity_.present), present);
+		cu.where(linkRowAt(cb, wc, triggerIngredientId, recommendationId));
+		return tx.createUpdate(cu).execute().replaceWithVoid();
+	}
+
+	private Uni<Void> deleteStagedLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId) {
+		var cb = tx.getCriteriaBuilder();
+		CriteriaDelete<TriggerIngredientComponentForScoringWcEntity> cd = cb.createCriteriaDelete(TriggerIngredientComponentForScoringWcEntity.class);
+		Root<TriggerIngredientComponentForScoringWcEntity> wc = cd.getRoot();
+		cd.where(linkRowAt(cb, wc, triggerIngredientId, recommendationId));
+		return tx.createDelete(cd).execute().replaceWithVoid();
+	}
+
+	private static Predicate linkRowAt(CriteriaBuilder cb, Root<TriggerIngredientComponentForScoringWcEntity> wc, UUID triggerIngredientId, UUID recommendationId) {
+		return cb.and(
+				cb.equal(wc.get(TriggerIngredientComponentForScoringWcEntity_.triggerIngredientId), triggerIngredientId),
+				cb.equal(wc.get(TriggerIngredientComponentForScoringWcEntity_.recommendationId), recommendationId));
 	}
 
 	private Uni<Map<UUID, TriggerIngredientTranslationEntity>> loadTranslationsByTriggerIngredientId(

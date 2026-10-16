@@ -462,15 +462,12 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	}
 
 	private Uni<Void> applyToggle(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, UUID recommendationId, boolean present, AlternativeIngredientComponentForScoringWcEntity existing, boolean masterHasLink) {
-		if (present == masterHasLink) {
-			return existing == null ? Uni.createFrom().voidItem() : deleteStagedLink(tx, alternativeIngredientId, recommendationId);
-		}
-		if (existing == null) {
-			return seedStagedLink(tx, alternativeIngredientId, recommendationId, present);
-		}
-		return existing.isPresent() == present
-				? Uni.createFrom().voidItem()
-				: updateStagedLink(tx, alternativeIngredientId, recommendationId, present);
+		return switch (StagedLinkChange.of(present, existing == null ? null : existing.isPresent(), masterHasLink)) {
+			case NONE -> Uni.createFrom().voidItem();
+			case SEED -> seedStagedLink(tx, alternativeIngredientId, recommendationId, present);
+			case UPDATE -> updateStagedLink(tx, alternativeIngredientId, recommendationId, present);
+			case DELETE -> deleteStagedLink(tx, alternativeIngredientId, recommendationId);
+		};
 	}
 
 	private Uni<Void> seedStagedLink(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, UUID recommendationId, boolean present) {

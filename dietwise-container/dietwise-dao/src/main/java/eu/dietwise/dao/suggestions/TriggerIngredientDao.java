@@ -2,12 +2,14 @@ package eu.dietwise.dao.suggestions;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import eu.dietwise.common.dao.reactive.ReactivePersistenceContext;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.types.ReferenceDetails;
 import eu.dietwise.common.types.ReferenceOption;
+import eu.dietwise.services.model.suggestions.BackofficeTriggerIngredient;
 import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.services.model.suggestions.TriggerIngredient;
 import eu.dietwise.v1.types.RecipeLanguage;
@@ -21,6 +23,35 @@ public interface TriggerIngredientDao {
 	 * wins), including Working-Copy-only entries, as id + English name, ordered by name.
 	 */
 	Uni<List<ReferenceOption>> listOptions(ReactivePersistenceContext em);
+
+	/**
+	 * Every Trigger Ingredient for the backoffice grid: published master overlaid by the Working Copy (mirror wins),
+	 * including Working-Copy-only entries, as id, effective English name, whether a published master row exists, and the
+	 * Working Copy version a subsequent edit must be based on ({@code 0} when no Staged Change exists yet). Sorted by name.
+	 */
+	Uni<List<BackofficeTriggerIngredient>> listForBackoffice(ReactivePersistenceContext em);
+
+	/**
+	 * The published master scoring-component links: for each Trigger Ingredient, the ids of the Recommendations it is
+	 * linked to in {@code DW_TRIGGER_INGREDIENT_COMPONENTS_FOR_SCORING}. Sparse — an ingredient with no master link does
+	 * not appear.
+	 */
+	Uni<Map<UUID, Set<UUID>>> findMasterRecommendationLinks(ReactivePersistenceContext em);
+
+	/**
+	 * The staged scoring-component links in the Working Copy: for each Trigger Ingredient, the ids of the Recommendations
+	 * whose link carries a Staged Change, mapped to the staged effective presence ({@code true} = staged addition,
+	 * {@code false} = staged removal). Sparse — an ingredient with no staged link change does not appear.
+	 */
+	Uni<Map<UUID, Map<UUID, Boolean>>> findStagedRecommendationLinks(ReactivePersistenceContext em);
+
+	/**
+	 * Stage a single Trigger-Ingredient-to-Recommendation scoring-component link to the given effective presence in the
+	 * Working Copy, leaving published master untouched. Staging the presence master already has collapses the Working
+	 * Copy row. An unversioned toggle: a binary link to an absolute target presence carries no lost-update hazard, so no
+	 * base version is taken and no stale-version check is performed.
+	 */
+	Uni<Void> toggleRecommendationLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId, boolean present);
 
 	/**
 	 * Stage a brand-new Trigger Ingredient in the Working Copy with the given name and no explanation. Uniqueness of the

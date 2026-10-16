@@ -105,6 +105,16 @@ public final class Tables {
 							List.of("alternative_ingredient_id", "recommendation_id")),
 					PublishKind.LINK_DELTA, 1),
 			new MirrorSpec(
+					new TableSpec("DW_TRIGGER_INGREDIENT_COMPONENTS_FOR_SCORING", List.of(
+							uuid("trigger_ingredient_id").notNull(), uuid("recommendation_id").notNull()),
+							List.of("trigger_ingredient_id", "recommendation_id")),
+					new TableSpec("DW_TRIGGER_INGREDIENT_COMPONENTS_FOR_SCORING_WC", List.of(
+							uuid("trigger_ingredient_id"), uuid("recommendation_id"), bool("present")),
+							List.of("trigger_ingredient_id", "recommendation_id")),
+					PublishKind.LINK_DELTA, 1, List.of(
+							new ParentRef("trigger_ingredient_id", "DW_TRIGGER_INGREDIENT"),
+							new ParentRef("recommendation_id", "DW_RECOMMENDATION"))),
+			new MirrorSpec(
 					new TableSpec("DW_ALTERNATIVE_INGREDIENT_SEASONALITY", List.of(
 							uuid("alternative_ingredient_id").notNull(), text("country").notNull(),
 							integer("month_from").notNull(), integer("month_to").notNull()),

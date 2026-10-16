@@ -5,7 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import jakarta.persistence.criteria.CriteriaDelete;
 
 import eu.dietwise.common.dao.EntityNotFoundException;
@@ -16,10 +19,13 @@ import eu.dietwise.common.test.jpa.HibernateReactiveExtension;
 import eu.dietwise.common.test.liquibase.LiquibaseExtension;
 import eu.dietwise.common.types.ReferenceDetails;
 import eu.dietwise.common.types.ReferenceOption;
+import eu.dietwise.dao.jpa.recommendations.RecommendationEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientTranslationEntity;
 import eu.dietwise.dao.jpa.suggestions.TriggerIngredientTranslationEntity_;
+import eu.dietwise.services.model.suggestions.BackofficeTriggerIngredient;
 import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.TypeOfRecommendation;
 import io.smallrye.mutiny.Uni;
 import org.hibernate.reactive.mutiny.Mutiny;
 import org.junit.jupiter.api.MethodOrderer;
@@ -61,6 +67,13 @@ class TriggerIngredientDaoImplTest {
 	private static final String STAGED_NL_EXPLANATION = "Eiwitrijke peulvrucht.";
 	private static final String RESTAGED_NL_NAME = "Linzen herzien";
 	private static final String RESTAGED_NL_EXPLANATION = "Herziene uitleg.";
+	private static final UUID DECREASE_RED_MEAT_RECOMMENDATION_ID = UUID.fromString("9977a713-0608-4f0c-9933-f7788b4f0225");
+	private static final UUID GRID_UNCHANGED_TI_ID = UUID.fromString("b1c2d3e4-0030-4f5a-8b9c-0d1e2f3a0030");
+	private static final UUID GRID_EDITED_TI_ID = UUID.fromString("b1c2d3e4-0031-4f5a-8b9c-0d1e2f3a0031");
+	private static final UUID TOGGLE_REMOVE_TI_ID = UUID.fromString("b1c2d3e4-0033-4f5a-8b9c-0d1e2f3a0033");
+	private static final UUID TOGGLE_ADD_TI_ID = UUID.fromString("b1c2d3e4-0034-4f5a-8b9c-0d1e2f3a0034");
+	private static final UUID REC_C_ID = UUID.fromString("b1c2d3e4-00a2-4f5a-8b9c-0d1e2f3a00a2");
+	private static final UUID REC_D_ID = UUID.fromString("b1c2d3e4-00a3-4f5a-8b9c-0d1e2f3a00a3");
 
 	@Container
 	private static final PostgreSQLContainer postgres = new PostgreSQLContainer(POSTGRES_IMAGE);
@@ -509,6 +522,86 @@ class TriggerIngredientDaoImplTest {
 		assertThat(details.explanationForLlm()).isEqualTo(LONGEST_EXPLANATION);
 	}
 
+	@Test
+	@Order(22)
+	void testFindMasterRecommendationLinksIncludesTheRecommendationsSeededFromTheRules(Mutiny.SessionFactory sessionFactory) {
+		var sut = new TriggerIngredientDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+
+		var links = factory.withoutTransaction(sut::findMasterRecommendationLinks).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		assertThat(links.get(TRIGGER_INGREDIENT_ID)).containsExactly(DECREASE_RED_MEAT_RECOMMENDATION_ID);
+	}
+
+	@Test
+	@Order(23)
+	void testListForBackofficeOverlaysWorkingCopyOnMaster(Mutiny.SessionFactory sessionFactory) {
+		var sut = new TriggerIngredientDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+
+		factory.withTransaction(tx -> persistTriggerIngredient(tx, GRID_UNCHANGED_TI_ID, "Grid unchanged cheese"))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		factory.withTransaction(tx -> persistTriggerIngredient(tx, GRID_EDITED_TI_ID, "Grid edited cheese"))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		factory.withTransaction(tx -> sut.editTriggerIngredient(tx, GRID_EDITED_TI_ID, "Grid edited cheese (wc)", "Edited.", 0L))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var wcOnlyId = factory.withTransaction(tx -> sut.createTriggerIngredient(tx, "Grid working-copy-only cheese"))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		var rows = factory.withoutTransaction(sut::listForBackoffice).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var byId = rows.stream().collect(Collectors.toMap(BackofficeTriggerIngredient::id, r -> r));
+
+		assertThat(byId.get(GRID_UNCHANGED_TI_ID))
+				.isEqualTo(new BackofficeTriggerIngredient(GRID_UNCHANGED_TI_ID, "Grid unchanged cheese", true, 0L));
+		assertThat(byId.get(GRID_EDITED_TI_ID))
+				.isEqualTo(new BackofficeTriggerIngredient(GRID_EDITED_TI_ID, "Grid edited cheese (wc)", true, 1L));
+		assertThat(byId.get(wcOnlyId))
+				.isEqualTo(new BackofficeTriggerIngredient(wcOnlyId, "Grid working-copy-only cheese", false, 1L));
+		assertThat(rows).isSortedAccordingTo(Comparator.comparing(BackofficeTriggerIngredient::name));
+	}
+
+	@Test
+	@Order(24)
+	void testToggleRecommendationLinkStagesRemovalThenCollapsesBackToMaster(Mutiny.SessionFactory sessionFactory) {
+		var sut = new TriggerIngredientDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+
+		factory.withTransaction(tx -> persistRecommendation(tx, REC_C_ID, "Trigger grid component C")
+						.chain(() -> persistTriggerIngredientLinkedTo(tx, TOGGLE_REMOVE_TI_ID, "Grid toggle-remove cheese", REC_C_ID)))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		factory.withTransaction(tx -> sut.toggleRecommendationLink(tx, TOGGLE_REMOVE_TI_ID, REC_C_ID, false))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var staged = factory.withoutTransaction(sut::findStagedRecommendationLinks).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		assertThat(staged.get(TOGGLE_REMOVE_TI_ID)).containsEntry(REC_C_ID, false);
+
+		factory.withTransaction(tx -> sut.toggleRecommendationLink(tx, TOGGLE_REMOVE_TI_ID, REC_C_ID, true))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var collapsed = factory.withoutTransaction(sut::findStagedRecommendationLinks).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		assertThat(collapsed).doesNotContainKey(TOGGLE_REMOVE_TI_ID);
+	}
+
+	@Test
+	@Order(25)
+	void testToggleRecommendationLinkStagesAdditionThenCollapsesBackToMaster(Mutiny.SessionFactory sessionFactory) {
+		var sut = new TriggerIngredientDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+
+		factory.withTransaction(tx -> persistRecommendation(tx, REC_D_ID, "Trigger grid component D")
+						.chain(() -> persistTriggerIngredient(tx, TOGGLE_ADD_TI_ID, "Grid toggle-add cheese")))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		factory.withTransaction(tx -> sut.toggleRecommendationLink(tx, TOGGLE_ADD_TI_ID, REC_D_ID, true))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var staged = factory.withoutTransaction(sut::findStagedRecommendationLinks).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		assertThat(staged.get(TOGGLE_ADD_TI_ID)).containsEntry(REC_D_ID, true);
+
+		factory.withTransaction(tx -> sut.toggleRecommendationLink(tx, TOGGLE_ADD_TI_ID, REC_D_ID, false))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var collapsed = factory.withoutTransaction(sut::findStagedRecommendationLinks).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		assertThat(collapsed).doesNotContainKey(TOGGLE_ADD_TI_ID);
+	}
+
 	private static Uni<Void> persistTriggerIngredient(ReactivePersistenceTxContext tx, UUID id, String name) {
 		var entity = new TriggerIngredientEntity();
 		entity.setId(id);
@@ -523,5 +616,24 @@ class TriggerIngredientDaoImplTest {
 		translation.setName(name);
 		translation.setExplanationForLlm(explanationForLlm);
 		return tx.persist(translation).replaceWithVoid();
+	}
+
+	private static Uni<Void> persistRecommendation(ReactivePersistenceTxContext tx, UUID id, String componentForScoring) {
+		var rec = new RecommendationEntity();
+		rec.setId(id);
+		rec.setName(componentForScoring);
+		rec.setComponentForScoring(componentForScoring);
+		rec.setTypeOfRecommendation(TypeOfRecommendation.LIMITED);
+		return tx.persist(rec).replaceWithVoid();
+	}
+
+	private static Uni<Void> persistTriggerIngredientLinkedTo(ReactivePersistenceTxContext tx, UUID id, String name, UUID... recommendationIds) {
+		var entity = new TriggerIngredientEntity();
+		entity.setId(id);
+		entity.setName(name);
+		entity.setComponentsForScoring(Arrays.stream(recommendationIds)
+				.map(recId -> tx.getReference(RecommendationEntity.class, recId))
+				.collect(Collectors.toSet()));
+		return tx.persist(entity).replaceWithVoid();
 	}
 }

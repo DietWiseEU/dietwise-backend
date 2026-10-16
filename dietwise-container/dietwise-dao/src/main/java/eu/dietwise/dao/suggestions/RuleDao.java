@@ -105,6 +105,13 @@ public interface RuleDao {
 	Uni<Map<UUID, RuleReferences>> findReferenceIds(ReactivePersistenceContext em);
 
 	/**
+	 * For each Trigger Ingredient, the ids of the Recommendations of its active Rules, across published master and the
+	 * Working Copy: a Rule's Working Copy row overrides its master row, so a staged Deactivate excludes a Rule and a
+	 * Working-Copy-only Rule is included. Sparse — a Trigger Ingredient without active Rules does not appear.
+	 */
+	Uni<Map<UUID, Set<UUID>>> findActiveRecommendationIdsByTriggerIngredient(ReactivePersistenceContext em);
+
+	/**
 	 * For each Rule with at least one rationale translation (published or staged), which languages are translated in
 	 * published master and which carry a pending change in the Working Copy. Keyed by Rule id; sparse — a Rule with no
 	 * rationale translation at all does not appear. English is the master/fallback and is never a translation language.

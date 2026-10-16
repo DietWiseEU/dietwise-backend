@@ -89,6 +89,13 @@ class RuleDaoImplTest {
 	private static final String EDITED_EL_RATIONALE = "Edited Greek rationale.";
 	private static final String STAGED_NL_RATIONALE = "Staged Dutch rationale.";
 	private static final String RESTAGED_NL_RATIONALE = "Re-staged Dutch rationale.";
+	private static final UUID RULE_RECOMMENDATIONS_TRIGGER_ID = UUID.fromString("a1b2c3d4-0010-4e5f-8a9b-0c1d2e3f0010");
+	private static final UUID ACTIVE_MASTER_RULE_ID = UUID.fromString("a1b2c3d4-0011-4e5f-8a9b-0c1d2e3f0011");
+	private static final UUID INACTIVE_MASTER_RULE_ID = UUID.fromString("a1b2c3d4-0012-4e5f-8a9b-0c1d2e3f0012");
+	private static final UUID STAGED_INACTIVE_RULE_ID = UUID.fromString("a1b2c3d4-0013-4e5f-8a9b-0c1d2e3f0013");
+	private static final UUID DECREASE_PROCESSED_MEAT_RECOMMENDATION_ID = UUID.fromString("10584009-a417-45ba-ac6f-e5b58ae5bed4");
+	private static final UUID DECREASE_SODIUM_RECOMMENDATION_ID = UUID.fromString("05268010-59c8-4d8f-8508-6e1aa0cf2978");
+	private static final UUID DECREASE_SUGAR_SWEETENED_BEVERAGES_RECOMMENDATION_ID = UUID.fromString("7f056712-5d53-4e8a-babf-0570dfad6f72");
 
 	@Container
 	private static final PostgreSQLContainer postgres = new PostgreSQLContainer(POSTGRES_IMAGE);
@@ -823,6 +830,45 @@ class RuleDaoImplTest {
 		var forEdit = factory.withoutTransaction(em -> sut.findRationaleTranslationsForEdit(em, TRANSLATION_NULL_RULE_ID))
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 		assertThat(forEdit.get(RecipeLanguage.EL)).isEqualTo(new VersionedText(null, 0L));
+	}
+
+	@Test
+	@Order(33)
+	void testFindActiveRecommendationIdsByTriggerIngredientOverlaysTheWorkingCopy(Mutiny.SessionFactory sessionFactory) {
+		var sut = new RuleDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+
+		factory.withTransaction(tx -> persistTriggerIngredient(tx, RULE_RECOMMENDATIONS_TRIGGER_ID, "Trigger with rules of every state")
+						.chain(() -> persistRule(tx, ACTIVE_MASTER_RULE_ID, DECREASE_RED_MEAT_RECOMMENDATION_ID, RULE_RECOMMENDATIONS_TRIGGER_ID, true))
+						.chain(() -> persistRule(tx, INACTIVE_MASTER_RULE_ID, DECREASE_PROCESSED_MEAT_RECOMMENDATION_ID, RULE_RECOMMENDATIONS_TRIGGER_ID, false))
+						.chain(() -> persistRule(tx, STAGED_INACTIVE_RULE_ID, DECREASE_SODIUM_RECOMMENDATION_ID, RULE_RECOMMENDATIONS_TRIGGER_ID, true)))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		factory.withTransaction(tx -> sut.setActive(tx, STAGED_INACTIVE_RULE_ID, false, 0L))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		factory.withTransaction(tx -> sut.createRule(tx, DECREASE_SUGAR_SWEETENED_BEVERAGES_RECOMMENDATION_ID, RULE_RECOMMENDATIONS_TRIGGER_ID, null))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		var recommendationIds = factory.withoutTransaction(sut::findActiveRecommendationIdsByTriggerIngredient)
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		assertThat(recommendationIds.get(RULE_RECOMMENDATIONS_TRIGGER_ID))
+				.containsExactlyInAnyOrder(DECREASE_RED_MEAT_RECOMMENDATION_ID, DECREASE_SUGAR_SWEETENED_BEVERAGES_RECOMMENDATION_ID);
+	}
+
+	private static Uni<Void> persistTriggerIngredient(ReactivePersistenceTxContext tx, UUID id, String name) {
+		var triggerIngredient = new TriggerIngredientEntity();
+		triggerIngredient.setId(id);
+		triggerIngredient.setName(name);
+		return tx.persist(triggerIngredient).replaceWithVoid();
+	}
+
+	private static Uni<Void> persistRule(ReactivePersistenceTxContext tx, UUID id, UUID recommendationId, UUID triggerIngredientId, boolean active) {
+		var rule = new RuleEntity();
+		rule.setId(id);
+		rule.setRecommendation(tx.getReference(RecommendationEntity.class, recommendationId));
+		rule.setTriggerIngredient(tx.getReference(TriggerIngredientEntity.class, triggerIngredientId));
+		rule.setActive(active);
+		return tx.persist(rule).replaceWithVoid();
 	}
 
 	private static Uni<Void> persistRuleTranslation(ReactivePersistenceTxContext tx, UUID ruleId, RecipeLanguage lang, String rationale) {
