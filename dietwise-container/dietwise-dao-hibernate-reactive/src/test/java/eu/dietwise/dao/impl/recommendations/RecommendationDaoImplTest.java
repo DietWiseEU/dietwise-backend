@@ -200,7 +200,7 @@ public class RecommendationDaoImplTest {
 
 	@Test
 	@Order(6)
-	void testListAllRecommendationsForScoringReturnsLocalizedValuesWhenTranslationExists(Mutiny.SessionFactory sessionFactory) {
+	void testListAllRecommendationsForScoringReturnsLocalizedComponentsIdentifiedByTheMasterRecommendation(Mutiny.SessionFactory sessionFactory) {
 		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
 		var sut = new RecommendationDaoImpl();
 
@@ -208,9 +208,10 @@ public class RecommendationDaoImplTest {
 				factory.withoutTransaction(em -> sut.listAllRecommendationsForScoring(em, RecipeLanguage.NL))
 						.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 
+		// the recommendation is the language-independent identity the weights and the rules refer to
 		assertThat(recommendations).anyMatch(rc ->
-				rc.getRecommendation().asString().equals("Voedingspatroon laag in calcium")
-						&& rc.getComponentForScoring().asString().equals("calcium"));
+				rc.getRecommendation().asString().equals("Decrease processed meat")
+						&& rc.getComponentForScoring().asString().equals("bewerkt vlees"));
 	}
 
 	@Test

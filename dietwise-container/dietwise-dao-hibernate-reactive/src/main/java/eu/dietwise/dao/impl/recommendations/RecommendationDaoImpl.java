@@ -451,7 +451,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 
 	private RecommendationComponent toRecommendationComponent(RecommendationEntity e, RecommendationTranslationEntity t) {
 		return ImmutableRecommendationComponent.builder()
-				.recommendation(new RecommendationImpl(t != null && t.getName() != null ? t.getName() : e.getName()))
+				.recommendation(new RecommendationImpl(e.getName()))
 				.componentForScoring(new RecommendationComponentNameImpl(
 						t != null && t.getComponentForScoring() != null ? t.getComponentForScoring() : e.getComponentForScoring()))
 				.typeOfRecommendation(e.getTypeOfRecommendation())
