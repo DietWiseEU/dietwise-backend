@@ -29,6 +29,7 @@ public class ScoringDataTest {
 				.recommendationWeights(recommendationWeights)
 				.humanFriendlyDisplays(humanFriendlyDisplays)
 				.recommendationsPerIngredient(recommendationsPerIngredient)
+				.primaryComponentPerIngredient(Map.of(new GenericIngredientId("id"), new RecommendationComponentNameImpl("rec2")))
 				.build();
 		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
 		om.registerModule(new Jdk8Module()); // at runtime Quarkus provides this
@@ -36,5 +37,6 @@ public class ScoringDataTest {
 		assertThat(result).doesNotContain("RecommendationComponentNameImpl", "GenericIngredientId");
 		assertThat(result).contains("Eat less processed meat");
 		assertThat(result).contains("LIMITED", "0.35");
+		assertThat(result).contains("\"primaryComponentPerIngredient\":{\"id\":\"rec2\"}");
 	}
 }

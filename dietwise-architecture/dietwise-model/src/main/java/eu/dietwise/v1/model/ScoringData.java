@@ -16,4 +16,11 @@ public interface ScoringData {
 	Map<RecommendationComponentName, String> getHumanFriendlyDisplays();
 
 	Map<IngredientId, Set<RecommendationComponentName>> getRecommendationsPerIngredient();
+
+	/**
+	 * The primary component of each ingredient a Rule was selected for: the component of that Rule's Recommendation,
+	 * also contained in the components of the ingredient in {@link #getRecommendationsPerIngredient()}. An ingredient
+	 * without a selected Rule has no entry.
+	 */
+	Map<IngredientId, RecommendationComponentName> getPrimaryComponentPerIngredient();
 }

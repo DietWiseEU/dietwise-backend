@@ -12,13 +12,14 @@ import eu.dietwise.v1.types.IngredientId;
 
 record SuggestionsAndRecommendationsPerIngredient(
 		List<Suggestion> suggestions,
-		Map<IngredientId, Set<RecommendationComponent>> recommendations
+		Map<IngredientId, Set<RecommendationComponent>> recommendations,
+		Map<IngredientId, RecommendationComponent> primaryComponents
 ) {
 	public static SuggestionsAndRecommendationsPerIngredient emptyMutable() {
-		return new SuggestionsAndRecommendationsPerIngredient(new ArrayList<>(), new HashMap<>());
+		return new SuggestionsAndRecommendationsPerIngredient(new ArrayList<>(), new HashMap<>(), new HashMap<>());
 	}
 
 	public SuggestionsAndRecommendationsPerIngredient withSuggestions(List<Suggestion> newSuggestions) {
-		return new SuggestionsAndRecommendationsPerIngredient(newSuggestions, recommendations);
+		return new SuggestionsAndRecommendationsPerIngredient(newSuggestions, recommendations, primaryComponents);
 	}
 }

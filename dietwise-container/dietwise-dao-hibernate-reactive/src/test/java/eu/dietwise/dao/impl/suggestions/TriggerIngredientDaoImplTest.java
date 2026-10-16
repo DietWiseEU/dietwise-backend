@@ -26,6 +26,7 @@ import eu.dietwise.dao.jpa.suggestions.TriggerIngredientTranslationEntity_;
 import eu.dietwise.services.model.suggestions.BackofficeTriggerIngredient;
 import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.TypeOfRecommendation;
+import eu.dietwise.v1.types.impl.RecommendationImpl;
 import io.smallrye.mutiny.Uni;
 import org.hibernate.reactive.mutiny.Mutiny;
 import org.junit.jupiter.api.MethodOrderer;
@@ -74,6 +75,7 @@ class TriggerIngredientDaoImplTest {
 	private static final UUID TOGGLE_ADD_TI_ID = UUID.fromString("b1c2d3e4-0034-4f5a-8b9c-0d1e2f3a0034");
 	private static final UUID REC_C_ID = UUID.fromString("b1c2d3e4-00a2-4f5a-8b9c-0d1e2f3a00a2");
 	private static final UUID REC_D_ID = UUID.fromString("b1c2d3e4-00a3-4f5a-8b9c-0d1e2f3a00a3");
+	private static final String DECREASE_RED_MEAT_RECOMMENDATION_NAME = "Decrease red meat";
 
 	@Container
 	private static final PostgreSQLContainer postgres = new PostgreSQLContainer(POSTGRES_IMAGE);
@@ -600,6 +602,33 @@ class TriggerIngredientDaoImplTest {
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 		var collapsed = factory.withoutTransaction(sut::findStagedRecommendationLinks).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 		assertThat(collapsed).doesNotContainKey(TOGGLE_ADD_TI_ID);
+	}
+
+	@Test
+	@Order(26)
+	void testFindAllReturnsThePublishedComponentsForScoringByMasterRecommendationInEveryLanguage(Mutiny.SessionFactory sessionFactory) {
+		var sut = new TriggerIngredientDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+
+		for (RecipeLanguage lang : RecipeLanguage.values()) {
+			var triggerIngredients = factory.withoutTransaction(em -> sut.findAll(em, lang))
+					.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+			var beef = triggerIngredients.stream()
+					.filter(t -> t.getId().asUuid().equals(TRIGGER_INGREDIENT_ID))
+					.findFirst()
+					.orElseThrow();
+			assertThat(beef.getComponentsForScoring()).as("components in %s", lang)
+					.containsExactly(new RecommendationImpl(DECREASE_RED_MEAT_RECOMMENDATION_NAME));
+		}
+		// an ingredient without published links has no components, and fetching the links does not repeat an ingredient
+		var triggerIngredients = factory.withoutTransaction(em -> sut.findAll(em, RecipeLanguage.EN))
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+		var unlinked = triggerIngredients.stream()
+				.filter(t -> t.getId().asUuid().equals(GRID_UNCHANGED_TI_ID))
+				.findFirst()
+				.orElseThrow();
+		assertThat(unlinked.getComponentsForScoring()).isEmpty();
+		assertThat(triggerIngredients).filteredOn(t -> t.getId().asUuid().equals(TRIGGER_INGREDIENT_ID)).hasSize(1);
 	}
 
 	private static Uni<Void> persistTriggerIngredient(ReactivePersistenceTxContext tx, UUID id, String name) {

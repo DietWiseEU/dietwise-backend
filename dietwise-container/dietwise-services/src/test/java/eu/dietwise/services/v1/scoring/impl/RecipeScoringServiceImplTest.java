@@ -1,6 +1,7 @@
 package eu.dietwise.services.v1.scoring.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,7 @@ class RecipeScoringServiceImplTest {
 	private static final long ASYNC_WAIT_SECONDS = 5;
 
 	private static final String INGREDIENT_1 = "ingredient-1";
+	private static final String INGREDIENT_2 = "ingredient-2";
 	private static final String FIBER = "Fiber";
 	private static final String SODIUM = "Sodium";
 	private static final BigDecimal FIBER_WEIGHT = new BigDecimal("0.42");
@@ -91,6 +93,17 @@ class RecipeScoringServiceImplTest {
 				);
 
 		verify(recommendationService).listComponentsForScoring(persistenceContext, RecipeLanguage.EN);
+	}
+
+	@Test
+	void scoreRecipeCarriesThePrimaryComponentOfEachIngredientThatHasOne() {
+		givenRecommendationComponents();
+		givenTheWeightsThatApplyTo(PERSONAL_INFO);
+
+		ScoringRecipeAssessmentMessage message = makeScoringMessage(PERSONAL_INFO);
+
+		assertThat(message.scoringData().getPrimaryComponentPerIngredient())
+				.containsExactly(entry(new GenericIngredientId(INGREDIENT_1), new RecommendationComponentNameImpl(FIBER)));
 	}
 
 	@Test
@@ -150,8 +163,9 @@ class RecipeScoringServiceImplTest {
 
 	private ScoringRecipeAssessmentMessage makeScoringMessage(PersonalInfo personalInfo) {
 		var ingredientId1 = new GenericIngredientId(INGREDIENT_1);
+		var ingredientId2 = new GenericIngredientId(INGREDIENT_2);
 		var fiber = recommendationComponent(FIBER, TypeOfRecommendation.ENCOURAGED, "High-fiber foods");
-		return sut.makeScoringMessage(Map.of(ingredientId1, Set.of(fiber)), RecipeLanguage.EN, personalInfo)
+		return sut.makeScoringMessage(Map.of(ingredientId1, Set.of(fiber), ingredientId2, Set.of()), Map.of(ingredientId1, fiber), RecipeLanguage.EN, personalInfo)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 	}
 

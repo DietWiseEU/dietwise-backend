@@ -39,23 +39,35 @@ public class RecipeScoringServiceImpl implements RecipeScoringService {
 	}
 
 	@Override
-	public Uni<ScoringRecipeAssessmentMessage> makeScoringMessage(Map<IngredientId, Set<RecommendationComponent>> recommendations, RecipeLanguage lang, PersonalInfo personalInfo) {
-		return persistenceContextFactory.withoutTransaction(em -> makeScoringMessageInternal(em, recommendations, lang, personalInfo));
+	public Uni<ScoringRecipeAssessmentMessage> makeScoringMessage(
+			Map<IngredientId, Set<RecommendationComponent>> recommendations,
+			Map<IngredientId, RecommendationComponent> primaryComponents,
+			RecipeLanguage lang,
+			PersonalInfo personalInfo
+	) {
+		return persistenceContextFactory.withoutTransaction(em -> makeScoringMessageInternal(em, recommendations, primaryComponents, lang, personalInfo));
 	}
 
-	private Uni<ScoringRecipeAssessmentMessage> makeScoringMessageInternal(ReactivePersistenceContext em, Map<IngredientId, Set<RecommendationComponent>> recommendations, RecipeLanguage lang, PersonalInfo personalInfo) {
+	private Uni<ScoringRecipeAssessmentMessage> makeScoringMessageInternal(
+			ReactivePersistenceContext em,
+			Map<IngredientId, Set<RecommendationComponent>> recommendations,
+			Map<IngredientId, RecommendationComponent> primaryComponents,
+			RecipeLanguage lang,
+			PersonalInfo personalInfo
+	) {
 		return forcm(
 				recommendationService.listComponentsForScoring(em, lang),
 				_ -> recommendationService.findRecommendationWeights(em, personalInfo),
 				(recommendationComponents, weights) ->
-						toScoringRecipeAssessmentMessage(recommendationComponents, weights, recommendations)
+						toScoringRecipeAssessmentMessage(recommendationComponents, weights, recommendations, primaryComponents)
 		);
 	}
 
 	private ScoringRecipeAssessmentMessage toScoringRecipeAssessmentMessage(
 			List<RecommendationComponent> recommendationComponents,
 			Map<Recommendation, BigDecimal> weights,
-			Map<IngredientId, Set<RecommendationComponent>> recommendationsPerIngredient
+			Map<IngredientId, Set<RecommendationComponent>> recommendationsPerIngredient,
+			Map<IngredientId, RecommendationComponent> primaryComponents
 	) {
 		var recommendationNamesPerIngredient = recommendationsPerIngredient.entrySet().stream()
 				.collect(toMap(Map.Entry::getKey, e -> e.getValue().stream().map(RecommendationComponent::getComponentForScoring).collect(toSet())));
@@ -67,6 +79,8 @@ public class RecipeScoringServiceImpl implements RecipeScoringService {
 						.collect(toMap(RecommendationComponent::getComponentForScoring, rc -> rc.getHumanFriendlyDisplay().get()))
 				)
 				.recommendationsPerIngredient(recommendationNamesPerIngredient)
+				.primaryComponentPerIngredient(primaryComponents.entrySet().stream()
+						.collect(toMap(Map.Entry::getKey, e -> e.getValue().getComponentForScoring())))
 				.build();
 		return new ScoringRecipeAssessmentMessage(scoringData);
 	}

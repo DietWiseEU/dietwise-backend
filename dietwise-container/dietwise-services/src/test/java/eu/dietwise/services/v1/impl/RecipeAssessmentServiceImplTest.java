@@ -29,6 +29,8 @@ import eu.dietwise.common.v1.types.Role;
 import eu.dietwise.common.v1.types.impl.UserIdImpl;
 import eu.dietwise.services.authz.Authorization;
 import eu.dietwise.services.authz.AuthorizationImpl;
+import eu.dietwise.services.model.recommendations.ImmutableRecommendationComponent;
+import eu.dietwise.services.model.recommendations.RecommendationComponent;
 import eu.dietwise.services.v1.StatisticsService;
 import eu.dietwise.services.v1.extraction.NoIngredientsInRecipeException;
 import eu.dietwise.services.v1.extraction.RecipeExtractionService;
@@ -61,7 +63,10 @@ import eu.dietwise.v1.types.BiologicalGender;
 import eu.dietwise.v1.types.HasSuggestionTemplateIds;
 import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.impl.AlternativeIngredientImpl;
+import eu.dietwise.v1.types.IngredientId;
+import eu.dietwise.v1.types.TypeOfRecommendation;
 import eu.dietwise.v1.types.impl.GenericIngredientId;
+import eu.dietwise.v1.types.impl.RecommendationComponentNameImpl;
 import eu.dietwise.v1.types.impl.GenericRuleId;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import eu.dietwise.v1.types.impl.RecommendationImpl;
@@ -124,6 +129,13 @@ class RecipeAssessmentServiceImplTest {
 	private static final String RULE_ID = "22222222-2222-3333-4444-555555555555";
 	private static final String RECOMMENDATION = "Recommendation";
 	private static final String SUGGESTION_TEXT = "Suggestion text";
+	private static final RecommendationComponent PRIMARY_COMPONENT = ImmutableRecommendationComponent.builder()
+			.recommendation(new RecommendationImpl(RECOMMENDATION))
+			.componentForScoring(new RecommendationComponentNameImpl("primary component"))
+			.typeOfRecommendation(TypeOfRecommendation.LIMITED)
+			.build();
+	private static final Map<IngredientId, RecommendationComponent> PRIMARY_COMPONENTS =
+			Map.of(new GenericIngredientId("ingredient-with-a-rule"), PRIMARY_COMPONENT);
 
 	private final Authorization authorization = new AuthorizationImpl();
 
@@ -188,7 +200,7 @@ class RecipeAssessmentServiceImplTest {
 				.thenAnswer(iom -> Uni.createFrom().item(makeSuggestions(iom.getArgument(3))));
 		when(recipeSuggestionsService.increaseTimesSuggested(any(), any(), any(), any())).thenReturn(Uni.createFrom().voidItem());
 		when(recipeSuggestionsService.enrichWithStatistics(any(), any(), any(), any())).thenAnswer(iom -> Uni.createFrom().item((SuggestionsRecipeAssessmentMessage) iom.getArgument(3)));
-		when(recipeScoringService.makeScoringMessage(any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
+		when(recipeScoringService.makeScoringMessage(any(), any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
 
 		List<RecipeAssessmentMessage> messages = sut.assessMarkdownRecipe(USER, MARKDOWN_PARAM)
 				.collect().asList()
@@ -218,7 +230,7 @@ class RecipeAssessmentServiceImplTest {
 		verify(statisticsService).assessedRecipe(USER);
 		verify(statisticsService).assessedRecipe(USER, MARKDOWN_PARAM.getUrl(), "Simple Pasta");
 		verify(recipeSuggestionsService).makeSuggestions(any(), eq(USER), eq(RecipeLanguage.EN), any(Recipe.class), eq(GREECE));
-		verify(recipeScoringService).makeScoringMessage(any(), eq(RecipeLanguage.EN), eq(PERSONAL_INFO));
+		verify(recipeScoringService).makeScoringMessage(any(), eq(PRIMARY_COMPONENTS), eq(RecipeLanguage.EN), eq(PERSONAL_INFO));
 		var applicationIdCaptor = ArgumentCaptor.forClass(String.class);
 		var hasUserIdCaptor = ArgumentCaptor.forClass(HasUserId.class);
 		var hasSuggestionTemplateIdsCaptor = ArgumentCaptor.forClass(HasSuggestionTemplateIds.class);
@@ -242,7 +254,7 @@ class RecipeAssessmentServiceImplTest {
 				.thenAnswer(iom -> Uni.createFrom().item(makeSuggestions(iom.getArgument(3))));
 		when(recipeSuggestionsService.increaseTimesSuggested(any(), any(), any(), any())).thenReturn(Uni.createFrom().voidItem());
 		when(recipeSuggestionsService.enrichWithStatistics(any(), any(), any(), any())).thenAnswer(iom -> Uni.createFrom().item((SuggestionsRecipeAssessmentMessage) iom.getArgument(3)));
-		when(recipeScoringService.makeScoringMessage(any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
+		when(recipeScoringService.makeScoringMessage(any(), any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
 
 		List<RecipeAssessmentMessage> messages = sut.extractAndAssessRecipeFromUrl(USER, URL_EXTRACTION_PARAM)
 				.collect().asList()
@@ -267,7 +279,7 @@ class RecipeAssessmentServiceImplTest {
 		verify(statisticsService).assessedRecipe(USER);
 		verify(statisticsService).assessedRecipe(USER, URL_EXTRACTION_PARAM.getUrl(), "Simple Pasta");
 		verify(recipeSuggestionsService).makeSuggestions(any(), eq(USER), eq(RecipeLanguage.EN), any(Recipe.class), isNull());
-		verify(recipeScoringService).makeScoringMessage(any(), eq(RecipeLanguage.EN), eq(PERSONAL_INFO));
+		verify(recipeScoringService).makeScoringMessage(any(), eq(PRIMARY_COMPONENTS), eq(RecipeLanguage.EN), eq(PERSONAL_INFO));
 		var applicationIdCaptor = ArgumentCaptor.forClass(String.class);
 		var hasUserIdCaptor = ArgumentCaptor.forClass(HasUserId.class);
 		var hasSuggestionTemplateIdsCaptor = ArgumentCaptor.forClass(HasSuggestionTemplateIds.class);
@@ -390,7 +402,7 @@ class RecipeAssessmentServiceImplTest {
 				.text(SUGGESTION_TEXT)
 				.build();
 		var message = new SuggestionsRecipeAssessmentMessage(List.of(suggestion));
-		return new MakeSuggestionsResult(message, Map.of(), PERSONAL_INFO);
+		return new MakeSuggestionsResult(message, Map.of(), PRIMARY_COMPONENTS, PERSONAL_INFO);
 	}
 
 	private ScoringData dummyScoringData() {

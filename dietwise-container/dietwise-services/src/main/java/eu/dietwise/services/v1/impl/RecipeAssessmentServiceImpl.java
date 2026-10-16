@@ -163,7 +163,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 				recipeSuggestionsService.makeSuggestions(correlationId, hasUserId, lang, recipe, countryOverride),
 				result -> recipeSuggestionsService.increaseTimesSuggested(correlationId, applicationId, hasUserId, result.message()),
 				(result, _) -> recipeSuggestionsService.enrichWithStatistics(correlationId, applicationId, hasUserId, result.message()),
-				(result, _, message) -> new MakeSuggestionsResult(message, result.recommendations(), result.personalInfo())
+				(result, _, message) -> new MakeSuggestionsResult(message, result.recommendations(), result.primaryComponents(), result.personalInfo())
 		).invoke(result -> emitter.emit(result.message()));
 	}
 
@@ -179,7 +179,8 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 		if (suggestionsResult == null) {
 			return Uni.createFrom().nullItem();
 		}
-		return recipeScoringService.makeScoringMessage(suggestionsResult.recommendations(), lang, suggestionsResult.personalInfo()).invoke(emitter::emit);
+		return recipeScoringService.makeScoringMessage(suggestionsResult.recommendations(), suggestionsResult.primaryComponents(), lang, suggestionsResult.personalInfo())
+				.invoke(emitter::emit);
 	}
 
 	private <T extends Throwable> void handleError(MultiEmitter<? super RecipeAssessmentMessage> emitter, T error) {
