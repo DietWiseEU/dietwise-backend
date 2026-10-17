@@ -365,7 +365,8 @@ public class RecipeSuggestionsServiceImpl implements RecipeSuggestionsService {
 	}
 
 	private BiFunction<? super RecipeSuggestionNecessaryData, ? super SuggestionsAndRecommendationsPerIngredient, Uni<? extends SuggestionsAndRecommendationsPerIngredient>> prioritizeSuggestions(ReactivePersistenceTxContext tx) {
-		return (data, suggestionsAndRecommendations) -> suggestionPrioritizer.prioritizeSuggestions(tx, data.personalInfo(), suggestionsAndRecommendations.suggestions())
+		return (data, suggestionsAndRecommendations) -> suggestionPrioritizer.prioritizeSuggestions(
+				tx, data.personalInfo(), suggestionsAndRecommendations.suggestions(), suggestionsAndRecommendations.primaryComponents())
 				.map(suggestionsAndRecommendations::withSuggestions);
 	}
 

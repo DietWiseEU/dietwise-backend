@@ -153,7 +153,7 @@ class RecipeSuggestionsServiceImplTest {
 				.thenReturn(Uni.createFrom().item(List.of(FIRST_SUGGESTION)));
 		Suggestion prioritizedSuggestion = ImmutableSuggestion.copyOf(FIRST_SUGGESTION)
 				.withText("We suggest: alternative-first instead of: " + INGREDIENT_NAME + " [prioritized]");
-		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), any()))
+		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), any(), any()))
 				.thenReturn(Uni.createFrom().item(List.of(prioritizedSuggestion)));
 
 		MakeSuggestionsResult result = sut.makeSuggestions(CORRELATION_ID, hasUserId, RecipeLanguage.EN, RECIPE, GREECE)
@@ -167,7 +167,8 @@ class RecipeSuggestionsServiceImplTest {
 				any(),
 				any(),
 				eq(List.of(ImmutableSuggestion.copyOf(FIRST_SUGGESTION)
-						.withText("We suggest: alternative-first instead of: " + INGREDIENT_NAME)))
+						.withText("We suggest: alternative-first instead of: " + INGREDIENT_NAME))),
+				eq(Map.of(INGREDIENT_ID, COMPONENT_FIBER))
 		);
 		verify(suggestionsAiFacade, never()).matchIngredientsWithRecommendations(any(), any(), any());
 	}
@@ -177,7 +178,7 @@ class RecipeSuggestionsServiceImplTest {
 		var hasUserId = hasUserId();
 		stubTheDataAndTheMatchingOfTheIngredient(hasUserId, ImmutablePersonalInfo.builder().build(), mock(RoleOrTechnique.class), TRIGGER_INGREDIENT_NAME_FLOUR);
 		when(ruleDao.findByTriggerIngredient(any(), eq(TRIGGER_INGREDIENT_FLOUR), eq(RecipeLanguage.EN))).thenReturn(Uni.createFrom().item(List.of()));
-		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()))).thenReturn(Uni.createFrom().item(List.of()));
+		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()), any())).thenReturn(Uni.createFrom().item(List.of()));
 
 		MakeSuggestionsResult result = sut.makeSuggestions(CORRELATION_ID, hasUserId, RecipeLanguage.EN, RECIPE, null)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
@@ -196,7 +197,7 @@ class RecipeSuggestionsServiceImplTest {
 		stubTheDataAndTheMatchingOfTheIngredient(hasUserId, ImmutablePersonalInfo.builder().build(), mock(RoleOrTechnique.class), TRIGGER_INGREDIENT_NAME_FLOUR);
 		when(ruleDao.findByTriggerIngredient(any(), eq(TRIGGER_INGREDIENT_FLOUR), eq(RecipeLanguage.EN))).thenReturn(Uni.createFrom().item(List.of(RULE1)));
 		when(suggestionsAiFacade.findBestRule(eq(RecipeLanguage.EN), any(), any(), any(), any(), any())).thenReturn(Uni.createFrom().item("unknown"));
-		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()))).thenReturn(Uni.createFrom().item(List.of()));
+		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()), any())).thenReturn(Uni.createFrom().item(List.of()));
 
 		MakeSuggestionsResult result = sut.makeSuggestions(CORRELATION_ID, hasUserId, RecipeLanguage.EN, RECIPE, null)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
@@ -213,7 +214,7 @@ class RecipeSuggestionsServiceImplTest {
 		when(suggestionsAiFacade.convertRecommendationsToMarkdownList(any())).thenReturn(RECOMMENDATIONS_MARKDOWN);
 		when(suggestionsAiFacade.matchIngredientsWithRecommendations(RecipeLanguage.EN, RECOMMENDATIONS_MARKDOWN, INGREDIENT_NAME))
 				.thenReturn(Uni.createFrom().item(Set.of(" Fiber ", "a component the model invented")));
-		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()))).thenReturn(Uni.createFrom().item(List.of()));
+		when(suggestionPrioritizer.prioritizeSuggestions(any(), any(), eq(List.of()), any())).thenReturn(Uni.createFrom().item(List.of()));
 
 		MakeSuggestionsResult result = sut.makeSuggestions(CORRELATION_ID, hasUserId, RecipeLanguage.EN, RECIPE, null)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
