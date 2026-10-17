@@ -316,6 +316,31 @@ class SuggestionDaoImplTest {
 		});
 	}
 
+	@Test
+	@Order(7)
+	void retrieveByRuleNamesTheComponentsOfTheAlternativesInTheRequestedLanguage(Mutiny.SessionFactory sessionFactory) {
+		var sut = new SuggestionDaoImpl();
+		var factory = new ReactivePersistenceContextFactoryImpl(sessionFactory);
+		var ingredient = ImmutableIngredient.builder()
+				.id(new GenericIngredientId(INGREDIENT_ID.toString()))
+				.nameInRecipe("rundergehakt")
+				.build();
+
+		var suggestions = factory.withoutTransaction(em ->
+				sut.retrieveByRule(em, new GenericRuleId(RULE_ID.toString()), null, ingredient, RecipeLanguage.NL)
+		).await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		// the clients look the components of an accepted alternative up among the localized components of the assessment
+		assertThat(suggestions).anySatisfy(suggestion -> {
+			assertThat(suggestion.getId().asString()).isEqualTo("b4cba823-e8aa-4e4f-a81a-0e3c3dd6816c");
+			assertThat(suggestion.getAlternativeComponentNames()).containsExactlyInAnyOrder(
+					new RecommendationComponentNameImpl("peulvruchten"),
+					new RecommendationComponentNameImpl("vezels"),
+					new RecommendationComponentNameImpl("groenten")
+			);
+		});
+	}
+
 	private static void setMasterHumanFriendlyDisplay(Mutiny.SessionFactory sessionFactory, UUID recommendationId, String value) {
 		sessionFactory.withTransaction(session -> session.createNativeQuery("update DW_RECOMMENDATION set human_friendly_display = :value where id = :id")
 						.setParameter("value", value).setParameter("id", recommendationId).executeUpdate())

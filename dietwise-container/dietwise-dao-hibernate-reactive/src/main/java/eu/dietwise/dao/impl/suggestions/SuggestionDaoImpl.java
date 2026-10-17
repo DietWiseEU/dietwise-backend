@@ -69,7 +69,7 @@ public class SuggestionDaoImpl implements SuggestionDao {
 				(_, _, recommendationIds, _, _) -> findRecommendationTranslationsByRecommendationId(em, recommendationIds, lang),
 				(_, alternativeIngredientIds, _, _, _, _) -> findSeasonalityByAlternativeIngredientId(em, alternativeIngredientIds, country),
 				(_, alternativeIngredientIds, _, _, _, _, _) -> findCostByAlternativeIngredientId(em, alternativeIngredientIds, country),
-				(_, alternativeIngredientIds, _, _, _, _, _, _) -> findAlternativeComponentNamesByAlternativeIngredientId(em, alternativeIngredientIds),
+				(_, alternativeIngredientIds, _, _, _, _, _, _) -> findAlternativeComponentNamesByAlternativeIngredientId(em, alternativeIngredientIds, lang),
 				(suggestionTemplates, _, _, suggestionTemplateTranslationsById, alternativeIngredientTranslationsById, recommendationTranslationsById,
 				 seasonalityByAlternativeIngredientId, costByAlternativeIngredientId, alternativeComponentNamesByAlternativeIngredientId) ->
 						toSuggestionList(
@@ -240,7 +240,8 @@ public class SuggestionDaoImpl implements SuggestionDao {
 
 	private Uni<Map<UUID, Set<RecommendationComponentName>>> findAlternativeComponentNamesByAlternativeIngredientId(
 			ReactivePersistenceContext em,
-			Set<UUID> alternativeIngredientIds
+			Set<UUID> alternativeIngredientIds,
+			RecipeLanguage lang
 	) {
 		if (alternativeIngredientIds.isEmpty()) {
 			return Uni.createFrom().item(Collections.emptyMap());
@@ -249,10 +250,13 @@ public class SuggestionDaoImpl implements SuggestionDao {
 		var q = cb.createQuery(AlternativeIngredientSeasonalitylessProjection.class);
 		Root<AlternativeIngredientEntity> alternativeIngredient = q.from(AlternativeIngredientEntity.class);
 		var component = alternativeIngredient.join(AlternativeIngredientEntity_.componentsForScoring, JoinType.LEFT);
+		var translation = component.join(RecommendationEntity_.translations, JoinType.LEFT);
+		translation.on(cb.equal(translation.get(RecommendationTranslationEntity_.lang), lang));
+		// localized like the components of the assessment, which the clients look the components of an alternative up in
 		q.select(cb.construct(
 				AlternativeIngredientSeasonalitylessProjection.class,
 				alternativeIngredient.get(AlternativeIngredientEntity_.id),
-				component.get(RecommendationEntity_.componentForScoring)
+				cb.coalesce(translation.get(RecommendationTranslationEntity_.componentForScoring), component.get(RecommendationEntity_.componentForScoring))
 		)).where(in(cb, alternativeIngredient.get(AlternativeIngredientEntity_.id), alternativeIngredientIds));
 		return em.createQuery(q).getResultList().map(rows -> {
 			Map<UUID, Set<RecommendationComponentName>> result = new LinkedHashMap<>();
