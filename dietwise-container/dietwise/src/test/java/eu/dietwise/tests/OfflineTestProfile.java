@@ -4,7 +4,7 @@ import java.util.Map;
 
 import io.quarkus.test.junit.QuarkusTestProfile;
 
-public class BreakerTestProfile implements QuarkusTestProfile {
+public class OfflineTestProfile implements QuarkusTestProfile {
 	@Override
 	public Map<String, String> getConfigOverrides() {
 		return Map.of(
@@ -18,6 +18,8 @@ public class BreakerTestProfile implements QuarkusTestProfile {
 				"quarkus.datasource.username", "test",
 				"quarkus.datasource.password", "test",
 				"quarkus.hibernate-orm.database.start-offline", "true",
+				// With trailing slashes, which the account deletion config strips
+				"dietwise.keycloak.deletion.base-url", "http://keycloak.test/realms/dietwise//",
 				// Just to satisfy the cthonic deities
 				"dietwise.git-hash", "abc"
 		);

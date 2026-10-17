@@ -118,6 +118,11 @@
 			<artifactId>quarkus-junit-mockito</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-test-security-oidc</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- TEST -->
 		<dependency>
@@ -173,6 +178,30 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<!--
+			Extends the coverage profile of the parent with a report that also covers the classes of the project
+			dependencies, e.g. the JAX-RS resources, which the tests of this module drive.
+			-->
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>jacoco-site-aggregate</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>report-aggregate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>dietwise-quarkus-dev</id>
 			<build>

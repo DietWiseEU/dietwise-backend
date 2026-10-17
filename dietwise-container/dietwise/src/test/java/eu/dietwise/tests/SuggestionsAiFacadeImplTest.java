@@ -30,7 +30,7 @@ import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenExce
 import org.junit.jupiter.api.Test;
 
 @QuarkusTest
-@TestProfile(BreakerTestProfile.class)
+@TestProfile(OfflineTestProfile.class)
 class SuggestionsAiFacadeImplTest {
 	private static final Duration AWAIT = Duration.ofSeconds(5);
 

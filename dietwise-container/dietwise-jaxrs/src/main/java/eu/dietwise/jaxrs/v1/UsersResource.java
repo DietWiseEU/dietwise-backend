@@ -60,7 +60,7 @@ public class UsersResource {
 	private void requireFreshAuthentication() {
 		Long authTime = readAuthTime();
 		if (authTime == null) {
-			throw new NotAuthenticatedException("auth_time is missing");
+			throw new NotAuthenticatedException("auth_time is not a number");
 		}
 		Instant authenticatedAt = Instant.ofEpochSecond(authTime);
 		if (authenticatedAt.isBefore(Instant.now().minus(MAX_AUTHENTICATION_AGE))) {
@@ -70,17 +70,7 @@ public class UsersResource {
 
 	private Long readAuthTime() {
 		Object authTime = jwt.getClaim(Claims.auth_time.name());
-		if (authTime instanceof Number authTimeNumber) {
-			return authTimeNumber.longValue();
-		}
-		if (authTime instanceof String authTimeString) {
-			try {
-				return Long.valueOf(authTimeString);
-			} catch (NumberFormatException _) {
-				return null;
-			}
-		}
-		return null;
+		return authTime instanceof Number authTimeNumber ? authTimeNumber.longValue() : null;
 	}
 
 	private static String stripTrailingSlash(String value) {
