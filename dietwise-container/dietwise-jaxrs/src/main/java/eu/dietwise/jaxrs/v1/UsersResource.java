@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.Response;
 import eu.dietwise.common.types.authorization.NotAuthenticatedException;
 import eu.dietwise.common.v1.model.User;
 import eu.dietwise.jaxrs.v1.security.AllowDeletedAccount;
+import eu.dietwise.jaxrs.v1.types.AccountDeletionConfigResponse;
 import eu.dietwise.services.v1.AccountService;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -87,8 +88,5 @@ public class UsersResource {
 			value = value.substring(0, value.length() - 1);
 		}
 		return value;
-	}
-
-	public record AccountDeletionConfigResponse(String realmUrl) {
 	}
 }
