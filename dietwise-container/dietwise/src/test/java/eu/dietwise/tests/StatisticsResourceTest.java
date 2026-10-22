@@ -10,9 +10,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
 
-import eu.dietwise.common.v1.model.User;
 import eu.dietwise.services.v1.StatisticsService;
-import eu.dietwise.v1.types.SuggestionTemplateId;
+import eu.dietwise.services.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -23,32 +22,27 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * The four endpoints have the same shape: each updates one counter of a Suggestion Template through its own method of
- * the {@link StatisticsService}.
+ * The four endpoints have the same shape: each updates one counter of a Suggestion Template by applying its own
+ * {@link SuggestionStatsTransition} through the {@link StatisticsService}.
  */
 @QuarkusTest
 @TestProfile(OfflineTestProfile.class)
 class StatisticsResourceTest extends CitizenResourceTest {
 	private static final String SUGGESTION_ID = "3f2a1b0c-9d8e-4f7a-b6c5-d4e3f2a1b0c9";
 
-	@FunctionalInterface
-	interface CounterUpdate {
-		Uni<Integer> apply(StatisticsService service, User user, SuggestionTemplateId suggestionId);
-	}
-
 	static Stream<Arguments> endpoints() {
 		return Stream.of(
-				Arguments.of("increaseTimesAccepted", (CounterUpdate) StatisticsService::increaseTimesAccepted),
-				Arguments.of("decreaseTimesAccepted", (CounterUpdate) StatisticsService::decreaseTimesAccepted),
-				Arguments.of("increaseTimesRejected", (CounterUpdate) StatisticsService::increaseTimesRejected),
-				Arguments.of("decreaseTimesRejected", (CounterUpdate) StatisticsService::decreaseTimesRejected)
+				Arguments.of("increaseTimesAccepted", SuggestionStatsTransition.INCREASE_ACCEPTED),
+				Arguments.of("decreaseTimesAccepted", SuggestionStatsTransition.DECREASE_ACCEPTED),
+				Arguments.of("increaseTimesRejected", SuggestionStatsTransition.INCREASE_REJECTED),
+				Arguments.of("decreaseTimesRejected", SuggestionStatsTransition.DECREASE_REJECTED)
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource("endpoints")
-	void updatesTheCounterOfTheSuggestionForTheAuthenticatedUser(String endpoint, CounterUpdate update) {
-		when(update.apply(statisticsService, any(), any())).thenReturn(Uni.createFrom().item(7));
+	void updatesTheCounterOfTheSuggestionForTheAuthenticatedUser(String endpoint, SuggestionStatsTransition transition) {
+		when(statisticsService.updateSuggestionStats(any(), any(), any())).thenReturn(Uni.createFrom().item(7));
 
 		given()
 				.contentType(ContentType.JSON)
@@ -61,12 +55,12 @@ class StatisticsResourceTest extends CitizenResourceTest {
 				.statusCode(200)
 				.body("updatedValue", equalTo(7));
 
-		update.apply(verify(statisticsService), authenticatedUser(), eq(new GenericSuggestionTemplateId(SUGGESTION_ID)));
+		verify(statisticsService).updateSuggestionStats(authenticatedUser(), eq(new GenericSuggestionTemplateId(SUGGESTION_ID)), eq(transition));
 	}
 
 	@ParameterizedTest
 	@MethodSource("endpoints")
-	void rejectsARequestWithoutSuggestion(String endpoint, CounterUpdate update) {
+	void rejectsARequestWithoutSuggestion(String endpoint, SuggestionStatsTransition transition) {
 		given()
 				.contentType(ContentType.JSON)
 				.body("{}")
@@ -75,6 +69,6 @@ class StatisticsResourceTest extends CitizenResourceTest {
 				.then()
 				.statusCode(400);
 
-		update.apply(verify(statisticsService, never()), any(), any());
+		verify(statisticsService, never()).updateSuggestionStats(any(), any(), any());
 	}
 }

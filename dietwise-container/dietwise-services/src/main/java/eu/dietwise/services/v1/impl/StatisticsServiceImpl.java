@@ -16,6 +16,7 @@ import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
 import eu.dietwise.services.authz.Authorization;
 import eu.dietwise.services.nondomain.DateTimeService;
 import eu.dietwise.services.v1.StatisticsService;
+import eu.dietwise.services.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.SuggestionTemplateId;
 import io.smallrye.mutiny.Uni;
 
@@ -88,38 +89,14 @@ public class StatisticsServiceImpl implements StatisticsService {
 	}
 
 	@Override
-	public Uni<Integer> increaseTimesAccepted(User user, SuggestionTemplateId suggestionId) {
+	public Uni<Integer> updateSuggestionStats(User user, SuggestionTemplateId suggestionId, SuggestionStatsTransition transition) {
 		authorization.requireLogin(user);
 		String applicationId = authorization.requireApplicationId(user);
-		return persistenceContextFactory.withTransaction(tx ->
-				userSuggestionStatsEntityDao.increaseTimesAccepted(tx, applicationId, user, suggestionId)
-		);
-	}
-
-	@Override
-	public Uni<Integer> decreaseTimesAccepted(User user, SuggestionTemplateId suggestionId) {
-		authorization.requireLogin(user);
-		String applicationId = authorization.requireApplicationId(user);
-		return persistenceContextFactory.withTransaction(tx ->
-				userSuggestionStatsEntityDao.decreaseTimesAccepted(tx, applicationId, user, suggestionId)
-		);
-	}
-
-	@Override
-	public Uni<Integer> increaseTimesRejected(User user, SuggestionTemplateId suggestionId) {
-		authorization.requireLogin(user);
-		String applicationId = authorization.requireApplicationId(user);
-		return persistenceContextFactory.withTransaction(tx ->
-				userSuggestionStatsEntityDao.increaseTimesRejected(tx, applicationId, user, suggestionId)
-		);
-	}
-
-	@Override
-	public Uni<Integer> decreaseTimesRejected(User user, SuggestionTemplateId suggestionId) {
-		authorization.requireLogin(user);
-		String applicationId = authorization.requireApplicationId(user);
-		return persistenceContextFactory.withTransaction(tx ->
-				userSuggestionStatsEntityDao.decreaseTimesRejected(tx, applicationId, user, suggestionId)
-		);
+		return persistenceContextFactory.withTransaction(tx -> switch (transition) {
+			case INCREASE_ACCEPTED -> userSuggestionStatsEntityDao.increaseTimesAccepted(tx, applicationId, user, suggestionId);
+			case DECREASE_ACCEPTED -> userSuggestionStatsEntityDao.decreaseTimesAccepted(tx, applicationId, user, suggestionId);
+			case INCREASE_REJECTED -> userSuggestionStatsEntityDao.increaseTimesRejected(tx, applicationId, user, suggestionId);
+			case DECREASE_REJECTED -> userSuggestionStatsEntityDao.decreaseTimesRejected(tx, applicationId, user, suggestionId);
+		});
 	}
 }

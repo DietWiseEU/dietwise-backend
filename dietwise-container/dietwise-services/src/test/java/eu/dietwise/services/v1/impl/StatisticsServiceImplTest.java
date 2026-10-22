@@ -14,10 +14,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.test.jpa.MockReactivePersistenceContextFactory;
 import eu.dietwise.common.v1.model.ImmutableUser;
 import eu.dietwise.common.v1.model.User;
+import eu.dietwise.common.v1.types.HasUserId;
 import eu.dietwise.common.v1.types.Role;
 import eu.dietwise.common.v1.types.impl.UserIdImpl;
 import eu.dietwise.dao.statistics.UserRecipeStatsEntityDao;
@@ -25,6 +28,7 @@ import eu.dietwise.dao.statistics.UserStatsEntityDao;
 import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
 import eu.dietwise.services.authz.Authorization;
 import eu.dietwise.services.nondomain.DateTimeService;
+import eu.dietwise.services.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.SuggestionTemplateId;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import io.smallrye.mutiny.Uni;
@@ -32,6 +36,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -152,65 +159,32 @@ class StatisticsServiceImplTest {
 		verify(userStatsEntityDao, never()).increaseDaysLaunched(any(), any(), any());
 	}
 
-	@Test
-	void testIncreaseTimesAccepted() {
-		User user = makeUserWithApplicationId(APPLICATION_ID);
-		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
-		when(userSuggestionStatsEntityDao.increaseTimesAccepted(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
-
-		Integer result = sut.increaseTimesAccepted(user, SUGGESTION_ID).await().atMost(Duration.ofSeconds(5L));
-
-		assertThat(result).isEqualTo(11);
-		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
-		verify(userSuggestionStatsEntityDao, times(1)).increaseTimesAccepted(any(), eq(APPLICATION_ID), eq(user), eq(SUGGESTION_ID));
-		verifyNoMoreInteractions(userSuggestionStatsEntityDao);
-		verify(authorization).requireLogin(user);
-		verify(authorization).requireApplicationId(user);
+	@FunctionalInterface
+	interface CounterUpdate {
+		Uni<Integer> apply(UserSuggestionStatsEntityDao dao, ReactivePersistenceTxContext tx, String applicationId, HasUserId userId, SuggestionTemplateId suggestionId);
 	}
 
-	@Test
-	void testDecreaseTimesAccepted() {
-		User user = makeUserWithApplicationId(APPLICATION_ID);
-		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
-		when(userSuggestionStatsEntityDao.decreaseTimesAccepted(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
-
-		Integer result = sut.decreaseTimesAccepted(user, SUGGESTION_ID).await().atMost(Duration.ofSeconds(5L));
-
-		assertThat(result).isEqualTo(11);
-		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
-		verify(userSuggestionStatsEntityDao, times(1)).decreaseTimesAccepted(any(), eq(APPLICATION_ID), eq(user), eq(SUGGESTION_ID));
-		verifyNoMoreInteractions(userSuggestionStatsEntityDao);
-		verify(authorization).requireLogin(user);
-		verify(authorization).requireApplicationId(user);
+	static Stream<Arguments> transitions() {
+		return Stream.of(
+				Arguments.of(SuggestionStatsTransition.INCREASE_ACCEPTED, (CounterUpdate) UserSuggestionStatsEntityDao::increaseTimesAccepted),
+				Arguments.of(SuggestionStatsTransition.DECREASE_ACCEPTED, (CounterUpdate) UserSuggestionStatsEntityDao::decreaseTimesAccepted),
+				Arguments.of(SuggestionStatsTransition.INCREASE_REJECTED, (CounterUpdate) UserSuggestionStatsEntityDao::increaseTimesRejected),
+				Arguments.of(SuggestionStatsTransition.DECREASE_REJECTED, (CounterUpdate) UserSuggestionStatsEntityDao::decreaseTimesRejected)
+		);
 	}
 
-	@Test
-	void testIncreaseTimesRejected() {
+	@ParameterizedTest
+	@MethodSource("transitions")
+	void updateSuggestionStatsUpdatesTheCounterOfTheTransition(SuggestionStatsTransition transition, CounterUpdate update) {
 		User user = makeUserWithApplicationId(APPLICATION_ID);
 		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
-		when(userSuggestionStatsEntityDao.increaseTimesRejected(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
+		when(update.apply(userSuggestionStatsEntityDao, any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
 
-		Integer result = sut.increaseTimesRejected(user, SUGGESTION_ID).await().atMost(Duration.ofSeconds(5L));
+		Integer result = sut.updateSuggestionStats(user, SUGGESTION_ID, transition).await().atMost(Duration.ofSeconds(5L));
 
 		assertThat(result).isEqualTo(11);
 		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
-		verify(userSuggestionStatsEntityDao, times(1)).increaseTimesRejected(any(), eq(APPLICATION_ID), eq(user), eq(SUGGESTION_ID));
-		verifyNoMoreInteractions(userSuggestionStatsEntityDao);
-		verify(authorization).requireLogin(user);
-		verify(authorization).requireApplicationId(user);
-	}
-
-	@Test
-	void testDecreaseTimesRejected() {
-		User user = makeUserWithApplicationId(APPLICATION_ID);
-		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
-		when(userSuggestionStatsEntityDao.decreaseTimesRejected(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
-
-		Integer result = sut.decreaseTimesRejected(user, SUGGESTION_ID).await().atMost(Duration.ofSeconds(5L));
-
-		assertThat(result).isEqualTo(11);
-		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
-		verify(userSuggestionStatsEntityDao, times(1)).decreaseTimesRejected(any(), eq(APPLICATION_ID), eq(user), eq(SUGGESTION_ID));
+		update.apply(verify(userSuggestionStatsEntityDao, times(1)), any(), eq(APPLICATION_ID), eq(user), eq(SUGGESTION_ID));
 		verifyNoMoreInteractions(userSuggestionStatsEntityDao);
 		verify(authorization).requireLogin(user);
 		verify(authorization).requireApplicationId(user);
