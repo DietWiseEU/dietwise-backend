@@ -10,6 +10,7 @@ import eu.dietwise.common.v1.model.User;
 import eu.dietwise.dao.PersonalInfoDao;
 import eu.dietwise.dao.UserDao;
 import eu.dietwise.dao.interventions.InterventionAssignmentDao;
+import eu.dietwise.dao.interventions.SuggestionEventDao;
 import eu.dietwise.dao.statistics.UserRecipeStatsEntityDao;
 import eu.dietwise.dao.statistics.UserStatsEntityDao;
 import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
@@ -34,6 +35,7 @@ public class AccountServiceImpl implements AccountService {
 	private final UserSuggestionStatsEntityDao userSuggestionStatsEntityDao;
 	private final UserStatsEntityDao userStatsEntityDao;
 	private final InterventionAssignmentDao interventionAssignmentDao;
+	private final SuggestionEventDao suggestionEventDao;
 	private final DateTimeService dateTimeService;
 	private final Authorization authorization;
 	private final KeycloakAdminClient keycloakAdminClient;
@@ -49,6 +51,7 @@ public class AccountServiceImpl implements AccountService {
 			UserSuggestionStatsEntityDao userSuggestionStatsEntityDao,
 			UserStatsEntityDao userStatsEntityDao,
 			InterventionAssignmentDao interventionAssignmentDao,
+			SuggestionEventDao suggestionEventDao,
 			DateTimeService dateTimeService,
 			Authorization authorization,
 			@RestClient KeycloakAdminClient keycloakAdminClient,
@@ -63,6 +66,7 @@ public class AccountServiceImpl implements AccountService {
 		this.userSuggestionStatsEntityDao = userSuggestionStatsEntityDao;
 		this.userStatsEntityDao = userStatsEntityDao;
 		this.interventionAssignmentDao = interventionAssignmentDao;
+		this.suggestionEventDao = suggestionEventDao;
 		this.dateTimeService = dateTimeService;
 		this.authorization = authorization;
 		this.keycloakAdminClient = keycloakAdminClient;
@@ -99,6 +103,7 @@ public class AccountServiceImpl implements AccountService {
 				personalInfoDao.deleteByUser(tx, user)
 						.chain(() -> userRecipeStatsEntityDao.deleteByUser(tx, userId))
 						.chain(() -> userSuggestionStatsEntityDao.deleteByUser(tx, userId))
+						.chain(() -> suggestionEventDao.deleteByUser(tx, userId))
 						.chain(() -> interventionAssignmentDao.deleteByUser(tx, userId))
 						.chain(() -> userStatsEntityDao.deleteByUser(tx, userId))
 						.chain(() -> userDao.tombstoneByIdmId(tx, idmId, deletedAt))

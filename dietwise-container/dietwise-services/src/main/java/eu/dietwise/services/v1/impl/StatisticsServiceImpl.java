@@ -3,20 +3,28 @@ package eu.dietwise.services.v1.impl;
 import static eu.dietwise.common.utils.UniComprehensions.forc;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import eu.dietwise.common.dao.EntityNotFoundException;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceContextFactory;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
+import eu.dietwise.common.types.InvalidRequestException;
+import eu.dietwise.common.types.Nullable;
 import eu.dietwise.common.v1.model.User;
+import eu.dietwise.dao.interventions.InterventionAssignmentDao;
+import eu.dietwise.dao.interventions.SuggestionEventDao;
 import eu.dietwise.dao.statistics.UserRecipeStatsEntityDao;
 import eu.dietwise.dao.statistics.UserStatsEntityDao;
 import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
 import eu.dietwise.services.authz.Authorization;
+import eu.dietwise.services.model.interventions.ImmutableSuggestionEvent;
+import eu.dietwise.services.model.interventions.InterventionAssignment;
 import eu.dietwise.services.nondomain.DateTimeService;
 import eu.dietwise.services.v1.StatisticsService;
-import eu.dietwise.services.v1.types.SuggestionStatsTransition;
+import eu.dietwise.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.SuggestionTemplateId;
 import io.smallrye.mutiny.Uni;
 
@@ -26,6 +34,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 	private final UserRecipeStatsEntityDao userRecipeStatsEntityDao;
 	private final UserStatsEntityDao userStatsEntityDao;
 	private final UserSuggestionStatsEntityDao userSuggestionStatsEntityDao;
+	private final InterventionAssignmentDao interventionAssignmentDao;
+	private final SuggestionEventDao suggestionEventDao;
 	private final DateTimeService dateTimeService;
 	private final Authorization authorization;
 
@@ -34,6 +44,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 			UserRecipeStatsEntityDao userRecipeStatsEntityDao,
 			UserStatsEntityDao userStatsEntityDao,
 			UserSuggestionStatsEntityDao userSuggestionStatsEntityDao,
+			InterventionAssignmentDao interventionAssignmentDao,
+			SuggestionEventDao suggestionEventDao,
 			DateTimeService dateTimeService,
 			Authorization authorization
 	) {
@@ -41,6 +53,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 		this.userRecipeStatsEntityDao = userRecipeStatsEntityDao;
 		this.userStatsEntityDao = userStatsEntityDao;
 		this.userSuggestionStatsEntityDao = userSuggestionStatsEntityDao;
+		this.interventionAssignmentDao = interventionAssignmentDao;
+		this.suggestionEventDao = suggestionEventDao;
 		this.dateTimeService = dateTimeService;
 		this.authorization = authorization;
 	}
@@ -89,14 +103,41 @@ public class StatisticsServiceImpl implements StatisticsService {
 	}
 
 	@Override
-	public Uni<Integer> updateSuggestionStats(User user, SuggestionTemplateId suggestionId, SuggestionStatsTransition transition) {
+	public Uni<Integer> updateSuggestionStats(User user, SuggestionTemplateId suggestionId, @Nullable UUID assessmentId, SuggestionStatsTransition transition) {
 		authorization.requireLogin(user);
 		String applicationId = authorization.requireApplicationId(user);
-		return persistenceContextFactory.withTransaction(tx -> switch (transition) {
+		if (assessmentId == null) {
+			return persistenceContextFactory.withTransaction(tx -> updateCounter(tx, applicationId, user, suggestionId, transition));
+		} else {
+			return persistenceContextFactory.withTransaction(tx -> interventionAssignmentDao.findById(tx, assessmentId)
+					.invoke(assignment -> requireSuggestionShownToUser(assignment, assessmentId, user, applicationId, suggestionId))
+					.chain(() -> updateCounter(tx, applicationId, user, suggestionId, transition))
+					.call(() -> suggestionEventDao.insert(tx, ImmutableSuggestionEvent.builder()
+							.assessmentId(assessmentId)
+							.suggestionTemplateId(suggestionId)
+							.action(transition)
+							.createdAt(dateTimeService.getNow())
+							.build()))
+			);
+		}
+	}
+
+	private Uni<Integer> updateCounter(ReactivePersistenceTxContext tx, String applicationId, User user, SuggestionTemplateId suggestionId, SuggestionStatsTransition transition) {
+		return switch (transition) {
 			case INCREASE_ACCEPTED -> userSuggestionStatsEntityDao.increaseTimesAccepted(tx, applicationId, user, suggestionId);
 			case DECREASE_ACCEPTED -> userSuggestionStatsEntityDao.decreaseTimesAccepted(tx, applicationId, user, suggestionId);
 			case INCREASE_REJECTED -> userSuggestionStatsEntityDao.increaseTimesRejected(tx, applicationId, user, suggestionId);
 			case DECREASE_REJECTED -> userSuggestionStatsEntityDao.decreaseTimesRejected(tx, applicationId, user, suggestionId);
-		});
+		};
+	}
+
+	private void requireSuggestionShownToUser(Optional<InterventionAssignment> assignment, UUID assessmentId, User user, String applicationId, SuggestionTemplateId suggestionId) {
+		UUID userId = UUID.fromString(user.getId().asString());
+		InterventionAssignment assignmentOfUser = assignment
+				.filter(a -> a.getUserId().equals(userId) && a.getApplicationId().equals(applicationId))
+				.orElseThrow(() -> new EntityNotFoundException(InterventionAssignment.class, assessmentId));
+		if (!assignmentOfUser.getSuggestionTemplateIds().contains(suggestionId)) {
+			throw new InvalidRequestException("Suggestion was not shown in the assessment: suggestion " + suggestionId.asString() + ", assessment " + assessmentId);
+		}
 	}
 }

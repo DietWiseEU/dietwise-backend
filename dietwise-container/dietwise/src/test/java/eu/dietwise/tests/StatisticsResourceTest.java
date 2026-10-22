@@ -8,10 +8,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import eu.dietwise.services.v1.StatisticsService;
-import eu.dietwise.services.v1.types.SuggestionStatsTransition;
+import eu.dietwise.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
@@ -29,6 +30,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @TestProfile(OfflineTestProfile.class)
 class StatisticsResourceTest extends CitizenResourceTest {
 	private static final String SUGGESTION_ID = "3f2a1b0c-9d8e-4f7a-b6c5-d4e3f2a1b0c9";
+	private static final String ASSESSMENT_ID = "6b1d3f5a-7c9e-4b2d-8f4a-6c8e0a2c4e6f";
 
 	static Stream<Arguments> endpoints() {
 		return Stream.of(
@@ -42,7 +44,7 @@ class StatisticsResourceTest extends CitizenResourceTest {
 	@ParameterizedTest
 	@MethodSource("endpoints")
 	void updatesTheCounterOfTheSuggestionForTheAuthenticatedUser(String endpoint, SuggestionStatsTransition transition) {
-		when(statisticsService.updateSuggestionStats(any(), any(), any())).thenReturn(Uni.createFrom().item(7));
+		when(statisticsService.updateSuggestionStats(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(7));
 
 		given()
 				.contentType(ContentType.JSON)
@@ -55,7 +57,42 @@ class StatisticsResourceTest extends CitizenResourceTest {
 				.statusCode(200)
 				.body("updatedValue", equalTo(7));
 
-		verify(statisticsService).updateSuggestionStats(authenticatedUser(), eq(new GenericSuggestionTemplateId(SUGGESTION_ID)), eq(transition));
+		verify(statisticsService).updateSuggestionStats(authenticatedUser(), eq(new GenericSuggestionTemplateId(SUGGESTION_ID)), eq(null), eq(transition));
+	}
+
+	@ParameterizedTest
+	@MethodSource("endpoints")
+	void passesTheAssessmentOfTheSuggestion(String endpoint, SuggestionStatsTransition transition) {
+		when(statisticsService.updateSuggestionStats(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(7));
+
+		given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"suggestionId": "%s", "assessmentId": "%s"}
+						""".formatted(SUGGESTION_ID, ASSESSMENT_ID))
+				.when()
+				.post("/api/v1/statistics/" + endpoint)
+				.then()
+				.statusCode(200)
+				.body("updatedValue", equalTo(7));
+
+		verify(statisticsService).updateSuggestionStats(authenticatedUser(), eq(new GenericSuggestionTemplateId(SUGGESTION_ID)), eq(UUID.fromString(ASSESSMENT_ID)), eq(transition));
+	}
+
+	@ParameterizedTest
+	@MethodSource("endpoints")
+	void rejectsARequestWithAMalformedAssessment(String endpoint, SuggestionStatsTransition transition) {
+		given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"suggestionId": "%s", "assessmentId": "not-a-uuid"}
+						""".formatted(SUGGESTION_ID))
+				.when()
+				.post("/api/v1/statistics/" + endpoint)
+				.then()
+				.statusCode(400);
+
+		verify(statisticsService, never()).updateSuggestionStats(any(), any(), any(), any());
 	}
 
 	@ParameterizedTest
@@ -69,6 +106,6 @@ class StatisticsResourceTest extends CitizenResourceTest {
 				.then()
 				.statusCode(400);
 
-		verify(statisticsService, never()).updateSuggestionStats(any(), any(), any());
+		verify(statisticsService, never()).updateSuggestionStats(any(), any(), any(), any());
 	}
 }

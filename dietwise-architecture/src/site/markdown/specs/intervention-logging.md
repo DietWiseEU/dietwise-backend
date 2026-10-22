@@ -109,7 +109,7 @@ one transaction.
 Validation, before anything is written:
 
 - The Assignment does not exist, or belongs to another user or application: `EntityNotFoundException` (`404`).
-- The Suggestion is not among the Assignment's Suggestions: `400`.
+- The Suggestion is not among the Assignment's Suggestions: `InvalidRequestException` (`400`).
 
 ## Account deletion
 

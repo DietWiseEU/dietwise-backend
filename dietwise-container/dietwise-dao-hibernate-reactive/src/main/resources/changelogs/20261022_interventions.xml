@@ -148,4 +148,41 @@
 			<delete tableName="DW_INTERVENTION" />
 		</rollback>
 	</changeSet>
+
+	<changeSet id="suggestion_events" author="nikospara">
+		<createTable tableName="DW_SUGGESTION_EVENT" remarks="Suggestion Events: an append-only log of the accept/reject transitions a user made on the Suggestions of an Intervention Assignment">
+			<column name="id" type="UUID" remarks="The primary key">
+				<constraints primaryKey="true" primaryKeyName="PK_DW_SUGGESTION_EVENT" />
+			</column>
+			<column name="intervention_assignment_assessment_id" type="UUID" remarks="The Intervention Assignment under which the Suggestion was shown">
+				<constraints nullable="false" notNullConstraintName="NL_DW_SUGGESTION_EVENT__INTERVENTION_ASSIGNMENT_ASSESSMENT_ID" />
+			</column>
+			<column name="suggestion_template_id" type="UUID" remarks="The Suggestion the user acted on">
+				<constraints nullable="false" notNullConstraintName="NL_DW_SUGGESTION_EVENT__SUGGESTION_TEMPLATE_ID" />
+			</column>
+			<column name="action" type="VARCHAR(20)" remarks="The transition: INCREASE_ACCEPTED, DECREASE_ACCEPTED, INCREASE_REJECTED or DECREASE_REJECTED">
+				<constraints nullable="false" notNullConstraintName="NL_DW_SUGGESTION_EVENT__ACTION" />
+			</column>
+			<column name="created_at" type="TIMESTAMP" remarks="The time of the transition">
+				<constraints nullable="false" notNullConstraintName="NL_DW_SUGGESTION_EVENT__CREATED_AT" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint
+				baseTableName="DW_SUGGESTION_EVENT"
+				baseColumnNames="intervention_assignment_assessment_id"
+				constraintName="FK_SUGG_EVENT__ASSESSMENT_ID__INTV_ASGN__ASSESSMENT_ID"
+				referencedTableName="DW_INTERVENTION_ASSIGNMENT"
+				referencedColumnNames="assessment_id"
+		/>
+		<addForeignKeyConstraint
+				baseTableName="DW_SUGGESTION_EVENT"
+				baseColumnNames="suggestion_template_id"
+				constraintName="FK_SUGG_EVENT__SUGG_TEMPLATE_ID__SUGG_TEMPLATE__ID"
+				referencedTableName="DW_SUGGESTION_TEMPLATE"
+				referencedColumnNames="id"
+		/>
+		<createIndex tableName="DW_SUGGESTION_EVENT" indexName="IX_DW_SUGGESTION_EVENT__INTERVENTION_ASSIGNMENT_ASSESSMENT_ID">
+			<column name="intervention_assignment_assessment_id" />
+		</createIndex>
+	</changeSet>
 </databaseChangeLog>

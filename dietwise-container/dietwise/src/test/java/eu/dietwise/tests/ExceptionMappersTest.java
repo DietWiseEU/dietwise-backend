@@ -10,6 +10,7 @@ import eu.dietwise.common.dao.DuplicateBusinessKeyException;
 import eu.dietwise.common.dao.EntityInUseException;
 import eu.dietwise.common.dao.EntityNotFoundException;
 import eu.dietwise.common.dao.StaleVersionException;
+import eu.dietwise.common.types.InvalidRequestException;
 import eu.dietwise.common.types.authorization.NotAuthenticatedException;
 import eu.dietwise.common.types.authorization.NotAuthorizedException;
 import eu.dietwise.services.v1.PersonalInfoService;
@@ -33,6 +34,7 @@ class ExceptionMappersTest extends CitizenResourceTest {
 
 	static Stream<Arguments> exceptionsAndStatuses() {
 		return Stream.of(
+				Arguments.of(new InvalidRequestException("invalid"), 400),
 				Arguments.of(new EntityNotFoundException("not found"), 404),
 				Arguments.of(new NotAuthenticatedException("not authenticated"), 401),
 				Arguments.of(new NotAuthorizedException("not authorized"), 403),

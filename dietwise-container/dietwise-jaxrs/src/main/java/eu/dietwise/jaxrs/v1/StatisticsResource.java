@@ -12,10 +12,10 @@ import jakarta.ws.rs.core.MediaType;
 
 import eu.dietwise.common.v1.model.User;
 import eu.dietwise.services.v1.StatisticsService;
-import eu.dietwise.services.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.model.ImmutableStatisticsResponse;
 import eu.dietwise.v1.model.StatisticsParam;
 import eu.dietwise.v1.model.StatisticsResponse;
+import eu.dietwise.v1.types.SuggestionStatsTransition;
 import io.smallrye.mutiny.Uni;
 
 @Path("statistics")
@@ -29,7 +29,7 @@ public class StatisticsResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Uni<StatisticsResponse> increaseTimesAccepted(@Context ContainerRequestContext crc, @Valid StatisticsParam param) {
 		var user = (User) crc.getSecurityContext().getUserPrincipal();
-		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), SuggestionStatsTransition.INCREASE_ACCEPTED)
+		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), param.getAssessmentId(), SuggestionStatsTransition.INCREASE_ACCEPTED)
 				.map(result -> ImmutableStatisticsResponse.builder().updatedValue(result).build());
 	}
 
@@ -39,7 +39,7 @@ public class StatisticsResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Uni<StatisticsResponse> decreaseTimesAccepted(@Context ContainerRequestContext crc, @Valid StatisticsParam param) {
 		var user = (User) crc.getSecurityContext().getUserPrincipal();
-		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), SuggestionStatsTransition.DECREASE_ACCEPTED)
+		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), param.getAssessmentId(), SuggestionStatsTransition.DECREASE_ACCEPTED)
 				.map(result -> ImmutableStatisticsResponse.builder().updatedValue(result).build());
 	}
 
@@ -49,7 +49,7 @@ public class StatisticsResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Uni<StatisticsResponse> increaseTimesRejected(@Context ContainerRequestContext crc, @Valid StatisticsParam param) {
 		var user = (User) crc.getSecurityContext().getUserPrincipal();
-		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), SuggestionStatsTransition.INCREASE_REJECTED)
+		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), param.getAssessmentId(), SuggestionStatsTransition.INCREASE_REJECTED)
 				.map(result -> ImmutableStatisticsResponse.builder().updatedValue(result).build());
 	}
 
@@ -59,7 +59,7 @@ public class StatisticsResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Uni<StatisticsResponse> decreaseTimesRejected(@Context ContainerRequestContext crc, @Valid StatisticsParam param) {
 		var user = (User) crc.getSecurityContext().getUserPrincipal();
-		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), SuggestionStatsTransition.DECREASE_REJECTED)
+		return statisticsService.updateSuggestionStats(user, param.getSuggestionId(), param.getAssessmentId(), SuggestionStatsTransition.DECREASE_REJECTED)
 				.map(result -> ImmutableStatisticsResponse.builder().updatedValue(result).build());
 	}
 }

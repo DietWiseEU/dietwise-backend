@@ -1,4 +1,4 @@
-package eu.dietwise.services.v1.types;
+package eu.dietwise.v1.types;
 
 /**
  * A change a user makes to the accepted/rejected counters of a Suggestion in their SuggestionStats.

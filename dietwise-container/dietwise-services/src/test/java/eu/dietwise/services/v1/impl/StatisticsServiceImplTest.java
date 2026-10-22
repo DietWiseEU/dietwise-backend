@@ -1,34 +1,46 @@
 package eu.dietwise.services.v1.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import eu.dietwise.common.dao.EntityNotFoundException;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.test.jpa.MockReactivePersistenceContextFactory;
+import eu.dietwise.common.types.InvalidRequestException;
 import eu.dietwise.common.v1.model.ImmutableUser;
 import eu.dietwise.common.v1.model.User;
 import eu.dietwise.common.v1.types.HasUserId;
 import eu.dietwise.common.v1.types.Role;
 import eu.dietwise.common.v1.types.impl.UserIdImpl;
+import eu.dietwise.dao.interventions.InterventionAssignmentDao;
+import eu.dietwise.dao.interventions.SuggestionEventDao;
 import eu.dietwise.dao.statistics.UserRecipeStatsEntityDao;
 import eu.dietwise.dao.statistics.UserStatsEntityDao;
 import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
 import eu.dietwise.services.authz.Authorization;
+import eu.dietwise.services.model.interventions.ImmutableInterventionAssignment;
+import eu.dietwise.services.model.interventions.ImmutableSuggestionEvent;
+import eu.dietwise.services.model.interventions.InterventionAssignment;
 import eu.dietwise.services.nondomain.DateTimeService;
-import eu.dietwise.services.v1.types.SuggestionStatsTransition;
+import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.SuggestionTemplateId;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import io.smallrye.mutiny.Uni;
@@ -50,6 +62,9 @@ class StatisticsServiceImplTest {
 	private static final SuggestionTemplateId SUGGESTION_ID = new GenericSuggestionTemplateId("22222222-2222-3333-4444-555555555555");
 	private static final String RECIPE_URL = "https://example.test/recipes/simple-pasta";
 	private static final String RECIPE_NAME = "Simple Pasta";
+	private static final UUID ASSESSMENT_ID = UUID.fromString("33333333-2222-3333-4444-555555555555");
+	private static final UUID OTHER_USER_UUID = UUID.fromString("44444444-2222-3333-4444-555555555555");
+	private static final SuggestionTemplateId OTHER_SUGGESTION_ID = new GenericSuggestionTemplateId("55555555-2222-3333-4444-555555555555");
 
 	@RegisterExtension
 	private final MockReactivePersistenceContextFactory persistenceContextFactory = new MockReactivePersistenceContextFactory();
@@ -61,6 +76,10 @@ class StatisticsServiceImplTest {
 	@Mock
 	private UserSuggestionStatsEntityDao userSuggestionStatsEntityDao;
 	@Mock
+	private InterventionAssignmentDao interventionAssignmentDao;
+	@Mock
+	private SuggestionEventDao suggestionEventDao;
+	@Mock
 	private DateTimeService dateTimeService;
 	@Mock
 	private Authorization authorization;
@@ -70,7 +89,7 @@ class StatisticsServiceImplTest {
 	@BeforeEach
 	void beforeEach() {
 		lenient().when(dateTimeService.getNow()).thenReturn(NOW);
-		sut = new StatisticsServiceImpl(persistenceContextFactory, userRecipeStatsEntityDao, userStatsEntityDao, userSuggestionStatsEntityDao, dateTimeService, authorization);
+		sut = new StatisticsServiceImpl(persistenceContextFactory, userRecipeStatsEntityDao, userStatsEntityDao, userSuggestionStatsEntityDao, interventionAssignmentDao, suggestionEventDao, dateTimeService, authorization);
 	}
 
 	@Test
@@ -180,7 +199,7 @@ class StatisticsServiceImplTest {
 		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
 		when(update.apply(userSuggestionStatsEntityDao, any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
 
-		Integer result = sut.updateSuggestionStats(user, SUGGESTION_ID, transition).await().atMost(Duration.ofSeconds(5L));
+		Integer result = sut.updateSuggestionStats(user, SUGGESTION_ID, null, transition).await().atMost(Duration.ofSeconds(5L));
 
 		assertThat(result).isEqualTo(11);
 		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
@@ -188,6 +207,76 @@ class StatisticsServiceImplTest {
 		verifyNoMoreInteractions(userSuggestionStatsEntityDao);
 		verify(authorization).requireLogin(user);
 		verify(authorization).requireApplicationId(user);
+		verifyNoInteractions(interventionAssignmentDao, suggestionEventDao);
+	}
+
+	@ParameterizedTest
+	@MethodSource("transitions")
+	void updateSuggestionStatsWithAssessmentAppendsASuggestionEventInTheTransactionOfTheCounter(SuggestionStatsTransition transition, CounterUpdate update) {
+		User user = makeUserWithApplicationId(APPLICATION_ID);
+		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
+		when(interventionAssignmentDao.findById(any(), eq(ASSESSMENT_ID))).thenReturn(Uni.createFrom().item(Optional.of(makeAssignment(USER_UUID, APPLICATION_ID))));
+		when(update.apply(userSuggestionStatsEntityDao, any(), any(), any(), any())).thenReturn(Uni.createFrom().item(11));
+		when(suggestionEventDao.insert(any(), any())).thenReturn(Uni.createFrom().voidItem());
+
+		Integer result = sut.updateSuggestionStats(user, SUGGESTION_ID, ASSESSMENT_ID, transition).await().atMost(Duration.ofSeconds(5L));
+
+		assertThat(result).isEqualTo(11);
+		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
+		ReactivePersistenceTxContext tx = persistenceContextFactory.getOpenedTransactions().getFirst();
+		update.apply(verify(userSuggestionStatsEntityDao), eq(tx), eq(APPLICATION_ID), eq(user), eq(SUGGESTION_ID));
+		verify(suggestionEventDao).insert(tx, ImmutableSuggestionEvent.builder()
+				.assessmentId(ASSESSMENT_ID)
+				.suggestionTemplateId(SUGGESTION_ID)
+				.action(transition)
+				.createdAt(NOW)
+				.build());
+	}
+
+	static Stream<Arguments> assignmentsTheUserCannotReport() {
+		return Stream.of(
+				Arguments.of("unknown assessment", Optional.empty()),
+				Arguments.of("assessment of another user", Optional.of(makeAssignment(OTHER_USER_UUID, APPLICATION_ID))),
+				Arguments.of("assessment of another application", Optional.of(makeAssignment(USER_UUID, "rca")))
+		);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("assignmentsTheUserCannotReport")
+	void updateSuggestionStatsWithAnAssessmentTheUserCannotReportIsNotFoundAndWritesNothing(String description, Optional<InterventionAssignment> assignment) {
+		User user = makeUserWithApplicationId(APPLICATION_ID);
+		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
+		when(interventionAssignmentDao.findById(any(), eq(ASSESSMENT_ID))).thenReturn(Uni.createFrom().item(assignment));
+
+		assertThatThrownBy(() -> sut.updateSuggestionStats(user, SUGGESTION_ID, ASSESSMENT_ID, SuggestionStatsTransition.INCREASE_ACCEPTED).await().atMost(Duration.ofSeconds(5L)))
+				.isInstanceOf(EntityNotFoundException.class);
+
+		verifyNoInteractions(userSuggestionStatsEntityDao, suggestionEventDao);
+	}
+
+	@Test
+	void updateSuggestionStatsWithASuggestionNotShownInTheAssessmentIsInvalidAndWritesNothing() {
+		User user = makeUserWithApplicationId(APPLICATION_ID);
+		when(authorization.requireApplicationId(user)).thenReturn(APPLICATION_ID);
+		when(interventionAssignmentDao.findById(any(), eq(ASSESSMENT_ID))).thenReturn(Uni.createFrom().item(Optional.of(makeAssignment(USER_UUID, APPLICATION_ID))));
+
+		assertThatThrownBy(() -> sut.updateSuggestionStats(user, OTHER_SUGGESTION_ID, ASSESSMENT_ID, SuggestionStatsTransition.INCREASE_ACCEPTED).await().atMost(Duration.ofSeconds(5L)))
+				.isInstanceOf(InvalidRequestException.class);
+
+		verifyNoInteractions(userSuggestionStatsEntityDao, suggestionEventDao);
+	}
+
+	private static InterventionAssignment makeAssignment(UUID userId, String applicationId) {
+		return ImmutableInterventionAssignment.builder()
+				.assessmentId(ASSESSMENT_ID)
+				.userId(userId)
+				.applicationId(applicationId)
+				.interventionId(1)
+				.uiLang(RecipeLanguage.EN)
+				.recipeUrl(RECIPE_URL)
+				.createdAt(NOW.minusMinutes(5))
+				.suggestionTemplateIds(Set.of(SUGGESTION_ID))
+				.build();
 	}
 
 	private static User makeUserWithApplicationId(String applicationId) {
