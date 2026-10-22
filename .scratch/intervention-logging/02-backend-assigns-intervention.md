@@ -11,24 +11,28 @@ Account deletion) and ADR 0001 for the decisions; do not re-open them.
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** DONE
 
-- [ ] Liquibase creates `DW_INTERVENTION` (manual integer id, `active`, `text_en/nl/el/lt`,
+- [x] Liquibase creates `DW_INTERVENTION` (manual integer id, `active`, `text_en/nl/el/lt`,
       `CHECK (id = 0 OR text_en IS NOT NULL)`), seeded with `0` (no texts) and `1..5` copied verbatim from
       MyRecipeWatch's `en/nl/el/lt.json` `interventions` blocks, all active. No Working Copy, publish-tool registry
       unchanged.
-- [ ] Liquibase creates `DW_INTERVENTION_ASSIGNMENT` (`assessment_id` UUID PK, `user_id`, `application_id`,
+- [x] Liquibase creates `DW_INTERVENTION_ASSIGNMENT` (`assessment_id` UUID PK, `user_id`, `application_id`,
       `intervention_id`, `ui_lang` actually used, `recipe_url`, `created_at`) and
-      `DW_INTERVENTION_ASSIGNMENT_SUGGESTION` (`assessment_id`, `suggestion_template_id`), with foreign keys.
-- [ ] Both assessment requests (URL and markdown) accept an optional `uiLang`.
-- [ ] With `uiLang`, active Interventions and at least one Suggestion: one Assignment and one row per Suggestion shown
+      `DW_INTERVENTION_ASSIGNMENT_SUGGESTIONS` (`intervention_assignment_assessment_id`, `suggestion_template_id`),
+      with foreign keys.
+- [x] Both assessment requests (URL and markdown) accept an optional `uiLang`, one of the supported languages; any
+      other value rejects the request.
+- [x] With `uiLang`, active Interventions and at least one Suggestion: one Assignment and one row per Suggestion shown
       are written in the same transaction as the times-suggested counters, and the `SUGGESTIONS` message carries
       `assessmentId` and `intervention {id, text}` (`text` null for `0`).
-- [ ] Without `uiLang`, with no active Intervention (kill switch), or with no Suggestions: no rows, and the
+- [x] Without `uiLang`, with no active Intervention (kill switch), or with no Suggestions: no rows, and the
       `SUGGESTIONS` message has no `assessmentId`/`intervention`.
-- [ ] A `uiLang` without a text column yields the `en` text and records `en` as `ui_lang`.
-- [ ] The random pick is injectable; tests fix it. Picking is uniform over the active rows, read on every assessment.
-- [ ] Deleting an account deletes the user's Assignment Suggestions and Assignments, in the existing deletion
+- [x] An Intervention without a text in `uiLang` yields its `en` text and records `en` as `ui_lang`.
+- [x] If writing the Assignment or the times-suggested counters fails, the failure is logged and the assessment
+      continues; the `SUGGESTIONS` message has no `assessmentId`/`intervention`.
+- [x] The random pick is injectable; tests fix it. Picking is uniform over the active rows, read on every assessment.
+- [x] Deleting an account deletes the user's Assignment Suggestions and Assignments, in the existing deletion
       transaction.
-- [ ] The RCA's assessment requests and response stream are unchanged (verified against its request shape/tests).
-- [ ] `CONTEXT.md` terms (Intervention, Intervention Assignment) are used in names.
+- [x] The RCA's assessment requests and response stream are unchanged (verified against its request shape/tests).
+- [x] `CONTEXT.md` terms (Intervention, Intervention Assignment) are used in names.

@@ -14,8 +14,9 @@ to each assessment.
 
 **Status:** ready-for-agent
 
-- [ ] Liquibase creates `DW_SUGGESTION_EVENT` (`id` UUID PK, `assessment_id` FK to the Assignment,
-      `suggestion_template_id` FK, `action`, `created_at`, index on `assessment_id`). Publish-tool registry unchanged.
+- [ ] Liquibase creates `DW_SUGGESTION_EVENT` (`id` UUID PK, `intervention_assignment_assessment_id` FK to the
+      Assignment, `suggestion_template_id` FK, `action`, `created_at`, index on
+      `intervention_assignment_assessment_id`). Publish-tool registry unchanged.
 - [ ] The statistics request body accepts an optional `assessmentId`.
 - [ ] With a valid `assessmentId`: the counter is updated as today and one event is appended, in one transaction —
       also when the counter does not move (cap or floor).
