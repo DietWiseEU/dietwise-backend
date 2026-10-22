@@ -56,6 +56,17 @@ _Avoid_: SavedDecision, saved suggestion, suggestion feedback, choice
 **SuggestionStats**:
 Aggregate counts of accept/reject *events* for a SuggestionTemplate. Answers "how often", whereas a SuggestionDecision answers "what is this user's verdict now, for this recipe".
 
+**Intervention**:
+A fixed motivational message shown in MyRecipeWatch above the Suggestions, curated by the marketing partners. Id `0` is the "no Intervention" arm of the experiment. An id names one wording forever: a change of meaning is a new id. Switched on and off by its `active` flag directly in master data, not through the Working Copy.
+_Avoid_: banner, nudge, motivational message
+
+**Intervention Assignment**:
+The Intervention the backend picked for one assessment, with the Suggestions shown under it; identified by the `assessmentId`. Records what was assigned, not what was displayed.
+_Avoid_: impression, exposure
+
+**Suggestion Event**:
+One accept/reject transition a user made on one Suggestion of an Intervention Assignment. Append-only history, unlike a SuggestionDecision; recorded alongside, not instead of, the SuggestionStats.
+
 ### Backoffice
 
 **Working Copy**:
