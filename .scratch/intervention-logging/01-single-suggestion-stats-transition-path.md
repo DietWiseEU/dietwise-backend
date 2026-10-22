@@ -10,14 +10,14 @@ Context: spec `dietwise-architecture/src/site/markdown/specs/intervention-loggin
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** DONE
 
-- [ ] The transition is a named type in the service-interface types, with the four values above.
-- [ ] The statistics service exposes one operation taking the user, the SuggestionTemplate id and the transition; the
+- [x] The transition is a named type in the service-interface types, with the four values above.
+- [x] The statistics service exposes one operation taking the user, the SuggestionTemplate id and the transition; the
       four per-transition service methods are gone.
-- [ ] The four endpoints keep their paths, request body and response, and delegate to the single operation.
-- [ ] Counter semantics are unchanged: the `accepted + rejected ≤ suggested` cap, the floor at 0, login and
+- [x] The four endpoints keep their paths, request body and response, and delegate to the single operation.
+- [x] Counter semantics are unchanged: the `accepted + rejected ≤ suggested` cap, the floor at 0, login and
       application id required.
-- [ ] Existing tests of the statistics resource, service and DAO pass, adapted only where they call the removed
+- [x] Existing tests of the statistics resource, service and DAO pass, adapted only where they call the removed
       methods; no behavior assertion is weakened.
-- [ ] The RCA's and MyRecipeWatch's statistics requests are unchanged.
+- [x] The RCA's and MyRecipeWatch's statistics requests are unchanged.
