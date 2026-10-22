@@ -9,6 +9,7 @@ import eu.dietwise.common.dao.reactive.ReactivePersistenceContextFactory;
 import eu.dietwise.common.v1.model.User;
 import eu.dietwise.dao.PersonalInfoDao;
 import eu.dietwise.dao.UserDao;
+import eu.dietwise.dao.interventions.InterventionAssignmentDao;
 import eu.dietwise.dao.statistics.UserRecipeStatsEntityDao;
 import eu.dietwise.dao.statistics.UserStatsEntityDao;
 import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
@@ -32,6 +33,7 @@ public class AccountServiceImpl implements AccountService {
 	private final UserRecipeStatsEntityDao userRecipeStatsEntityDao;
 	private final UserSuggestionStatsEntityDao userSuggestionStatsEntityDao;
 	private final UserStatsEntityDao userStatsEntityDao;
+	private final InterventionAssignmentDao interventionAssignmentDao;
 	private final DateTimeService dateTimeService;
 	private final Authorization authorization;
 	private final KeycloakAdminClient keycloakAdminClient;
@@ -46,6 +48,7 @@ public class AccountServiceImpl implements AccountService {
 			UserRecipeStatsEntityDao userRecipeStatsEntityDao,
 			UserSuggestionStatsEntityDao userSuggestionStatsEntityDao,
 			UserStatsEntityDao userStatsEntityDao,
+			InterventionAssignmentDao interventionAssignmentDao,
 			DateTimeService dateTimeService,
 			Authorization authorization,
 			@RestClient KeycloakAdminClient keycloakAdminClient,
@@ -59,6 +62,7 @@ public class AccountServiceImpl implements AccountService {
 		this.userRecipeStatsEntityDao = userRecipeStatsEntityDao;
 		this.userSuggestionStatsEntityDao = userSuggestionStatsEntityDao;
 		this.userStatsEntityDao = userStatsEntityDao;
+		this.interventionAssignmentDao = interventionAssignmentDao;
 		this.dateTimeService = dateTimeService;
 		this.authorization = authorization;
 		this.keycloakAdminClient = keycloakAdminClient;
@@ -95,6 +99,7 @@ public class AccountServiceImpl implements AccountService {
 				personalInfoDao.deleteByUser(tx, user)
 						.chain(() -> userRecipeStatsEntityDao.deleteByUser(tx, userId))
 						.chain(() -> userSuggestionStatsEntityDao.deleteByUser(tx, userId))
+						.chain(() -> interventionAssignmentDao.deleteByUser(tx, userId))
 						.chain(() -> userStatsEntityDao.deleteByUser(tx, userId))
 						.chain(() -> userDao.tombstoneByIdmId(tx, idmId, deletedAt))
 		);

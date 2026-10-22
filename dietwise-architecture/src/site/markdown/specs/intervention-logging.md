@@ -29,8 +29,10 @@ The RCA must not be affected.
 2. An Assignment is made only when the assessment request carries `uiLang`, there is at least one active Intervention,
    and the assessment produced Suggestions. Otherwise nothing is assigned or logged. The RCA and outdated app builds
    never send `uiLang`; deactivating every Intervention is a kill switch.
-3. `DW_INTERVENTION` is the single source of the texts. The text is sent in `uiLang`, falling back to `en` for a
-   language without a column. The app's i18n files no longer hold them.
+3. `DW_INTERVENTION` is the single source of the texts. The text is sent in `uiLang`, falling back to `en` when the
+   Intervention has no text in that language. The app's i18n files no longer hold them.
+8. `uiLang` is validated strictly, like `lang`: a value outside the supported languages rejects the request. A client
+   must not send a UI language the backend does not support.
 4. The Suggestion Events are an append-only log: one row per statistics call, never merged or overwritten.
 5. `DW_USER_SUGGESTION_STATS` and the `/statistics/*` endpoints keep their behavior for every caller. The event is
    written in addition, in the same transaction as the counter, and even when the counter does not move (the
@@ -58,23 +60,24 @@ New changelog `changelogs/20261022_interventions.xml`, included from `changelog.
 - `user_id UUID NOT NULL`, FK `DW_USER`.
 - `application_id VARCHAR NOT NULL`.
 - `intervention_id INTEGER NOT NULL`, FK `DW_INTERVENTION`.
-- `ui_lang VARCHAR NOT NULL`: the language of the text actually sent (after the fallback).
+- `ui_lang VARCHAR NOT NULL`: the language of the text actually sent (after the fallback to `en`); for `0`, which
+  has no text, the `uiLang` of the request.
 - `recipe_url VARCHAR`.
 - `created_at TIMESTAMP NOT NULL`.
 
-`DW_INTERVENTION_ASSIGNMENT_SUGGESTION`, the denominator of the acceptance rate:
+`DW_INTERVENTION_ASSIGNMENT_SUGGESTIONS`, the denominator of the acceptance rate:
 
-- `assessment_id UUID`, FK `DW_INTERVENTION_ASSIGNMENT`; `suggestion_template_id UUID`, FK
+- `intervention_assignment_assessment_id UUID`, FK `DW_INTERVENTION_ASSIGNMENT`; `suggestion_template_id UUID`, FK
   `DW_SUGGESTION_TEMPLATE`; composite PK.
 
 `DW_SUGGESTION_EVENT`:
 
 - `id UUID` PK.
-- `assessment_id UUID NOT NULL`, FK `DW_INTERVENTION_ASSIGNMENT`.
+- `intervention_assignment_assessment_id UUID NOT NULL`, FK `DW_INTERVENTION_ASSIGNMENT`.
 - `suggestion_template_id UUID NOT NULL`, FK `DW_SUGGESTION_TEMPLATE`.
 - `action VARCHAR NOT NULL`: `INCREASE_ACCEPTED`, `DECREASE_ACCEPTED`, `INCREASE_REJECTED`, `DECREASE_REJECTED`.
 - `created_at TIMESTAMP NOT NULL`.
-- Index on `assessment_id`.
+- Index on `intervention_assignment_assessment_id`.
 
 The user and the Intervention of an event are reached through its Assignment. The final decision per (assessment,
 Suggestion) is derived by replaying its events; no view is provided for now.
@@ -83,10 +86,12 @@ None of these tables is mirrored by the publish tool, so `Tables` does not chang
 
 ## Assessment
 
-`RecipeAssessmentParam` and `RecipeExtractionAndAssessmentParam` gain an optional `uiLang`.
+`RecipeAssessmentParam` and `RecipeExtractionAndAssessmentParam` gain an optional `uiLang`, a `RecipeLanguage`.
 
 In `RecipeAssessmentServiceImpl.assessSingleRecipe`, in the same transaction as `increaseTimesSuggested`, when decision
-2 allows it: pick an active Intervention, insert the Assignment and its Suggestions, and resolve the text.
+2 allows it: pick an active Intervention, insert the Assignment and its Suggestions, and resolve the text. The
+transaction is opened by `RecipeAssessmentServiceImpl` and passed to both. If it fails, the failure is logged and the
+assessment continues: the `SUGGESTIONS` message is sent without `assessmentId` and `intervention`.
 
 `SuggestionsRecipeAssessmentMessage` gains optional fields, absent when nothing was assigned:
 

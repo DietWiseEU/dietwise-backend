@@ -4,18 +4,22 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import eu.dietwise.services.v1.RecipeAssessmentService;
+import eu.dietwise.services.v1.types.Intervention;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.MoreThanOneRecipesAssessmentMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.RecipeAssessmentErrorMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.ScoringRecipeAssessmentMessage;
+import eu.dietwise.services.v1.types.RecipeAssessmentMessage.SuggestionsRecipeAssessmentMessage;
 import eu.dietwise.v1.model.ImmutableRecipeAssessmentParam;
 import eu.dietwise.v1.model.ImmutableRecipeExtractionAndAssessmentParam;
 import eu.dietwise.v1.model.ImmutableScoringData;
@@ -42,6 +46,7 @@ class RecipeAssessmentResourceTest extends CitizenResourceTest {
 			.primaryComponentPerIngredient(Map.of(new GenericIngredientId("apple"), new RecommendationComponentNameImpl("fruit")))
 			.build());
 	private static final RecipeAssessmentMessage ERROR_MESSAGE = new RecipeAssessmentErrorMessage(List.of("No recipe found"));
+	private static final UUID ASSESSMENT_ID = UUID.fromString("3e0c7a52-1b6d-4f8e-9a2c-5d4b3a2f1e0d");
 
 	@InjectMock
 	RecipeAssessmentService service;
@@ -91,5 +96,104 @@ class RecipeAssessmentResourceTest extends CitizenResourceTest {
 				authenticatedUser(),
 				eq(ImmutableRecipeExtractionAndAssessmentParam.builder().url(RECIPE_URL).lang(RecipeLanguage.EL).build()));
 		assertThat(body.lines()).containsExactly("{\"type\":\"ERROR\",\"errors\":[\"No recipe found\"]}");
+	}
+
+	@Test
+	void assessMarkdownRecipePassesTheUiLanguageToTheService() {
+		when(service.assessMarkdownRecipe(any(), any())).thenReturn(Multi.createFrom().items(ERROR_MESSAGE));
+
+		given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"url": "%s", "pageContent": "Recipe text", "lang": "en", "uiLang": "el"}
+						""".formatted(RECIPE_URL))
+				.when()
+				.post("/api/v1/recipe/assess/markdown")
+				.then()
+				.statusCode(200);
+
+		verify(service).assessMarkdownRecipe(
+				authenticatedUser(),
+				eq(ImmutableRecipeAssessmentParam.builder().url(RECIPE_URL).pageContent("Recipe text").lang(RecipeLanguage.EN).uiLang(RecipeLanguage.EL).build()));
+	}
+
+	@Test
+	void extractAndAssessRecipeFromUrlPassesTheUiLanguageToTheService() {
+		when(service.extractAndAssessRecipeFromUrl(any(), any())).thenReturn(Multi.createFrom().items(ERROR_MESSAGE));
+
+		given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"url": "%s", "lang": "el", "uiLang": "lt"}
+						""".formatted(RECIPE_URL))
+				.when()
+				.post("/api/v1/recipe/assess/url")
+				.then()
+				.statusCode(200);
+
+		verify(service).extractAndAssessRecipeFromUrl(
+				authenticatedUser(),
+				eq(ImmutableRecipeExtractionAndAssessmentParam.builder().url(RECIPE_URL).lang(RecipeLanguage.EL).uiLang(RecipeLanguage.LT).build()));
+	}
+
+	@Test
+	void assessMarkdownRecipeRejectsAnUnsupportedUiLanguage() {
+		given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"url": "%s", "pageContent": "Recipe text", "lang": "en", "uiLang": "de"}
+						""".formatted(RECIPE_URL))
+				.when()
+				.post("/api/v1/recipe/assess/markdown")
+				.then()
+				.statusCode(400);
+
+		verify(service, never()).assessMarkdownRecipe(any(), any());
+	}
+
+	@Test
+	void suggestionsMessageWithoutInterventionHasNoInterventionFields() {
+		when(service.assessMarkdownRecipe(any(), any())).thenReturn(Multi.createFrom().items(new SuggestionsRecipeAssessmentMessage(List.of())));
+
+		var body = assessMarkdownRecipe();
+
+		assertThat(body.lines()).containsExactly("{\"type\":\"SUGGESTIONS\",\"suggestions\":[],\"suggestionTemplateIds\":[]}");
+	}
+
+	@Test
+	void suggestionsMessageCarriesTheAssessmentIdAndTheIntervention() {
+		when(service.assessMarkdownRecipe(any(), any())).thenReturn(Multi.createFrom().items(
+				new SuggestionsRecipeAssessmentMessage(List.of(), ASSESSMENT_ID, new Intervention(2, "Healthiness guaranteed."))));
+
+		var body = assessMarkdownRecipe();
+
+		assertThat(body.lines()).containsExactly(
+				"{\"type\":\"SUGGESTIONS\",\"suggestions\":[],\"assessmentId\":\"3e0c7a52-1b6d-4f8e-9a2c-5d4b3a2f1e0d\","
+						+ "\"intervention\":{\"id\":2,\"text\":\"Healthiness guaranteed.\"},\"suggestionTemplateIds\":[]}");
+	}
+
+	@Test
+	void suggestionsMessageOfTheNoInterventionArmCarriesANullText() {
+		when(service.assessMarkdownRecipe(any(), any())).thenReturn(Multi.createFrom().items(
+				new SuggestionsRecipeAssessmentMessage(List.of(), ASSESSMENT_ID, new Intervention(0, null))));
+
+		var body = assessMarkdownRecipe();
+
+		assertThat(body.lines()).containsExactly(
+				"{\"type\":\"SUGGESTIONS\",\"suggestions\":[],\"assessmentId\":\"3e0c7a52-1b6d-4f8e-9a2c-5d4b3a2f1e0d\","
+						+ "\"intervention\":{\"id\":0,\"text\":null},\"suggestionTemplateIds\":[]}");
+	}
+
+	private String assessMarkdownRecipe() {
+		return given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"url": "%s", "pageContent": "Recipe text", "lang": "en", "uiLang": "en"}
+						""".formatted(RECIPE_URL))
+				.when()
+				.post("/api/v1/recipe/assess/markdown")
+				.then()
+				.statusCode(200)
+				.extract().asString();
 	}
 }

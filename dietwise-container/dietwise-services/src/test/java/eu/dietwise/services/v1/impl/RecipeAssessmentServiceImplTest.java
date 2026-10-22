@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import eu.dietwise.common.test.jpa.MockReactivePersistenceContextFactory;
 import eu.dietwise.common.types.authorization.NotAuthenticatedException;
 import eu.dietwise.common.types.authorization.NotAuthorizedException;
 import eu.dietwise.common.v1.model.ImmutableUser;
@@ -34,9 +36,12 @@ import eu.dietwise.services.model.recommendations.RecommendationComponent;
 import eu.dietwise.services.v1.StatisticsService;
 import eu.dietwise.services.v1.extraction.NoIngredientsInRecipeException;
 import eu.dietwise.services.v1.extraction.RecipeExtractionService;
+import eu.dietwise.services.v1.interventions.AssignedIntervention;
+import eu.dietwise.services.v1.interventions.InterventionService;
 import eu.dietwise.services.v1.scoring.RecipeScoringService;
 import eu.dietwise.services.v1.suggestions.MakeSuggestionsResult;
 import eu.dietwise.services.v1.suggestions.RecipeSuggestionsService;
+import eu.dietwise.services.v1.types.Intervention;
 import eu.dietwise.services.v1.types.RecipeAndDetectionType;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.MoreThanOneRecipesAssessmentMessage;
@@ -74,6 +79,7 @@ import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -123,6 +129,10 @@ class RecipeAssessmentServiceImplTest {
 			.pageContent(MARKDOWN)
 			.countryOverride(GREECE)
 			.build();
+	private static final RecipeAssessmentParam MARKDOWN_PARAM_WITH_UI_LANG = ImmutableRecipeAssessmentParam.copyOf(MARKDOWN_PARAM).withUiLang(RecipeLanguage.EL);
+	private static final RecipeExtractionAndAssessmentParam URL_EXTRACTION_PARAM_WITH_UI_LANG = ImmutableRecipeExtractionAndAssessmentParam.copyOf(URL_EXTRACTION_PARAM).withUiLang(RecipeLanguage.NL);
+	private static final UUID ASSESSMENT_ID = UUID.fromString("3e0c7a52-1b6d-4f8e-9a2c-5d4b3a2f1e0d");
+	private static final Intervention INTERVENTION = new Intervention(2, "Εγγυημένη υγιεινή επιλογή.");
 	private static final String RENDERED_MARKDOWN = "rendered markdown";
 	private static final String SUGGESTION_ID = "00000000-2222-3333-4444-555555555555";
 	private static final String ALTERNATIVE_INGREDIENT = "Onion";
@@ -139,6 +149,9 @@ class RecipeAssessmentServiceImplTest {
 
 	private final Authorization authorization = new AuthorizationImpl();
 
+	@RegisterExtension
+	private final MockReactivePersistenceContextFactory persistenceContextFactory = new MockReactivePersistenceContextFactory();
+
 	@Mock
 	private RecipeExtractionService recipeExtractionService;
 
@@ -151,11 +164,14 @@ class RecipeAssessmentServiceImplTest {
 	@Mock
 	private RecipeScoringService recipeScoringService;
 
+	@Mock
+	private InterventionService interventionService;
+
 	private RecipeAssessmentServiceImpl sut;
 
 	@BeforeEach
 	void beforeEach() {
-		sut = new RecipeAssessmentServiceImpl(authorization, recipeExtractionService, statisticsService, recipeSuggestionsService, recipeScoringService);
+		sut = new RecipeAssessmentServiceImpl(authorization, persistenceContextFactory, recipeExtractionService, statisticsService, recipeSuggestionsService, recipeScoringService, interventionService);
 	}
 
 	@Test
@@ -199,6 +215,7 @@ class RecipeAssessmentServiceImplTest {
 		when(recipeSuggestionsService.makeSuggestions(any(), eq(USER), eq(RecipeLanguage.EN), any(Recipe.class), eq(GREECE)))
 				.thenAnswer(iom -> Uni.createFrom().item(makeSuggestions(iom.getArgument(3))));
 		when(recipeSuggestionsService.increaseTimesSuggested(any(), any(), any(), any())).thenReturn(Uni.createFrom().voidItem());
+		when(interventionService.assign(any(), any(), any(), any(), any(), any())).thenReturn(Uni.createFrom().item(Optional.empty()));
 		when(recipeSuggestionsService.enrichWithStatistics(any(), any(), any(), any())).thenAnswer(iom -> Uni.createFrom().item((SuggestionsRecipeAssessmentMessage) iom.getArgument(3)));
 		when(recipeScoringService.makeScoringMessage(any(), any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
 
@@ -223,6 +240,8 @@ class RecipeAssessmentServiceImplTest {
 		var suggestions = (SuggestionsRecipeAssessmentMessage) messages.get(1);
 		assertThat(suggestions.suggestions()).hasSize(1);
 		assertThat(suggestions.suggestions().getFirst().getText()).contains(SUGGESTION_TEXT);
+		assertThat(suggestions.assessmentId()).isNull();
+		assertThat(suggestions.intervention()).isNull();
 
 		assertThat(messages.get(2)).isInstanceOf(ScoringRecipeAssessmentMessage.class);
 
@@ -253,6 +272,7 @@ class RecipeAssessmentServiceImplTest {
 		when(recipeSuggestionsService.makeSuggestions(any(), eq(USER), eq(RecipeLanguage.EN), any(Recipe.class), isNull()))
 				.thenAnswer(iom -> Uni.createFrom().item(makeSuggestions(iom.getArgument(3))));
 		when(recipeSuggestionsService.increaseTimesSuggested(any(), any(), any(), any())).thenReturn(Uni.createFrom().voidItem());
+		when(interventionService.assign(any(), any(), any(), any(), any(), any())).thenReturn(Uni.createFrom().item(Optional.empty()));
 		when(recipeSuggestionsService.enrichWithStatistics(any(), any(), any(), any())).thenAnswer(iom -> Uni.createFrom().item((SuggestionsRecipeAssessmentMessage) iom.getArgument(3)));
 		when(recipeScoringService.makeScoringMessage(any(), any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
 
@@ -272,6 +292,8 @@ class RecipeAssessmentServiceImplTest {
 		var suggestions = (SuggestionsRecipeAssessmentMessage) messages.get(1);
 		assertThat(suggestions.suggestions()).hasSize(1);
 		assertThat(suggestions.suggestions().getFirst().getText()).contains(SUGGESTION_TEXT);
+		assertThat(suggestions.assessmentId()).isNull();
+		assertThat(suggestions.intervention()).isNull();
 
 		assertThat(messages.get(2)).isInstanceOf(ScoringRecipeAssessmentMessage.class);
 
@@ -287,6 +309,92 @@ class RecipeAssessmentServiceImplTest {
 		assertThat(applicationIdCaptor.getValue()).isEqualTo(APPLICATION_ID);
 		assertThat(hasUserIdCaptor.getValue().getId().asString()).isEqualTo(USER_UUID.toString());
 		assertThat(hasSuggestionTemplateIdsCaptor.getValue().getSuggestionTemplateIds()).containsExactlyInAnyOrder(new GenericSuggestionTemplateId(SUGGESTION_ID));
+	}
+
+	@Test
+	void assessMarkdownRecipeAssignsAnInterventionInTheTransactionOfTheTimesSuggestedCounters() {
+		givenTheMarkdownRecipeIsAssessed();
+		when(interventionService.assign(any(), any(), any(), any(), any(), any()))
+				.thenReturn(Uni.createFrom().item(Optional.of(new AssignedIntervention(ASSESSMENT_ID, INTERVENTION))));
+
+		List<RecipeAssessmentMessage> messages = sut.assessMarkdownRecipe(USER, MARKDOWN_PARAM_WITH_UI_LANG)
+				.collect().asList()
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		assertThat(messages).hasSize(3);
+		var suggestions = (SuggestionsRecipeAssessmentMessage) messages.get(1);
+		assertThat(suggestions.suggestions()).hasSize(1);
+		assertThat(suggestions.assessmentId()).isEqualTo(ASSESSMENT_ID);
+		assertThat(suggestions.intervention()).isEqualTo(INTERVENTION);
+		assertThat(messages.get(2)).isInstanceOf(ScoringRecipeAssessmentMessage.class);
+		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
+		var tx = persistenceContextFactory.getOpenedTransactions().getFirst();
+		verify(recipeSuggestionsService).increaseTimesSuggested(same(tx), eq(APPLICATION_ID), any(), any());
+		var suggestionsCaptor = ArgumentCaptor.forClass(HasSuggestionTemplateIds.class);
+		verify(interventionService).assign(same(tx), eq(USER), eq(APPLICATION_ID), eq(RecipeLanguage.EL), eq(MARKDOWN_PARAM.getUrl()), suggestionsCaptor.capture());
+		assertThat(suggestionsCaptor.getValue().getSuggestionTemplateIds()).containsExactly(new GenericSuggestionTemplateId(SUGGESTION_ID));
+	}
+
+	@Test
+	void extractAndAssessRecipeFromUrlAssignsAnInterventionInTheUiLanguage() {
+		var extractionMessage = new RecipeExtractionRecipeAssessmentMessage(
+				List.of(new RecipeAndDetectionType(RECIPE_SIMPLE_PASTA, JSONLD)),
+				RENDERED_MARKDOWN
+		);
+		when(recipeExtractionService.extractRecipeFromUrl(any(UUID.class), any(RecipeExtractionAndAssessmentParam.class)))
+				.thenReturn(Uni.createFrom().item(extractionMessage));
+		when(statisticsService.assessedRecipe(USER)).thenReturn(Uni.createFrom().item(USER));
+		when(statisticsService.assessedRecipe(USER, URL_EXTRACTION_PARAM.getUrl(), "Simple Pasta")).thenReturn(Uni.createFrom().item(USER));
+		when(recipeSuggestionsService.makeSuggestions(any(), eq(USER), eq(RecipeLanguage.EN), any(Recipe.class), isNull()))
+				.thenAnswer(iom -> Uni.createFrom().item(makeSuggestions(iom.getArgument(3))));
+		when(recipeSuggestionsService.increaseTimesSuggested(any(), any(), any(), any())).thenReturn(Uni.createFrom().voidItem());
+		when(recipeSuggestionsService.enrichWithStatistics(any(), any(), any(), any())).thenAnswer(iom -> Uni.createFrom().item((SuggestionsRecipeAssessmentMessage) iom.getArgument(3)));
+		when(recipeScoringService.makeScoringMessage(any(), any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
+		when(interventionService.assign(any(), any(), any(), any(), any(), any()))
+				.thenReturn(Uni.createFrom().item(Optional.of(new AssignedIntervention(ASSESSMENT_ID, INTERVENTION))));
+
+		List<RecipeAssessmentMessage> messages = sut.extractAndAssessRecipeFromUrl(USER, URL_EXTRACTION_PARAM_WITH_UI_LANG)
+				.collect().asList()
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		var suggestions = (SuggestionsRecipeAssessmentMessage) messages.get(1);
+		assertThat(suggestions.assessmentId()).isEqualTo(ASSESSMENT_ID);
+		assertThat(suggestions.intervention()).isEqualTo(INTERVENTION);
+		verify(interventionService).assign(any(), eq(USER), eq(APPLICATION_ID), eq(RecipeLanguage.NL), eq(URL_EXTRACTION_PARAM.getUrl()), any());
+	}
+
+	@Test
+	void assessMarkdownRecipeContinuesWithoutInterventionWhenRecordingTheSuggestionsFails() {
+		givenTheMarkdownRecipeIsAssessed();
+		when(interventionService.assign(any(), any(), any(), any(), any(), any()))
+				.thenReturn(Uni.createFrom().failure(new RuntimeException("Database failure")));
+
+		List<RecipeAssessmentMessage> messages = sut.assessMarkdownRecipe(USER, MARKDOWN_PARAM_WITH_UI_LANG)
+				.collect().asList()
+				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
+
+		assertThat(messages).hasSize(3);
+		var suggestions = (SuggestionsRecipeAssessmentMessage) messages.get(1);
+		assertThat(suggestions.suggestions()).hasSize(1);
+		assertThat(suggestions.assessmentId()).isNull();
+		assertThat(suggestions.intervention()).isNull();
+		assertThat(messages.get(2)).isInstanceOf(ScoringRecipeAssessmentMessage.class);
+	}
+
+	private void givenTheMarkdownRecipeIsAssessed() {
+		var extractionMessage = new RecipeExtractionRecipeAssessmentMessage(
+				List.of(new RecipeAndDetectionType(RECIPE_SIMPLE_PASTA, LLM_FROM_TEXT)),
+				MARKDOWN
+		);
+		when(recipeExtractionService.extractRecipeFromJsonLdOrMarkdown(any(UUID.class), any(RecipeAssessmentParam.class)))
+				.thenReturn(Uni.createFrom().item(extractionMessage));
+		when(statisticsService.assessedRecipe(USER)).thenReturn(Uni.createFrom().item(USER));
+		when(statisticsService.assessedRecipe(USER, MARKDOWN_PARAM.getUrl(), "Simple Pasta")).thenReturn(Uni.createFrom().item(USER));
+		when(recipeSuggestionsService.makeSuggestions(any(), eq(USER), eq(RecipeLanguage.EN), any(Recipe.class), eq(GREECE)))
+				.thenAnswer(iom -> Uni.createFrom().item(makeSuggestions(iom.getArgument(3))));
+		when(recipeSuggestionsService.increaseTimesSuggested(any(), any(), any(), any())).thenReturn(Uni.createFrom().voidItem());
+		when(recipeSuggestionsService.enrichWithStatistics(any(), any(), any(), any())).thenAnswer(iom -> Uni.createFrom().item((SuggestionsRecipeAssessmentMessage) iom.getArgument(3)));
+		when(recipeScoringService.makeScoringMessage(any(), any(), eq(RecipeLanguage.EN), any())).thenAnswer(_ -> Uni.createFrom().item(new ScoringRecipeAssessmentMessage(dummyScoringData())));
 	}
 
 	@Test

@@ -2,6 +2,7 @@ package eu.dietwise.services.v1.suggestions;
 
 import java.util.UUID;
 
+import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.v1.types.HasUserId;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.SuggestionsRecipeAssessmentMessage;
 import eu.dietwise.v1.model.Recipe;
@@ -17,9 +18,9 @@ public interface RecipeSuggestionsService {
 	Uni<MakeSuggestionsResult> makeSuggestions(UUID correlationId, HasUserId hasUserId, RecipeLanguage lang, Recipe recipe, Country countryOverride);
 
 	/**
-	 * Try to increase the times each suggestion was offered. Will log any failures silently.
+	 * Increase the times each suggestion was offered, in the given transaction.
 	 */
-	Uni<Void> increaseTimesSuggested(UUID correlationId, String applicationId, HasUserId hasUserId, HasSuggestionTemplateIds suggestions);
+	Uni<Void> increaseTimesSuggested(ReactivePersistenceTxContext tx, String applicationId, HasUserId hasUserId, HasSuggestionTemplateIds suggestions);
 
 	Uni<SuggestionsRecipeAssessmentMessage> enrichWithStatistics(UUID correlationId, String applicationId, HasUserId hasUserId, SuggestionsRecipeAssessmentMessage message);
 }

@@ -9,6 +9,9 @@
 		<!-- Let's keep them sorted alphabetically by FQCN -->
 		<class>eu.dietwise.dao.jpa.PersonalInfoEntity</class>
 		<class>eu.dietwise.dao.jpa.UserEntity</class>
+		<class>eu.dietwise.dao.jpa.interventions.InterventionAssignmentEntity</class>
+		<class>eu.dietwise.dao.jpa.interventions.InterventionAssignmentSuggestionEntity</class>
+		<class>eu.dietwise.dao.jpa.interventions.InterventionEntity</class>
 		<class>eu.dietwise.dao.jpa.recommendations.AgeGroupEntity</class>
 		<class>eu.dietwise.dao.jpa.recommendations.RecommendationEntity</class>
 		<class>eu.dietwise.dao.jpa.recommendations.RecommendationTranslationEntity</class>

@@ -4,9 +4,11 @@ import static eu.dietwise.common.utils.MultiComprehensions.emitInSequence;
 import static eu.dietwise.common.utils.UniComprehensions.forcm;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import eu.dietwise.common.dao.reactive.ReactivePersistenceContextFactory;
 import eu.dietwise.common.v1.model.User;
 import eu.dietwise.common.v1.types.HasUserId;
 import eu.dietwise.services.authz.Authorization;
@@ -15,6 +17,8 @@ import eu.dietwise.services.v1.StatisticsService;
 import eu.dietwise.services.v1.extraction.NoIngredientsInRecipeException;
 import eu.dietwise.services.v1.extraction.RecipeExtractionService;
 import eu.dietwise.services.v1.extraction.impl.InvalidRecipeSourceUrlException;
+import eu.dietwise.services.v1.interventions.AssignedIntervention;
+import eu.dietwise.services.v1.interventions.InterventionService;
 import eu.dietwise.services.v1.scoring.RecipeScoringService;
 import eu.dietwise.services.v1.suggestions.MakeSuggestionsResult;
 import eu.dietwise.services.v1.suggestions.RecipeSuggestionsService;
@@ -22,10 +26,12 @@ import eu.dietwise.services.v1.types.RecipeAssessmentMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.MoreThanOneRecipesAssessmentMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.RecipeAssessmentErrorMessage;
 import eu.dietwise.services.v1.types.RecipeAssessmentMessage.RecipeExtractionRecipeAssessmentMessage;
+import eu.dietwise.services.v1.types.RecipeAssessmentMessage.SuggestionsRecipeAssessmentMessage;
 import eu.dietwise.v1.model.Recipe;
 import eu.dietwise.v1.model.RecipeAssessmentParam;
 import eu.dietwise.v1.model.RecipeExtractionAndAssessmentParam;
 import eu.dietwise.v1.types.Country;
+import eu.dietwise.v1.types.HasSuggestionTemplateIds;
 import eu.dietwise.v1.types.RecipeLanguage;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -39,23 +45,29 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 	private static final Logger LOG = LoggerFactory.getLogger(RecipeAssessmentServiceImpl.class);
 
 	private final Authorization authorization;
+	private final ReactivePersistenceContextFactory persistenceContextFactory;
 	private final RecipeExtractionService recipeExtractionService;
 	private final StatisticsService statisticsService;
 	private final RecipeSuggestionsService recipeSuggestionsService;
 	private final RecipeScoringService recipeScoringService;
+	private final InterventionService interventionService;
 
 	public RecipeAssessmentServiceImpl(
 			Authorization authorization,
+			ReactivePersistenceContextFactory persistenceContextFactory,
 			RecipeExtractionService recipeExtractionService,
 			StatisticsService statisticsService,
 			RecipeSuggestionsService recipeSuggestionsService,
-			RecipeScoringService recipeScoringService
+			RecipeScoringService recipeScoringService,
+			InterventionService interventionService
 	) {
 		this.authorization = authorization;
+		this.persistenceContextFactory = persistenceContextFactory;
 		this.recipeExtractionService = recipeExtractionService;
 		this.statisticsService = statisticsService;
 		this.recipeSuggestionsService = recipeSuggestionsService;
 		this.recipeScoringService = recipeScoringService;
+		this.interventionService = interventionService;
 	}
 
 	@Override
@@ -68,7 +80,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 				statisticsService.assessedRecipe(user),
 				(_, _) -> recipeExtractionService.extractRecipeFromJsonLdOrMarkdown(correlationId, param),
 				(emitter, message) -> emitExtractionAndClassify(emitter, user, correlationId, param.getUrl(), message),
-				(emitter, outcome) -> assessExtractionOutcome(emitter, correlationId, applicationId, user, param.getUrl(), param.getLang(), param.getCountryOverride(), outcome),
+				(emitter, outcome) -> assessExtractionOutcome(emitter, correlationId, applicationId, user, param.getUrl(), param.getLang(), param.getCountryOverride(), param.getUiLang(), outcome),
 				(emitter, suggestionsResult) -> emitScoringMessage(emitter, suggestionsResult, param.getLang()),
 				this::handleError
 		);
@@ -84,7 +96,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 				statisticsService.assessedRecipe(user),
 				(_, _) -> recipeExtractionService.extractRecipeFromUrl(correlationId, param),
 				(emitter, message) -> emitExtractionAndClassify(emitter, user, correlationId, param.getUrl(), message),
-				(emitter, outcome) -> assessExtractionOutcome(emitter, correlationId, applicationId, user, param.getUrl(), param.getLang(), null, outcome),
+				(emitter, outcome) -> assessExtractionOutcome(emitter, correlationId, applicationId, user, param.getUrl(), param.getLang(), null, param.getUiLang(), outcome),
 				(emitter, suggestionsResult) -> emitScoringMessage(emitter, suggestionsResult, param.getLang()),
 				this::handleError
 		);
@@ -130,6 +142,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 			String url,
 			RecipeLanguage lang,
 			Country countryOverride,
+			RecipeLanguage uiLang,
 			RecipeExtractionOutcome outcome
 	) {
 		return switch (outcome) {
@@ -143,7 +156,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 				yield Uni.createFrom().nullItem();
 			}
 			case RecipeExtractionOutcome.SingleRecipe(Recipe recipe) ->
-					assessSingleRecipe(emitter, correlationId, applicationId, hasUserId, lang, countryOverride, recipe);
+					assessSingleRecipe(emitter, correlationId, applicationId, hasUserId, url, lang, countryOverride, uiLang, recipe);
 		};
 	}
 
@@ -155,16 +168,45 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 			UUID correlationId,
 			String applicationId,
 			HasUserId hasUserId,
+			String url,
 			RecipeLanguage lang,
 			Country countryOverride,
+			RecipeLanguage uiLang,
 			Recipe recipe
 	) {
 		return forcm(
 				recipeSuggestionsService.makeSuggestions(correlationId, hasUserId, lang, recipe, countryOverride),
-				result -> recipeSuggestionsService.increaseTimesSuggested(correlationId, applicationId, hasUserId, result.message()),
+				result -> recordSuggestionsAndAssignIntervention(correlationId, applicationId, hasUserId, url, uiLang, result.message()),
 				(result, _) -> recipeSuggestionsService.enrichWithStatistics(correlationId, applicationId, hasUserId, result.message()),
-				(result, _, message) -> new MakeSuggestionsResult(message, result.recommendations(), result.primaryComponents(), result.personalInfo())
+				(result, assignedIntervention, message) -> new MakeSuggestionsResult(withIntervention(message, assignedIntervention), result.recommendations(), result.primaryComponents(), result.personalInfo())
 		).invoke(result -> emitter.emit(result.message()));
+	}
+
+	/**
+	 * Record that the Suggestions were offered and assign an Intervention to the assessment, in one transaction. A
+	 * failure is logged and the assessment continues without an Intervention.
+	 */
+	private Uni<Optional<AssignedIntervention>> recordSuggestionsAndAssignIntervention(
+			UUID correlationId,
+			String applicationId,
+			HasUserId hasUserId,
+			String url,
+			RecipeLanguage uiLang,
+			HasSuggestionTemplateIds suggestions
+	) {
+		return persistenceContextFactory.withTransaction(tx ->
+				recipeSuggestionsService.increaseTimesSuggested(tx, applicationId, hasUserId, suggestions)
+						.chain(() -> interventionService.assign(tx, hasUserId, applicationId, uiLang, url, suggestions))
+		).onFailure().recoverWithItem(t -> {
+			LOG.error("Failed to record the suggestions and assign an intervention for user <{}> {}: {}", correlationId, hasUserId, t.getMessage(), t);
+			return Optional.empty();
+		});
+	}
+
+	private SuggestionsRecipeAssessmentMessage withIntervention(SuggestionsRecipeAssessmentMessage message, Optional<AssignedIntervention> assignedIntervention) {
+		return assignedIntervention
+				.map(assigned -> message.withIntervention(assigned.assessmentId(), assigned.intervention()))
+				.orElse(message);
 	}
 
 	private Uni<?> emitScoringMessage(

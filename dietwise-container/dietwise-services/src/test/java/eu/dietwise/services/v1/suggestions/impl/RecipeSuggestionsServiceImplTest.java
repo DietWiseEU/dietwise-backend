@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import eu.dietwise.common.test.jpa.MockReactivePersistenceContextFactory;
+import eu.dietwise.common.test.jpa.MockReactivePersistenceContextFactory.MockReactivePersistenceTxContext;
 import eu.dietwise.common.v1.types.HasUserId;
 import eu.dietwise.common.v1.types.UserId;
 import eu.dietwise.common.v1.types.impl.UserIdImpl;
@@ -226,20 +228,21 @@ class RecipeSuggestionsServiceImplTest {
 	}
 
 	@Test
-	void increaseTimesSuggestedIncreasesEverySuggestionIdInSingleTransaction() {
+	void increaseTimesSuggestedIncreasesEverySuggestionIdInTheGivenTransaction() {
 		var hasUserId = hasUserId();
 		HasSuggestionTemplateIds suggestions = () -> Set.of(FIRST_SUGGESTION_ID, SECOND_SUGGESTION_ID);
+		var tx = new MockReactivePersistenceTxContext();
 
 		when(userSuggestionStatsEntityDao.increaseTimesSuggested(any(), eq(APPLICATION_ID), eq(hasUserId), any()))
 				.thenReturn(Uni.createFrom().item(1));
 
-		Void result = sut.increaseTimesSuggested(CORRELATION_ID, APPLICATION_ID, hasUserId, suggestions)
+		Void result = sut.increaseTimesSuggested(tx, APPLICATION_ID, hasUserId, suggestions)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 
 		assertThat(result).isNull();
-		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
-		verify(userSuggestionStatsEntityDao).increaseTimesSuggested(any(), eq(APPLICATION_ID), eq(hasUserId), eq(FIRST_SUGGESTION_ID));
-		verify(userSuggestionStatsEntityDao).increaseTimesSuggested(any(), eq(APPLICATION_ID), eq(hasUserId), eq(SECOND_SUGGESTION_ID));
+		assertThat(persistenceContextFactory.getOpenedTransactions()).isEmpty();
+		verify(userSuggestionStatsEntityDao).increaseTimesSuggested(same(tx), eq(APPLICATION_ID), eq(hasUserId), eq(FIRST_SUGGESTION_ID));
+		verify(userSuggestionStatsEntityDao).increaseTimesSuggested(same(tx), eq(APPLICATION_ID), eq(hasUserId), eq(SECOND_SUGGESTION_ID));
 	}
 
 	@Test

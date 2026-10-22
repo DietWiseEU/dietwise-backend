@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -24,6 +25,7 @@ import eu.dietwise.common.v1.types.Role;
 import eu.dietwise.common.v1.types.impl.UserIdImpl;
 import eu.dietwise.dao.PersonalInfoDao;
 import eu.dietwise.dao.UserDao;
+import eu.dietwise.dao.interventions.InterventionAssignmentDao;
 import eu.dietwise.dao.statistics.UserRecipeStatsEntityDao;
 import eu.dietwise.dao.statistics.UserStatsEntityDao;
 import eu.dietwise.dao.statistics.UserSuggestionStatsEntityDao;
@@ -64,6 +66,8 @@ class AccountServiceImplTest {
 	@Mock
 	private UserStatsEntityDao userStatsEntityDao;
 	@Mock
+	private InterventionAssignmentDao interventionAssignmentDao;
+	@Mock
 	private DateTimeService dateTimeService;
 	@Mock
 	private KeycloakAdminClient keycloakAdminClient;
@@ -79,6 +83,7 @@ class AccountServiceImplTest {
 				userRecipeStatsEntityDao,
 				userSuggestionStatsEntityDao,
 				userStatsEntityDao,
+				interventionAssignmentDao,
 				dateTimeService,
 				new AuthorizationImpl(),
 				keycloakAdminClient,
@@ -100,6 +105,7 @@ class AccountServiceImplTest {
 		when(personalInfoDao.deleteByUser(any(), eq(user))).thenReturn(Uni.createFrom().voidItem());
 		when(userRecipeStatsEntityDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
 		when(userSuggestionStatsEntityDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
+		when(interventionAssignmentDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
 		when(userStatsEntityDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
 		when(userDao.tombstoneByIdmId(any(), eq(IDM_ID), eq(DELETED_AT))).thenReturn(Uni.createFrom().voidItem());
 
@@ -107,12 +113,14 @@ class AccountServiceImplTest {
 
 		assertThat(result).isNull();
 		assertThat(persistenceContextFactory.getOpenedTransactions()).hasSize(1);
-		InOrder inOrder = inOrder(keycloakAdminClient, personalInfoDao, userRecipeStatsEntityDao, userSuggestionStatsEntityDao, userStatsEntityDao, userDao);
+		var tx = persistenceContextFactory.getOpenedTransactions().getFirst();
+		InOrder inOrder = inOrder(keycloakAdminClient, personalInfoDao, userRecipeStatsEntityDao, userSuggestionStatsEntityDao, interventionAssignmentDao, userStatsEntityDao, userDao);
 		inOrder.verify(keycloakAdminClient).getClientCredentialsToken(REALM, "client_credentials", CLIENT_ID, CLIENT_SECRET);
 		inOrder.verify(keycloakAdminClient).deleteUser(REALM, IDM_ID, "Bearer " + ACCESS_TOKEN);
 		inOrder.verify(personalInfoDao).deleteByUser(any(), eq(user));
 		inOrder.verify(userRecipeStatsEntityDao).deleteByUser(any(), eq(USER_UUID));
 		inOrder.verify(userSuggestionStatsEntityDao).deleteByUser(any(), eq(USER_UUID));
+		inOrder.verify(interventionAssignmentDao).deleteByUser(same(tx), eq(USER_UUID));
 		inOrder.verify(userStatsEntityDao).deleteByUser(any(), eq(USER_UUID));
 		inOrder.verify(userDao).tombstoneByIdmId(any(), eq(IDM_ID), eq(DELETED_AT));
 	}
@@ -129,6 +137,7 @@ class AccountServiceImplTest {
 		when(personalInfoDao.deleteByUser(any(), eq(user))).thenReturn(Uni.createFrom().voidItem());
 		when(userRecipeStatsEntityDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
 		when(userSuggestionStatsEntityDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
+		when(interventionAssignmentDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
 		when(userStatsEntityDao.deleteByUser(any(), eq(USER_UUID))).thenReturn(Uni.createFrom().voidItem());
 		when(userDao.tombstoneByIdmId(any(), eq(IDM_ID), eq(DELETED_AT))).thenReturn(Uni.createFrom().voidItem());
 

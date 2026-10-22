@@ -371,17 +371,10 @@ public class RecipeSuggestionsServiceImpl implements RecipeSuggestionsService {
 	}
 
 	@Override
-	public Uni<Void> increaseTimesSuggested(UUID correlationId, String applicationId, HasUserId hasUserId, HasSuggestionTemplateIds suggestions) {
-		return persistenceContextFactory.withTransaction(tx ->
-				Multi.createFrom().iterable(suggestions.getSuggestionTemplateIds())
-						.onItem().transformToUniAndConcatenate(sid -> userSuggestionStatsEntityDao.increaseTimesSuggested(tx, applicationId, hasUserId, sid))
-						.onItem().ignoreAsUni()
-						.onFailure()
-						.recoverWithItem(t -> {
-							LOG.error("Failed to increase times suggested for user <{}> {}: {}", correlationId, hasUserId, t.getMessage(), t);
-							return null;
-						})
-		);
+	public Uni<Void> increaseTimesSuggested(ReactivePersistenceTxContext tx, String applicationId, HasUserId hasUserId, HasSuggestionTemplateIds suggestions) {
+		return Multi.createFrom().iterable(suggestions.getSuggestionTemplateIds())
+				.onItem().transformToUniAndConcatenate(sid -> userSuggestionStatsEntityDao.increaseTimesSuggested(tx, applicationId, hasUserId, sid))
+				.onItem().ignoreAsUni();
 	}
 
 	@Override
