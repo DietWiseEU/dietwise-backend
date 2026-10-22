@@ -12,18 +12,18 @@ Statistics, Account deletion) and ADR 0001.
 **Blocked by:** 01 — Prefactor: one path for suggestion statistics transitions; 02 — Backend assigns an Intervention
 to each assessment.
 
-**Status:** ready-for-agent
+**Status:** DONE
 
-- [ ] Liquibase creates `DW_SUGGESTION_EVENT` (`id` UUID PK, `intervention_assignment_assessment_id` FK to the
+- [x] Liquibase creates `DW_SUGGESTION_EVENT` (`id` UUID PK, `intervention_assignment_assessment_id` FK to the
       Assignment, `suggestion_template_id` FK, `action`, `created_at`, index on
       `intervention_assignment_assessment_id`). Publish-tool registry unchanged.
-- [ ] The statistics request body accepts an optional `assessmentId`.
-- [ ] With a valid `assessmentId`: the counter is updated as today and one event is appended, in one transaction —
+- [x] The statistics request body accepts an optional `assessmentId`.
+- [x] With a valid `assessmentId`: the counter is updated as today and one event is appended, in one transaction —
       also when the counter does not move (cap or floor).
-- [ ] Unknown `assessmentId`, or one belonging to another user or application: `404`, nothing written (counter
+- [x] Unknown `assessmentId`, or one belonging to another user or application: `404`, nothing written (counter
       included).
-- [ ] SuggestionTemplate not among the Assignment's Suggestions: `400`, nothing written.
-- [ ] Repeated calls append repeated rows; nothing is merged or overwritten.
-- [ ] Deleting an account deletes the user's Suggestion Events before their Assignments, in the existing deletion
+- [x] SuggestionTemplate not among the Assignment's Suggestions: `400`, nothing written.
+- [x] Repeated calls append repeated rows; nothing is merged or overwritten.
+- [x] Deleting an account deletes the user's Suggestion Events before their Assignments, in the existing deletion
       transaction.
-- [ ] The RCA's statistics requests and responses are unchanged (verified against its request shape/tests).
+- [x] The RCA's statistics requests and responses are unchanged (verified against its request shape/tests).

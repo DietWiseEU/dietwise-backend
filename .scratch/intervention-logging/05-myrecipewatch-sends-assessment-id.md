@@ -8,10 +8,10 @@ See the spec `dietwise-architecture/src/site/markdown/specs/intervention-logging
 
 **Blocked by:** 03 — MyRecipeWatch shows the Intervention chosen by the server; 04 — Backend logs Suggestion Events.
 
-**Status:** ready-for-agent
+**Status:** DONE
 
-- [ ] Every statistics call (including the implicit "un-accept" of a previously accepted Suggestion for the same
+- [x] Every statistics call (including the implicit "un-accept" of a previously accepted Suggestion for the same
       ingredient) includes the current assessment's `assessmentId` when there is one, and omits it otherwise.
-- [ ] Existing statistics behavior (sequencing, in-flight locking, timeout, error logging) is unchanged.
-- [ ] Verified end to end in the running app: an accept → undo → reject sequence produces the expected event rows,
+- [x] Existing statistics behavior (sequencing, in-flight locking, timeout, error logging) is unchanged.
+- [x] Verified end to end in the running app: an accept → undo → reject sequence produces the expected event rows,
       joined to the Assignment and its Intervention.

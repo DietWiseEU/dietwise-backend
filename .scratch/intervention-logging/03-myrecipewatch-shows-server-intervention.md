@@ -9,14 +9,14 @@ See the spec `dietwise-architecture/src/site/markdown/specs/intervention-logging
 
 **Blocked by:** 02 — Backend assigns an Intervention to each assessment.
 
-**Status:** ready-for-agent
+**Status:** DONE
 
-- [ ] The assessment request carries `uiLang` = the app's active i18n language.
-- [ ] The `SUGGESTIONS` message's optional `assessmentId` and `intervention` are parsed and kept with the assessment
+- [x] The assessment request carries `uiLang` = the app's active i18n language.
+- [x] The `SUGGESTIONS` message's optional `assessmentId` and `intervention` are parsed and kept with the assessment
       state; they are replaced on every new assessment and untouched by accept/reject.
-- [ ] The banner shows if and only if the current assessment has an Intervention with a non-null text, and shows
+- [x] The banner shows if and only if the current assessment has an Intervention with a non-null text, and shows
       that text verbatim.
-- [ ] The local random pick, its test, and the `interventions` blocks of all i18n files are removed.
-- [ ] Cooking mode reset on a new assessment still works as before.
-- [ ] Verified in the running app against a backend with ticket 02, in at least `en` and one other language,
+- [x] The local random pick, its test, and the `interventions` blocks of all i18n files are removed.
+- [x] Cooking mode reset on a new assessment still works as before.
+- [x] Verified in the running app against a backend with ticket 02, in at least `en` and one other language,
       including the `0` arm (no banner).
