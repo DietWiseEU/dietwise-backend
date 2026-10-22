@@ -2,7 +2,7 @@ package eu.dietwise.services.model.interventions;
 
 import java.util.Map;
 
-import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import org.immutables.value.Value;
 
 /**
@@ -12,5 +12,5 @@ import org.immutables.value.Value;
 public interface TranslatedIntervention {
 	int getId();
 
-	Map<RecipeLanguage, String> getTexts();
+	Map<UiLanguage, String> getTexts();
 }

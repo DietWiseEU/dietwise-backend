@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import eu.dietwise.common.types.Nullable;
 import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.Viewport;
 import org.immutables.value.Value;
 
@@ -19,5 +20,5 @@ public interface RecipeExtractionAndAssessmentParam {
 	 * The language of the client's user interface; absent for clients that show no Intervention.
 	 */
 	@Nullable
-	RecipeLanguage getUiLang();
+	UiLanguage getUiLang();
 }

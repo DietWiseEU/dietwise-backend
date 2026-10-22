@@ -23,9 +23,9 @@ import eu.dietwise.services.model.interventions.ImmutableInterventionAssignment;
 import eu.dietwise.services.model.interventions.ImmutableSuggestionEvent;
 import eu.dietwise.services.model.interventions.InterventionAssignment;
 import eu.dietwise.services.model.interventions.SuggestionEvent;
-import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.SuggestionTemplateId;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import org.hibernate.reactive.mutiny.Mutiny;
 import org.junit.jupiter.api.MethodOrderer;
@@ -144,7 +144,7 @@ public class SuggestionEventDaoImplTest {
 				.userId(userId)
 				.applicationId(APPLICATION_ID)
 				.interventionId(2)
-				.uiLang(RecipeLanguage.EL)
+				.uiLang(UiLanguage.EL)
 				.recipeUrl("https://example.test/recipe")
 				.createdAt(CREATED_AT)
 				.suggestionTemplateIds(Set.of(SUGGESTION_ID))

@@ -39,9 +39,9 @@ import eu.dietwise.services.model.interventions.ImmutableInterventionAssignment;
 import eu.dietwise.services.model.interventions.ImmutableSuggestionEvent;
 import eu.dietwise.services.model.interventions.InterventionAssignment;
 import eu.dietwise.services.nondomain.DateTimeService;
-import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.SuggestionStatsTransition;
 import eu.dietwise.v1.types.SuggestionTemplateId;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.BeforeEach;
@@ -272,7 +272,7 @@ class StatisticsServiceImplTest {
 				.userId(userId)
 				.applicationId(applicationId)
 				.interventionId(1)
-				.uiLang(RecipeLanguage.EN)
+				.uiLang(UiLanguage.EN)
 				.recipeUrl(RECIPE_URL)
 				.createdAt(NOW.minusMinutes(5))
 				.suggestionTemplateIds(Set.of(SUGGESTION_ID))

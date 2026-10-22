@@ -10,7 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 
 @Entity
 @Table(name = "DW_INTERVENTION_ASSIGNMENT")
@@ -30,7 +30,7 @@ public class InterventionAssignmentEntity {
 
 	@Enumerated(STRING)
 	@Column(name = "ui_lang")
-	private RecipeLanguage uiLang;
+	private UiLanguage uiLang;
 
 	@Column(name = "recipe_url")
 	private String recipeUrl;
@@ -70,11 +70,11 @@ public class InterventionAssignmentEntity {
 		this.interventionId = interventionId;
 	}
 
-	public RecipeLanguage getUiLang() {
+	public UiLanguage getUiLang() {
 		return uiLang;
 	}
 
-	public void setUiLang(RecipeLanguage uiLang) {
+	public void setUiLang(UiLanguage uiLang) {
 		this.uiLang = uiLang;
 	}
 

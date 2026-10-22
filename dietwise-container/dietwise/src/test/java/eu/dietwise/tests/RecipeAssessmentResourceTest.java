@@ -24,6 +24,7 @@ import eu.dietwise.v1.model.ImmutableRecipeAssessmentParam;
 import eu.dietwise.v1.model.ImmutableRecipeExtractionAndAssessmentParam;
 import eu.dietwise.v1.model.ImmutableScoringData;
 import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.impl.GenericIngredientId;
 import eu.dietwise.v1.types.impl.RecommendationComponentNameImpl;
 import io.quarkus.test.InjectMock;
@@ -114,7 +115,7 @@ class RecipeAssessmentResourceTest extends CitizenResourceTest {
 
 		verify(service).assessMarkdownRecipe(
 				authenticatedUser(),
-				eq(ImmutableRecipeAssessmentParam.builder().url(RECIPE_URL).pageContent("Recipe text").lang(RecipeLanguage.EN).uiLang(RecipeLanguage.EL).build()));
+				eq(ImmutableRecipeAssessmentParam.builder().url(RECIPE_URL).pageContent("Recipe text").lang(RecipeLanguage.EN).uiLang(UiLanguage.EL).build()));
 	}
 
 	@Test
@@ -133,7 +134,7 @@ class RecipeAssessmentResourceTest extends CitizenResourceTest {
 
 		verify(service).extractAndAssessRecipeFromUrl(
 				authenticatedUser(),
-				eq(ImmutableRecipeExtractionAndAssessmentParam.builder().url(RECIPE_URL).lang(RecipeLanguage.EL).uiLang(RecipeLanguage.LT).build()));
+				eq(ImmutableRecipeExtractionAndAssessmentParam.builder().url(RECIPE_URL).lang(RecipeLanguage.EL).uiLang(UiLanguage.LT).build()));
 	}
 
 	@Test
@@ -142,6 +143,21 @@ class RecipeAssessmentResourceTest extends CitizenResourceTest {
 				.contentType(ContentType.JSON)
 				.body("""
 						{"url": "%s", "pageContent": "Recipe text", "lang": "en", "uiLang": "de"}
+						""".formatted(RECIPE_URL))
+				.when()
+				.post("/api/v1/recipe/assess/markdown")
+				.then()
+				.statusCode(400);
+
+		verify(service, never()).assessMarkdownRecipe(any(), any());
+	}
+
+	@Test
+	void assessMarkdownRecipeRejectsABlankUiLanguage() {
+		given()
+				.contentType(ContentType.JSON)
+				.body("""
+						{"url": "%s", "pageContent": "Recipe text", "lang": "en", "uiLang": " "}
 						""".formatted(RECIPE_URL))
 				.when()
 				.post("/api/v1/recipe/assess/markdown")

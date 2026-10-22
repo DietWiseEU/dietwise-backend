@@ -19,7 +19,7 @@ import eu.dietwise.services.v1.interventions.AssignedIntervention;
 import eu.dietwise.services.v1.interventions.InterventionService;
 import eu.dietwise.services.v1.types.Intervention;
 import eu.dietwise.v1.types.HasSuggestionTemplateIds;
-import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
@@ -46,7 +46,7 @@ public class InterventionServiceImpl implements InterventionService {
 			ReactivePersistenceTxContext tx,
 			HasUserId hasUserId,
 			String applicationId,
-			RecipeLanguage uiLang,
+			UiLanguage uiLang,
 			String recipeUrl,
 			HasSuggestionTemplateIds suggestions
 	) {
@@ -58,7 +58,7 @@ public class InterventionServiceImpl implements InterventionService {
 				return Uni.createFrom().item(Optional.empty());
 			}
 			TranslatedIntervention picked = pick(active);
-			RecipeLanguage textLang = textLanguage(picked, uiLang);
+			UiLanguage textLang = textLanguage(picked, uiLang);
 			InterventionAssignment assignment = ImmutableInterventionAssignment.builder()
 					.assessmentId(UUID.randomUUID())
 					.userId(UUID.fromString(hasUserId.getId().asString()))
@@ -82,8 +82,8 @@ public class InterventionServiceImpl implements InterventionService {
 	/**
 	 * The language of the text sent: {@code uiLang}, unless the Intervention has texts but none in {@code uiLang}.
 	 */
-	private RecipeLanguage textLanguage(TranslatedIntervention intervention, RecipeLanguage uiLang) {
-		Map<RecipeLanguage, String> texts = intervention.getTexts();
-		return texts.isEmpty() || texts.containsKey(uiLang) ? uiLang : RecipeLanguage.EN;
+	private UiLanguage textLanguage(TranslatedIntervention intervention, UiLanguage uiLang) {
+		Map<UiLanguage, String> texts = intervention.getTexts();
+		return texts.isEmpty() || texts.containsKey(uiLang) ? uiLang : UiLanguage.EN;
 	}
 }

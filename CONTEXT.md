@@ -67,6 +67,9 @@ _Avoid_: impression, exposure
 **Suggestion Event**:
 One accept/reject transition a user made on one Suggestion of an Intervention Assignment. Append-only history, unlike a SuggestionDecision; recorded alongside, not instead of, the SuggestionStats.
 
+**UI language**:
+The language of a client's user interface, sent by MyRecipeWatch with each assessment; the Intervention text is sent in it. Distinct from the language of the recipe, which drives the assessment itself; the two sets of supported languages may differ.
+
 ### Backoffice
 
 **Working Copy**:

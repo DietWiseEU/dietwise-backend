@@ -1,9 +1,9 @@
 package eu.dietwise.services.v1.interventions.impl;
 
-import static eu.dietwise.v1.types.RecipeLanguage.EL;
-import static eu.dietwise.v1.types.RecipeLanguage.EN;
-import static eu.dietwise.v1.types.RecipeLanguage.LT;
-import static eu.dietwise.v1.types.RecipeLanguage.NL;
+import static eu.dietwise.v1.types.UiLanguage.EL;
+import static eu.dietwise.v1.types.UiLanguage.EN;
+import static eu.dietwise.v1.types.UiLanguage.LT;
+import static eu.dietwise.v1.types.UiLanguage.NL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,8 +33,8 @@ import eu.dietwise.services.nondomain.DateTimeService;
 import eu.dietwise.services.v1.interventions.AssignedIntervention;
 import eu.dietwise.services.v1.types.Intervention;
 import eu.dietwise.v1.types.HasSuggestionTemplateIds;
-import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.SuggestionTemplateId;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import io.smallrye.mutiny.Uni;
 import org.junit.jupiter.api.BeforeEach;
@@ -154,7 +154,7 @@ class InterventionServiceImplTest {
 		verifyNoInteractions(interventionAssignmentDao, random);
 	}
 
-	private Optional<AssignedIntervention> assign(RecipeLanguage uiLang, HasSuggestionTemplateIds suggestions) {
+	private Optional<AssignedIntervention> assign(UiLanguage uiLang, HasSuggestionTemplateIds suggestions) {
 		return sut.assign(tx, USER, APPLICATION_ID, uiLang, RECIPE_URL, suggestions)
 				.await().atMost(Duration.ofSeconds(ASYNC_WAIT_SECONDS));
 	}
@@ -165,7 +165,7 @@ class InterventionServiceImplTest {
 		return captor.getValue();
 	}
 
-	private static InterventionAssignment expectedAssignment(UUID assessmentId, int interventionId, RecipeLanguage uiLang) {
+	private static InterventionAssignment expectedAssignment(UUID assessmentId, int interventionId, UiLanguage uiLang) {
 		return ImmutableInterventionAssignment.builder()
 				.assessmentId(assessmentId)
 				.userId(USER_UUID)
@@ -178,7 +178,7 @@ class InterventionServiceImplTest {
 				.build();
 	}
 
-	private static TranslatedIntervention intervention(int id, Map<RecipeLanguage, String> texts) {
+	private static TranslatedIntervention intervention(int id, Map<UiLanguage, String> texts) {
 		return ImmutableTranslatedIntervention.builder().id(id).texts(texts).build();
 	}
 }

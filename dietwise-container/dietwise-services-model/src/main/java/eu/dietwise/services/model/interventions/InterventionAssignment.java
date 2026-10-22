@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.SuggestionTemplateId;
+import eu.dietwise.v1.types.UiLanguage;
 import org.immutables.value.Value;
 
 /**
@@ -22,7 +22,7 @@ public interface InterventionAssignment {
 	int getInterventionId();
 
 	/** The language of the Intervention text sent to the client. */
-	RecipeLanguage getUiLang();
+	UiLanguage getUiLang();
 
 	String getRecipeUrl();
 

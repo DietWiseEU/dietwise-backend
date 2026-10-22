@@ -1,7 +1,7 @@
 package eu.dietwise.v1.model;
 
-import static eu.dietwise.v1.types.RecipeLanguage.EL;
 import static eu.dietwise.v1.types.RecipeLanguage.EN;
+import static eu.dietwise.v1.types.UiLanguage.EL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -52,6 +52,22 @@ public class RecipeExtractionAndAssessmentParamTest {
 					"url": "https://example.test/recipe",
 					"lang": "en",
 					"uiLang": "de"
+				}
+				""";
+
+		assertThatThrownBy(() -> om.readValue(json, RecipeExtractionAndAssessmentParam.class))
+				.isInstanceOf(JsonMappingException.class)
+				.hasRootCauseInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	void testDeserializationRejectsBlankUiLang() {
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
+		var json = """
+				{
+					"url": "https://example.test/recipe",
+					"lang": "en",
+					"uiLang": ""
 				}
 				""";
 

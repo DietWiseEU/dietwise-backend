@@ -11,7 +11,7 @@ import eu.dietwise.dao.jpa.interventions.InterventionEntity;
 import eu.dietwise.dao.jpa.interventions.InterventionEntity_;
 import eu.dietwise.services.model.interventions.ImmutableTranslatedIntervention;
 import eu.dietwise.services.model.interventions.TranslatedIntervention;
-import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
@@ -27,15 +27,15 @@ public class InterventionDaoImpl implements InterventionDao {
 	}
 
 	private TranslatedIntervention toTranslatedIntervention(InterventionEntity entity) {
-		Map<RecipeLanguage, String> texts = new EnumMap<>(RecipeLanguage.class);
-		putIfPresent(texts, RecipeLanguage.EN, entity.getTextEn());
-		putIfPresent(texts, RecipeLanguage.NL, entity.getTextNl());
-		putIfPresent(texts, RecipeLanguage.EL, entity.getTextEl());
-		putIfPresent(texts, RecipeLanguage.LT, entity.getTextLt());
+		Map<UiLanguage, String> texts = new EnumMap<>(UiLanguage.class);
+		putIfPresent(texts, UiLanguage.EN, entity.getTextEn());
+		putIfPresent(texts, UiLanguage.NL, entity.getTextNl());
+		putIfPresent(texts, UiLanguage.EL, entity.getTextEl());
+		putIfPresent(texts, UiLanguage.LT, entity.getTextLt());
 		return ImmutableTranslatedIntervention.builder().id(entity.getId()).texts(texts).build();
 	}
 
-	private void putIfPresent(Map<RecipeLanguage, String> texts, RecipeLanguage lang, String text) {
+	private void putIfPresent(Map<UiLanguage, String> texts, UiLanguage lang, String text) {
 		if (text != null) {
 			texts.put(lang, text);
 		}

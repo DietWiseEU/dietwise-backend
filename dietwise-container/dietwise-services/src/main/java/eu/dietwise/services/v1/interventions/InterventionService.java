@@ -5,7 +5,7 @@ import java.util.Optional;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.v1.types.HasUserId;
 import eu.dietwise.v1.types.HasSuggestionTemplateIds;
-import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import io.smallrye.mutiny.Uni;
 
 public interface InterventionService {
@@ -20,7 +20,7 @@ public interface InterventionService {
 			ReactivePersistenceTxContext tx,
 			HasUserId hasUserId,
 			String applicationId,
-			RecipeLanguage uiLang,
+			UiLanguage uiLang,
 			String recipeUrl,
 			HasSuggestionTemplateIds suggestions
 	);

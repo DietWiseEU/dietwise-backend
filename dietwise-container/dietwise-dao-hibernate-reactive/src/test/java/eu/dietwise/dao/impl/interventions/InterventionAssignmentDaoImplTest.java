@@ -15,8 +15,8 @@ import eu.dietwise.common.test.liquibase.LiquibaseExtension;
 import eu.dietwise.dao.jpa.UserEntity;
 import eu.dietwise.services.model.interventions.ImmutableInterventionAssignment;
 import eu.dietwise.services.model.interventions.InterventionAssignment;
-import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.SuggestionTemplateId;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.impl.GenericSuggestionTemplateId;
 import org.hibernate.reactive.mutiny.Mutiny;
 import org.junit.jupiter.api.MethodOrderer;
@@ -112,7 +112,7 @@ public class InterventionAssignmentDaoImplTest {
 				.userId(userId)
 				.applicationId(APPLICATION_ID)
 				.interventionId(2)
-				.uiLang(RecipeLanguage.EL)
+				.uiLang(UiLanguage.EL)
 				.recipeUrl(RECIPE_URL)
 				.createdAt(CREATED_AT)
 				.suggestionTemplateIds(Set.of(SUGGESTION_ID_1, SUGGESTION_ID_2))

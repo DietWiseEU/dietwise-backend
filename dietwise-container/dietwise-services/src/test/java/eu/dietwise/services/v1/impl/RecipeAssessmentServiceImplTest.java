@@ -70,6 +70,7 @@ import eu.dietwise.v1.types.RecipeLanguage;
 import eu.dietwise.v1.types.impl.AlternativeIngredientImpl;
 import eu.dietwise.v1.types.IngredientId;
 import eu.dietwise.v1.types.TypeOfRecommendation;
+import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.impl.GenericIngredientId;
 import eu.dietwise.v1.types.impl.RecommendationComponentNameImpl;
 import eu.dietwise.v1.types.impl.GenericRuleId;
@@ -129,8 +130,8 @@ class RecipeAssessmentServiceImplTest {
 			.pageContent(MARKDOWN)
 			.countryOverride(GREECE)
 			.build();
-	private static final RecipeAssessmentParam MARKDOWN_PARAM_WITH_UI_LANG = ImmutableRecipeAssessmentParam.copyOf(MARKDOWN_PARAM).withUiLang(RecipeLanguage.EL);
-	private static final RecipeExtractionAndAssessmentParam URL_EXTRACTION_PARAM_WITH_UI_LANG = ImmutableRecipeExtractionAndAssessmentParam.copyOf(URL_EXTRACTION_PARAM).withUiLang(RecipeLanguage.NL);
+	private static final RecipeAssessmentParam MARKDOWN_PARAM_WITH_UI_LANG = ImmutableRecipeAssessmentParam.copyOf(MARKDOWN_PARAM).withUiLang(UiLanguage.EL);
+	private static final RecipeExtractionAndAssessmentParam URL_EXTRACTION_PARAM_WITH_UI_LANG = ImmutableRecipeExtractionAndAssessmentParam.copyOf(URL_EXTRACTION_PARAM).withUiLang(UiLanguage.NL);
 	private static final UUID ASSESSMENT_ID = UUID.fromString("3e0c7a52-1b6d-4f8e-9a2c-5d4b3a2f1e0d");
 	private static final Intervention INTERVENTION = new Intervention(2, "Εγγυημένη υγιεινή επιλογή.");
 	private static final String RENDERED_MARKDOWN = "rendered markdown";
@@ -331,7 +332,7 @@ class RecipeAssessmentServiceImplTest {
 		var tx = persistenceContextFactory.getOpenedTransactions().getFirst();
 		verify(recipeSuggestionsService).increaseTimesSuggested(same(tx), eq(APPLICATION_ID), any(), any());
 		var suggestionsCaptor = ArgumentCaptor.forClass(HasSuggestionTemplateIds.class);
-		verify(interventionService).assign(same(tx), eq(USER), eq(APPLICATION_ID), eq(RecipeLanguage.EL), eq(MARKDOWN_PARAM.getUrl()), suggestionsCaptor.capture());
+		verify(interventionService).assign(same(tx), eq(USER), eq(APPLICATION_ID), eq(UiLanguage.EL), eq(MARKDOWN_PARAM.getUrl()), suggestionsCaptor.capture());
 		assertThat(suggestionsCaptor.getValue().getSuggestionTemplateIds()).containsExactly(new GenericSuggestionTemplateId(SUGGESTION_ID));
 	}
 
@@ -360,7 +361,7 @@ class RecipeAssessmentServiceImplTest {
 		var suggestions = (SuggestionsRecipeAssessmentMessage) messages.get(1);
 		assertThat(suggestions.assessmentId()).isEqualTo(ASSESSMENT_ID);
 		assertThat(suggestions.intervention()).isEqualTo(INTERVENTION);
-		verify(interventionService).assign(any(), eq(USER), eq(APPLICATION_ID), eq(RecipeLanguage.NL), eq(URL_EXTRACTION_PARAM.getUrl()), any());
+		verify(interventionService).assign(any(), eq(USER), eq(APPLICATION_ID), eq(UiLanguage.NL), eq(URL_EXTRACTION_PARAM.getUrl()), any());
 	}
 
 	@Test

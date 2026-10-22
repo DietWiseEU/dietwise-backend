@@ -33,6 +33,7 @@ import eu.dietwise.v1.model.RecipeExtractionAndAssessmentParam;
 import eu.dietwise.v1.types.Country;
 import eu.dietwise.v1.types.HasSuggestionTemplateIds;
 import eu.dietwise.v1.types.RecipeLanguage;
+import eu.dietwise.v1.types.UiLanguage;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.subscription.MultiEmitter;
@@ -142,7 +143,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 			String url,
 			RecipeLanguage lang,
 			Country countryOverride,
-			RecipeLanguage uiLang,
+			UiLanguage uiLang,
 			RecipeExtractionOutcome outcome
 	) {
 		return switch (outcome) {
@@ -171,7 +172,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 			String url,
 			RecipeLanguage lang,
 			Country countryOverride,
-			RecipeLanguage uiLang,
+			UiLanguage uiLang,
 			Recipe recipe
 	) {
 		return forcm(
@@ -191,7 +192,7 @@ public class RecipeAssessmentServiceImpl implements RecipeAssessmentService {
 			String applicationId,
 			HasUserId hasUserId,
 			String url,
-			RecipeLanguage uiLang,
+			UiLanguage uiLang,
 			HasSuggestionTemplateIds suggestions
 	) {
 		return persistenceContextFactory.withTransaction(tx ->

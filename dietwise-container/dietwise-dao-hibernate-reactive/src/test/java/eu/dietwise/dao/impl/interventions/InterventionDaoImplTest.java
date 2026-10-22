@@ -1,10 +1,10 @@
 package eu.dietwise.dao.impl.interventions;
 
 import static eu.dietwise.common.test.testcontainers.DockerImageNames.POSTGRES_IMAGE;
-import static eu.dietwise.v1.types.RecipeLanguage.EL;
-import static eu.dietwise.v1.types.RecipeLanguage.EN;
-import static eu.dietwise.v1.types.RecipeLanguage.LT;
-import static eu.dietwise.v1.types.RecipeLanguage.NL;
+import static eu.dietwise.v1.types.UiLanguage.EL;
+import static eu.dietwise.v1.types.UiLanguage.EN;
+import static eu.dietwise.v1.types.UiLanguage.LT;
+import static eu.dietwise.v1.types.UiLanguage.NL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

@@ -38,6 +38,8 @@ import eu.dietwise.v1.types.RepresentableAsStringKeySerializer;
 import eu.dietwise.v1.types.RepresentableAsStringSerializer;
 import eu.dietwise.v1.types.SuggestionTemplateId;
 import eu.dietwise.v1.types.SuggestionTemplateIdMixin;
+import eu.dietwise.v1.types.UiLanguage;
+import eu.dietwise.v1.types.UiLanguageDeserializer;
 
 public class DietwiseJacksonModule extends SimpleModule {
 	public DietwiseJacksonModule() {
@@ -63,5 +65,6 @@ public class DietwiseJacksonModule extends SimpleModule {
 		addDeserializer(RecipeLanguage.class, new RecipeLanguageDeserializer());
 		addSerializer(RepresentableAsString.class, new RepresentableAsStringSerializer());
 		addKeySerializer(RepresentableAsString.class, new RepresentableAsStringKeySerializer());
+		addDeserializer(UiLanguage.class, new UiLanguageDeserializer());
 	}
 }

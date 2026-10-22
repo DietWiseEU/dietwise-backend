@@ -31,8 +31,8 @@ The RCA must not be affected.
    never send `uiLang`; deactivating every Intervention is a kill switch.
 3. `DW_INTERVENTION` is the single source of the texts. The text is sent in `uiLang`, falling back to `en` when the
    Intervention has no text in that language. The app's i18n files no longer hold them.
-8. `uiLang` is validated strictly, like `lang`: a value outside the supported languages rejects the request. A client
-   must not send a UI language the backend does not support.
+8. `uiLang` is validated strictly: a blank value or a value outside the supported languages rejects the request, whereas
+   a blank `lang` means `en`. A client must not send a UI language the backend does not support.
 4. The Suggestion Events are an append-only log: one row per statistics call, never merged or overwritten.
 5. `DW_USER_SUGGESTION_STATS` and the `/statistics/*` endpoints keep their behavior for every caller. The event is
    written in addition, in the same transaction as the counter, and even when the counter does not move (the
@@ -86,7 +86,8 @@ None of these tables is mirrored by the publish tool, so `Tables` does not chang
 
 ## Assessment
 
-`RecipeAssessmentParam` and `RecipeExtractionAndAssessmentParam` gain an optional `uiLang`, a `RecipeLanguage`.
+`RecipeAssessmentParam` and `RecipeExtractionAndAssessmentParam` gain an optional `uiLang`, a `UiLanguage`. It is a
+type of its own, not a `RecipeLanguage`, because the languages of the user interface and of the recipes may differ.
 
 In `RecipeAssessmentServiceImpl.assessSingleRecipe`, in the same transaction as `increaseTimesSuggested`, when decision
 2 allows it: pick an active Intervention, insert the Assignment and its Suggestions, and resolve the text. The
