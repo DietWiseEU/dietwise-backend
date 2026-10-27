@@ -67,14 +67,20 @@ public class StatisticsServiceImpl implements StatisticsService {
 		UUID userId = UUID.fromString(user.getId().asString());
 		return persistenceContextFactory.withTransaction(tx -> forc(
 				userStatsEntityDao.setLastSeen(tx, applicationId, userId, now),
-				increaseDaysLaunchedIfNeeded(tx, user, user.getApplicationId().get(), userId, now)
+				startDayOfUseIfNeeded(tx, user, applicationId, userId, now)
 		));
 	}
 
-	private Function<? super LocalDateTime, Uni<? extends User>> increaseDaysLaunchedIfNeeded(ReactivePersistenceTxContext tx, User user, String applicationId, UUID userId, LocalDateTime now) {
+	/**
+	 * A day of use starts with the first activity of a calendar day: it counts as one more day launched and its time
+	 * becomes the last launched.
+	 */
+	private Function<? super LocalDateTime, Uni<? extends User>> startDayOfUseIfNeeded(ReactivePersistenceTxContext tx, User user, String applicationId, UUID userId, LocalDateTime now) {
 		return lastSeen -> {
-			if (lastSeen == null || lastSeen.isBefore(now.minusDays(1))) {
-				return userStatsEntityDao.increaseDaysLaunched(tx, applicationId, userId).replaceWith(user);
+			if (lastSeen == null || lastSeen.toLocalDate().isBefore(now.toLocalDate())) {
+				return userStatsEntityDao.increaseDaysLaunched(tx, applicationId, userId)
+						.chain(() -> userStatsEntityDao.setLastLaunched(tx, applicationId, userId, now))
+						.replaceWith(user);
 			} else {
 				return Uni.createFrom().item(user);
 			}

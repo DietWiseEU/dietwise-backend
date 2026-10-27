@@ -147,11 +147,20 @@ class StatisticsServiceImplTest {
 		verify(userRecipeStatsEntityDao).increaseTimesAssessed(any(), eq(APPLICATION_ID), eq(USER_UUID), eq(RECIPE_URL), eq(RECIPE_NAME), eq(NOW));
 	}
 
-	@Test
-	void markUserActivityIncreasesDaysLaunchedWhenLastSeenMoreThanOneDayAgo() {
+	static Stream<Arguments> lastSeenOnAnEarlierDay() {
+		return Stream.of(
+				Arguments.of(NOW.minusDays(2)),
+				Arguments.of(NOW.toLocalDate().minusDays(1).atTime(23, 0))
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("lastSeenOnAnEarlierDay")
+	void markUserActivityStartsANewDayOfUseWhenLastSeenOnAnEarlierDay(LocalDateTime lastSeen) {
 		User user = makeUserWithApplicationId(APPLICATION_ID);
-		when(userStatsEntityDao.setLastSeen(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(NOW.minusDays(2)));
-		lenient().when(userStatsEntityDao.increaseDaysLaunched(any(), any(), any())).thenReturn(Uni.createFrom().item(1));
+		when(userStatsEntityDao.setLastSeen(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(lastSeen));
+		when(userStatsEntityDao.increaseDaysLaunched(any(), any(), any())).thenReturn(Uni.createFrom().item(1));
+		when(userStatsEntityDao.setLastLaunched(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(lastSeen));
 
 		User result = sut.markUserActivity(user)
 				.await().atMost(Duration.ofSeconds(5L));
@@ -161,10 +170,26 @@ class StatisticsServiceImplTest {
 		verify(dateTimeService, times(1)).getNow();
 		verify(userStatsEntityDao).setLastSeen(any(), eq(APPLICATION_ID), eq(USER_UUID), eq(NOW));
 		verify(userStatsEntityDao).increaseDaysLaunched(any(), eq(APPLICATION_ID), eq(USER_UUID));
+		verify(userStatsEntityDao).setLastLaunched(any(), eq(APPLICATION_ID), eq(USER_UUID), eq(NOW));
 	}
 
 	@Test
-	void markUserActivitySkipsDaysLaunchedIncreaseWhenLastSeenWithinOneDay() {
+	void markUserActivityStartsTheFirstDayOfUseWhenNeverSeenBefore() {
+		User user = makeUserWithApplicationId(APPLICATION_ID);
+		when(userStatsEntityDao.setLastSeen(any(), any(), any(), any())).thenReturn(Uni.createFrom().nullItem());
+		when(userStatsEntityDao.increaseDaysLaunched(any(), any(), any())).thenReturn(Uni.createFrom().item(0));
+		when(userStatsEntityDao.setLastLaunched(any(), any(), any(), any())).thenReturn(Uni.createFrom().nullItem());
+
+		User result = sut.markUserActivity(user)
+				.await().atMost(Duration.ofSeconds(5L));
+
+		assertThat(result).isSameAs(user);
+		verify(userStatsEntityDao).increaseDaysLaunched(any(), eq(APPLICATION_ID), eq(USER_UUID));
+		verify(userStatsEntityDao).setLastLaunched(any(), eq(APPLICATION_ID), eq(USER_UUID), eq(NOW));
+	}
+
+	@Test
+	void markUserActivityContinuesTheDayOfUseWhenLastSeenEarlierTheSameDay() {
 		User user = makeUserWithApplicationId(APPLICATION_ID);
 		when(userStatsEntityDao.setLastSeen(any(), any(), any(), any())).thenReturn(Uni.createFrom().item(NOW.minusHours(12)));
 
@@ -176,6 +201,7 @@ class StatisticsServiceImplTest {
 		verify(dateTimeService, times(1)).getNow();
 		verify(userStatsEntityDao).setLastSeen(any(), eq(APPLICATION_ID), eq(USER_UUID), eq(NOW));
 		verify(userStatsEntityDao, never()).increaseDaysLaunched(any(), any(), any());
+		verify(userStatsEntityDao, never()).setLastLaunched(any(), any(), any(), any());
 	}
 
 	@FunctionalInterface
