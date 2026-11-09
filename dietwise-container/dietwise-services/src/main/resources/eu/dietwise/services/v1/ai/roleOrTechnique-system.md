@@ -32,7 +32,6 @@ Here are a few examples:
 
 ## User message
 Allowed RoleOrTechnique values:
-- Salad topping
 - Sandwich spread
 - baking fat (savory)
 - baking fat (sweet)
@@ -87,7 +86,6 @@ sauté fat
 
 ## User message
 Allowed RoleOrTechnique values:
-- Salad topping
 - Sandwich spread
 - baking fat (savory)
 - baking fat (sweet)
@@ -142,7 +140,6 @@ finish oil
 
 ## User message
 Allowed RoleOrTechnique values:
-- Salad topping
 - Sandwich spread
 - baking fat (savory)
 - baking fat (sweet)
@@ -197,7 +194,6 @@ flavoring
 
 ## User message
 Allowed RoleOrTechnique values:
-- Salad topping
 - Sandwich spread
 - baking fat (savory)
 - baking fat (sweet)

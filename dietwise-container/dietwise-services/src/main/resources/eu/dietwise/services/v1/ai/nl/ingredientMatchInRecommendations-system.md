@@ -39,7 +39,7 @@ Componenten:
 - groenten
 - volkoren granen
 
-Ingrediënt: Feta/Gecondenseerde melk
+Ingrediënt: Feta
 
 ## Assistentbericht
 

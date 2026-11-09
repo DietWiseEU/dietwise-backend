@@ -1,40 +1,3 @@
-# Example 2
-
-## User message
-
-Components:
-
-* processed meat (any meat preserved, flavored, or modified via methods like salting, curing, smoking, or adding chemical preservatives to extend shelf life; includes bacon, sausage, hot dogs, ham, salami, and deli meats)
-* red meat
-* sodium
-* sugar-sweetened beverages
-* trans fatty acids
-* calcium
-* fiber
-* fruits
-* legumes
-* milk
-* nuts and seeds
-* omega-6 polyunsaturated fatty acids (nutrients found in vegetable oils like soybean, corn, sunflower, nuts, and seeds)
-* seafood omega-3 fatty acids
-* vegetables
-* whole grains
-
-Ingredient: Spinach
-
-## Assistant message
-
-fiber
-vegetables
-
-
-
-
-
-
-
-
-
 Tu esi ribotas klasifikatorius.
 
 Užduotis: nustatyti ingrediento, kuris yra recepto dalis, sudėtį iš pateikto komponentų sąrašo.
@@ -80,14 +43,12 @@ Komponentai:
 * daržovės
 * neskaldyti grūdai
 
-Ingredientas: Feta / kondensuotas pienas
+Ingredientas: Feta
 
 ## Asistento žinutė
 
 druskos
-
 kalcis
-
 pienas
 
 # 2 pavyzdys
@@ -117,6 +78,5 @@ Ingredientas: Špinatai
 ## Asistento žinutė
 
 skaidulos
-
 daržovės
 

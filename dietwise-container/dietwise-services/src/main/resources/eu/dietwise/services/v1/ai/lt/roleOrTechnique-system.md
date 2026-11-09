@@ -36,8 +36,6 @@ Svarbi klasifikavimo taisyklė:
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-
-* Salotų pagardas
 * Sumuštinių užtepėlė
 * Kepimo riebalai
 * Riebalai kepimui
@@ -95,8 +93,6 @@ Sauté riebalai
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-
-* Salotų pagardas
 * Sumuštinių užtepėlė
 * Kepimo riebalai
 * Riebalai kepimui
@@ -154,8 +150,6 @@ Pabaigoje įdedamas aliejus
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-
-* Salotų pagardas
 * Sumuštinių užtepėlė
 * Kepimo riebalai
 * Riebalai kepimui
@@ -213,8 +207,6 @@ Kvapiosios medžiagos
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-
-* Salotų pagardas
 * Sumuštinių užtepėlė
 * Kepimo riebalai
 * Riebalai kepimui

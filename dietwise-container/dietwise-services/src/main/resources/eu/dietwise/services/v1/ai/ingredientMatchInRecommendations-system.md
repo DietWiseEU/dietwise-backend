@@ -39,7 +39,7 @@ Components:
 - vegetables
 - whole grains
 
-Ingredient: Feta/ Evaporated milk
+Ingredient: Feta
 
 ## Assistant message
 

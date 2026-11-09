@@ -36,8 +36,6 @@ Hier zijn enkele voorbeelden:
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-
-* Saladetopping
 * Sandwich spread
 * bakvet
 * bakvet (zoet)
@@ -95,8 +93,6 @@ bakvet
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-
-* Saladetopping
 * Sandwich spread
 * bakvet
 * bakvet (zoet)
@@ -154,8 +150,6 @@ afwerkolie
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-
-* Saladetopping
 * Sandwich spread
 * bakvet
 * bakvet (zoet)
@@ -213,8 +207,6 @@ smaakmaker
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-
-* Saladetopping
 * Sandwich spread
 * bakvet
 * bakvet (zoet)
