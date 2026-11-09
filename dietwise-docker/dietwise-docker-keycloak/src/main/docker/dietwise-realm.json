@@ -745,7 +745,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "redirectUris" : [ "moz-extension://df8600df85c3391d23d3d57d72796210f7bb3674@temporary-addon/callback.html", "/callback.html", "http://localhost:8180/extension-callback.html", "https://gaia.ispatial.survey.ntua.gr/extension-callback.html", "https://e9daffa4e57cef0785f2756a14b247b128162e80.extensions.allizom.org/", "http://localhost:5173", "http://localhost:5173/", "https://gaia.ispatial.survey.ntua.local/extension-callback.html" ],
-    "webOrigins" : [ "chrome-extension://*" ],
+    "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
     "consentRequired" : false,

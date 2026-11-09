@@ -121,11 +121,12 @@ Full info [here](https://docs.liquibase.com/tools-integrations/maven/commands/ma
 
 #### Updating the master tables from the working copies of the backoffice
 
-Run the `dietwise-publish` tool:
+Run the `dietwise-publish` tool (full details in `dietwise-tools/dietwise-publish/README.md`):
 
 ```bash
 QUARKUS_DATASOURCE_JDBC_URL=... QUARKUS_DATASOURCE_USERNAME=... QUARKUS_DATASOURCE_PASSWORD=... \
-mvn -q -pl dietwise-tools/dietwise-publish exec:java > changelogs/YYYYMMDD_publish.xml
+mvn -q -pl dietwise-tools/dietwise-publish compile exec:java \
+	> dietwise-container/dietwise-dao-hibernate-reactive/src/main/resources/changelogs/YYYYMMDD_publish.xml
 ```
 
 Wire the output into `changelog.xml` (optional args: `exec:java -Dexec.args="<changeset-id> <author>"`; id

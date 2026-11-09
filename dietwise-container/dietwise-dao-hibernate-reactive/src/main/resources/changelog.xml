@@ -24,4 +24,5 @@
 	<include relativeToChangelogFile="true" file="changelogs/20260914_recommendation_renames.xml"/>
 	<include relativeToChangelogFile="true" file="changelogs/20261016_trigger_ingredient_components.xml"/>
 	<include relativeToChangelogFile="true" file="changelogs/20261022_interventions.xml"/>
+	<include relativeToChangelogFile="true" file="changelogs/20261103_master_data.xml"/>
 </databaseChangeLog>

@@ -116,6 +116,16 @@ Create a new client in the Realm:
 			For a public PKCE client that's less alarming than it sounds — an attacker site still can't obtain an
 			authorization code, since `redirect_uri` is validated — but it does open the token and refresh endpoints to
 			cross-site calls from any page.
+
+			Keycloak matches Web origins literally: a lone `*` is the only wildcard, and `+` adds the origins of the
+			valid redirect URIs (http/https only). Entries such as `chrome-extension://*` match nothing; the token
+			endpoint then answers `403 {"error":"Invalid origin"}` to the extension. (The backend's
+			`quarkus.http.cors.origins` does accept regular expressions; Keycloak does not.)
+
+			The Chrome extension has a fixed ID, `foljbdngpnpeaadnkmkpeclklkblgobd`, because its manifest
+			(`public-chrome/manifest.json` in responsible-cooking-alliance) carries the Chrome Web Store public key as
+			`"key"`. Its exact origin is therefore `chrome-extension://foljbdngpnpeaadnkmkpeclklkblgobd`, for both
+			unpacked and store installs.
 		- **FOR PRODUCTION:** `*` *but revisit*
 - Save & finish the new client wizard
 
