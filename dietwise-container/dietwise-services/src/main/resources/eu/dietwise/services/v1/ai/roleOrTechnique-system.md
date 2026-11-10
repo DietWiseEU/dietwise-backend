@@ -33,6 +33,7 @@ Here are a few examples:
 ## User message
 Allowed RoleOrTechnique values:
 - Sandwich spread
+- Vegetable base
 - baking fat (savory)
 - baking fat (sweet)
 - baking/binding (sweet)
@@ -49,7 +50,6 @@ Allowed RoleOrTechnique values:
 - flavoring
 - meat base
 - minced in sauce
-- pasta
 - protein
 - protein add-in in preservation processing
 - roux binder
@@ -63,10 +63,13 @@ Allowed RoleOrTechnique values:
 - savory main protein centerpiece
 - seasoning
 - staple
-- starchy base
+- starch
+- starch base
 - steak centerpiece
 - stirfry protein
 - sweetener, bulk ingredient
+- sweetener, bulk ingredient (sweet)
+  sweetener, flavor balance (savory)
 - topping
 
 ingredient: butter
@@ -87,6 +90,7 @@ sauté fat
 ## User message
 Allowed RoleOrTechnique values:
 - Sandwich spread
+- Vegetable base
 - baking fat (savory)
 - baking fat (sweet)
 - baking/binding (sweet)
@@ -103,7 +107,6 @@ Allowed RoleOrTechnique values:
 - flavoring
 - meat base
 - minced in sauce
-- pasta
 - protein
 - protein add-in in preservation processing
 - roux binder
@@ -117,10 +120,13 @@ Allowed RoleOrTechnique values:
 - savory main protein centerpiece
 - seasoning
 - staple
-- starchy base
+- starch
+- starch base
 - steak centerpiece
 - stirfry protein
 - sweetener, bulk ingredient
+- sweetener, bulk ingredient (sweet)
+  sweetener, flavor balance (savory)
 - topping
 
 ingredient: olive oil
@@ -141,6 +147,7 @@ finish oil
 ## User message
 Allowed RoleOrTechnique values:
 - Sandwich spread
+- Vegetable base
 - baking fat (savory)
 - baking fat (sweet)
 - baking/binding (sweet)
@@ -157,7 +164,6 @@ Allowed RoleOrTechnique values:
 - flavoring
 - meat base
 - minced in sauce
-- pasta
 - protein
 - protein add-in in preservation processing
 - roux binder
@@ -171,10 +177,13 @@ Allowed RoleOrTechnique values:
 - savory main protein centerpiece
 - seasoning
 - staple
-- starchy base
+- starch
+- starch base
 - steak centerpiece
 - stirfry protein
 - sweetener, bulk ingredient
+- sweetener, bulk ingredient (sweet)
+  sweetener, flavor balance (savory)
 - topping
 
 ingredient: onion
@@ -195,6 +204,7 @@ flavoring
 ## User message
 Allowed RoleOrTechnique values:
 - Sandwich spread
+- Vegetable base
 - baking fat (savory)
 - baking fat (sweet)
 - baking/binding (sweet)
@@ -211,7 +221,6 @@ Allowed RoleOrTechnique values:
 - flavoring
 - meat base
 - minced in sauce
-- pasta
 - protein
 - protein add-in in preservation processing
 - roux binder
@@ -225,10 +234,13 @@ Allowed RoleOrTechnique values:
 - savory main protein centerpiece
 - seasoning
 - staple
-- starchy base
+- starch
+- starch base
 - steak centerpiece
 - stirfry protein
 - sweetener, bulk ingredient
+- sweetener, bulk ingredient (sweet)
+  sweetener, flavor balance (savory)
 - topping
 
 ingredient: feta cheese
