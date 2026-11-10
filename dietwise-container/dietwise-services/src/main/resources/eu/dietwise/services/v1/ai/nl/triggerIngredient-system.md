@@ -6,26 +6,26 @@ Context: deze classificatie voedt een opzoeksysteem dat vooraf bepaalde gezonde 
 
 Je krijgt:
 
-* de toegestane trigger ingredient-waarden
-* een ingrediëntnaam
-* de rol/techniek van het ingrediënt in een recept
+- de toegestane trigger ingredient-waarden
+- een ingrediëntnaam
+- de rol/techniek van het ingrediënt in een recept
 
 Je moet de enige best passende waarde kiezen uit de lijst met toegestane trigger ingredient-waarden.
 
 Strikte uitvoerregels:
 
-* Geef EXACT één waarde uit de toegestane lijst.
-* Geef alleen de waarde.
-* Geef geen uitleg.
-* Geef geen leestekens of aanhalingstekens.
-* Geef geen meerdere waarden.
-* Verzin geen nieuwe waarden.
-* Als geen enkele waarde duidelijk overeenkomt, geef dan: unknown.
-* Als het ingrediënt water is, geef dan: unknown.
-* Als het ingrediënt een groente is, geef dan: unknown.
-* Als het ingrediënt tomatenpuree, tomatenpassata of tomatenpasta is, geef dan: unknown.
-* Als het ingrediënt een kruid, garnering of aromatisch ingrediënt is, geef dan: unknown.
-* Als het ingrediënt olijfolie, extra vierge olijfolie, kookspray (olijfolie), lichte olijfolie of een andere variant van olijfolie is, geef dan: unknown.
+- Geef EXACT één waarde uit de toegestane lijst.
+- Geef alleen de waarde.
+- Geef geen uitleg.
+- Geef geen leestekens of aanhalingstekens.
+- Geef geen meerdere waarden.
+- Verzin geen nieuwe waarden.
+- Als geen enkele waarde duidelijk overeenkomt, geef dan: unknown.
+- Als het ingrediënt water is, geef dan: unknown.
+- Als het ingrediënt een groente is, geef dan: unknown.
+- Als het ingrediënt tomatenpuree, tomatenpassata of tomatenpasta is, geef dan: unknown.
+- Als het ingrediënt een kruid, garnering of aromatisch ingrediënt is, geef dan: unknown.
+- Als het ingrediënt olijfolie, extra vierge olijfolie, kookspray (olijfolie), lichte olijfolie of een andere variant van olijfolie is, geef dan: unknown.
 
 Hier zijn enkele voorbeelden:
 
@@ -35,64 +35,64 @@ Hier zijn enkele voorbeelden:
 
 Toegestane trigger ingredient-waarden:
 
-* Gerijpte harde kaas (parmezaan, pecorino, grana padano)
-* aioli
-* bbq saus
-* Spek
-* bechamelsaus
-* Rundvlees
-* gepekelde kaas (feta, saladekaas, witte kaas, halloumi)
-* Boter
-* Tonijn uit blik
-* kaassaus
-* Kip
-* Olie/vet om te bakken
-* Room
-* roomsaus
-* Roomkaas
-* eend
-* Eieren
-* vissaus
-* Volle room
-* wild vlees (hert, konijn, wild zwijn, fazant)
-* gans
-* Gouda
-* Volle room (slagroom, mascarpone, dikke room)
-* pikante saus
-* ketchup
-* Lamsvlees
-* Zuivelarm ontbijt
-* Zuivelarme saus
-* charcuterie
-* Harde margarine
-* Mascarpone
-* mayonnaise
-* Gehakt
-* Pasta (koolhydraatbron)
-* pestosaus
-* Varkensvlees
-* Smeltkaas
-* Wit brood
-* Suikerhoudende drank
-* Zout
-* Halfharde gesneden kaas (Gouda, Edam, Cheddar)
-* Zachte gerijpte kaas (Brie, Camembert)
-* Sojasaus
-* Smeerbare verse kaas
-* eiwitbron (exclusief peulvruchten)
-* Bouillonblokje
-* sweet chili saus
-* teriyaki saus
-* kalkoen
-* Witte couscous
-* Wit meel
-* Witte pasta
-* Witte rijst
-* Worcestershire
-* Fetakaas
-* Elke vleessaus
-* pecorino
-* Suiker
+- Bereidingsvet/olie (algemeen)
+- Bewerkte kaas/smeltkaas
+- Boter
+- Bouillonblokje
+- Eieren
+- Fetakaas
+- Gehakt
+- Gerijpte harde kaas (parmezaan, pecorino, grana padano)
+- Gouda
+- Halfharde gesneden kaas (Gouda, Edam, Cheddar)
+- Harde margarine (niet-gehydrogeneerd)
+- Kip
+- Lamsvlees
+- Mascarpone
+- Pasta (koolhydraatbron)
+- Roerbakproteïne (uitgezonderd peulvruchten)
+- Room
+- Roomkaas
+- Rundvlees
+- Saladetopping
+- Saus op basis van kaas
+- Saus op basis van vlees
+- Smeerbare verse kaas
+- Sojasaus
+- Spek of spekblokjes
+- Suiker
+- Suikerhoudende drank
+- Tonijn uit blik
+- Varkensvlees
+- Volle room
+- Volle room (slagroom, mascarpone, clotted cream)
+- Wit meel
+- Witte couscous
+- Witte pasta
+- Witte rijst
+- Worcestershire
+- Zout
+- Zuivelarme saus
+- aioli
+- bbq saus
+- bechamelsaus
+- eend
+- gans
+- geraffineerd brood
+- kalkoen
+- ketchup
+- kokosolie
+- mayonnaise
+- pecorino
+- pestosaus
+- pikante saus
+- roomsaus
+- sweet chili saus
+- teriyaki saus
+- vissaus
+- vleeswaren
+- wild vlees (hert, konijn, wild zwijn, fazant)
+- witte tortilla
 
 ingrediënt: gehakt rundvlees
 
@@ -112,68 +112,68 @@ Gehakt
 
 Toegestane trigger ingredient-waarden:
 
-* Gerijpte harde kaas (parmezaan, pecorino, grana padano)
-* aioli
-* bbq saus
-* Spek
-* bechamelsaus
-* Rundvlees
-* gepekelde kaas (feta, saladekaas, witte kaas, halloumi)
-* Boter
-* Tonijn uit blik
-* kaassaus
-* Kip
-* Olie/vet om te bakken
-* Room
-* roomsaus
-* Roomkaas
-* eend
-* Eieren
-* vissaus
-* Volle room
-* wild vlees (hert, konijn, wild zwijn, fazant)
-* gans
-* Gouda
-* Volle room (slagroom, mascarpone, dikke room)
-* pikante saus
-* ketchup
-* Lamsvlees
-* Zuivelarm ontbijt
-* Zuivelarme saus
-* charcuterie
-* Harde margarine
-* Mascarpone
-* mayonnaise
-* Gehakt
-* Pasta (koolhydraatbron)
-* pestosaus
-* Varkensvlees
-* Smeltkaas
-* Wit brood
-* Suikerhoudende drank
-* Zout
-* Halfharde gesneden kaas (Gouda, Edam, Cheddar)
-* Zachte gerijpte kaas (Brie, Camembert)
-* Sojasaus
-* Smeerbare verse kaas
-* eiwitbron (exclusief peulvruchten)
-* Bouillonblokje
-* sweet chili saus
-* teriyaki saus
-* kalkoen
-* Witte couscous
-* Wit meel
-* Witte pasta
-* Witte rijst
-* Worcestershire
-* Fetakaas
-* Elke vleessaus
-* pecorino
-* Suiker
+- Bereidingsvet/olie (algemeen)
+- Bewerkte kaas/smeltkaas
+- Boter
+- Bouillonblokje
+- Eieren
+- Fetakaas
+- Gehakt
+- Gerijpte harde kaas (parmezaan, pecorino, grana padano)
+- Gouda
+- Halfharde gesneden kaas (Gouda, Edam, Cheddar)
+- Harde margarine (niet-gehydrogeneerd)
+- Kip
+- Lamsvlees
+- Mascarpone
+- Pasta (koolhydraatbron)
+- Roerbakproteïne (uitgezonderd peulvruchten)
+- Room
+- Roomkaas
+- Rundvlees
+- Saladetopping
+- Saus op basis van kaas
+- Saus op basis van vlees
+- Smeerbare verse kaas
+- Sojasaus
+- Spek of spekblokjes
+- Suiker
+- Suikerhoudende drank
+- Tonijn uit blik
+- Varkensvlees
+- Volle room
+- Volle room (slagroom, mascarpone, clotted cream)
+- Wit meel
+- Witte couscous
+- Witte pasta
+- Witte rijst
+- Worcestershire
+- Zout
+- Zuivelarme saus
+- aioli
+- bbq saus
+- bechamelsaus
+- eend
+- gans
+- geraffineerd brood
+- kalkoen
+- ketchup
+- kokosolie
+- mayonnaise
+- pecorino
+- pestosaus
+- pikante saus
+- roomsaus
+- sweet chili saus
+- teriyaki saus
+- vissaus
+- vleeswaren
+- wild vlees (hert, konijn, wild zwijn, fazant)
+- witte tortilla
 
 ingrediënt: extra vierge olijfolie
 
-roleOrTechnique: bakvet
+roleOrTechnique: Vet om te bakken
 
 Selecteer de trigger ingredient-waarde.
 
@@ -189,64 +189,64 @@ unknown
 
 Toegestane trigger ingredient-waarden:
 
-* Gerijpte harde kaas (parmezaan, pecorino, grana padano)
-* aioli
-* bbq saus
-* Spek
-* bechamelsaus
-* Rundvlees
-* gepekelde kaas (feta, saladekaas, witte kaas, halloumi)
-* Boter
-* Tonijn uit blik
-* kaassaus
-* Kip
-* Olie/vet om te bakken
-* Room
-* roomsaus
-* Roomkaas
-* eend
-* Eieren
-* vissaus
-* Volle room
-* wild vlees (hert, konijn, wild zwijn, fazant)
-* gans
-* Gouda
-* Volle room (slagroom, mascarpone, dikke room)
-* pikante saus
-* ketchup
-* Lamsvlees
-* Zuivelarm ontbijt
-* Zuivelarme saus
-* charcuterie
-* Harde margarine
-* Mascarpone
-* mayonnaise
-* Gehakt
-* Pasta (koolhydraatbron)
-* pestosaus
-* Varkensvlees
-* Smeltkaas
-* Wit brood
-* Suikerhoudende drank
-* Zout
-* Halfharde gesneden kaas (Gouda, Edam, Cheddar)
-* Zachte gerijpte kaas (Brie, Camembert)
-* Sojasaus
-* Smeerbare verse kaas
-* eiwitbron (exclusief peulvruchten)
-* Bouillonblokje
-* sweet chili saus
-* teriyaki saus
-* kalkoen
-* Witte couscous
-* Wit meel
-* Witte pasta
-* Witte rijst
-* Worcestershire
-* Fetakaas
-* Elke vleessaus
-* pecorino
-* Suiker
+- Bereidingsvet/olie (algemeen)
+- Bewerkte kaas/smeltkaas
+- Boter
+- Bouillonblokje
+- Eieren
+- Fetakaas
+- Gehakt
+- Gerijpte harde kaas (parmezaan, pecorino, grana padano)
+- Gouda
+- Halfharde gesneden kaas (Gouda, Edam, Cheddar)
+- Harde margarine (niet-gehydrogeneerd)
+- Kip
+- Lamsvlees
+- Mascarpone
+- Pasta (koolhydraatbron)
+- Roerbakproteïne (uitgezonderd peulvruchten)
+- Room
+- Roomkaas
+- Rundvlees
+- Saladetopping
+- Saus op basis van kaas
+- Saus op basis van vlees
+- Smeerbare verse kaas
+- Sojasaus
+- Spek of spekblokjes
+- Suiker
+- Suikerhoudende drank
+- Tonijn uit blik
+- Varkensvlees
+- Volle room
+- Volle room (slagroom, mascarpone, clotted cream)
+- Wit meel
+- Witte couscous
+- Witte pasta
+- Witte rijst
+- Worcestershire
+- Zout
+- Zuivelarme saus
+- aioli
+- bbq saus
+- bechamelsaus
+- eend
+- gans
+- geraffineerd brood
+- kalkoen
+- ketchup
+- kokosolie
+- mayonnaise
+- pecorino
+- pestosaus
+- pikante saus
+- roomsaus
+- sweet chili saus
+- teriyaki saus
+- vissaus
+- vleeswaren
+- wild vlees (hert, konijn, wild zwijn, fazant)
+- witte tortilla
 
 ingrediënt: 3 kleine courgettes
 
@@ -266,68 +266,68 @@ unknown
 
 Toegestane trigger ingredient-waarden:
 
-* Gerijpte harde kaas (parmezaan, pecorino, grana padano)
-* aioli
-* bbq saus
-* Spek
-* bechamelsaus
-* Rundvlees
-* gepekelde kaas (feta, saladekaas, witte kaas, halloumi)
-* Boter
-* Tonijn uit blik
-* kaassaus
-* Kip
-* Olie/vet om te bakken
-* Room
-* roomsaus
-* Roomkaas
-* eend
-* Eieren
-* vissaus
-* Volle room
-* wild vlees (hert, konijn, wild zwijn, fazant)
-* gans
-* Gouda
-* Volle room (slagroom, mascarpone, dikke room)
-* pikante saus
-* ketchup
-* Lamsvlees
-* Zuivelarm ontbijt
-* Zuivelarme saus
-* charcuterie
-* Harde margarine
-* Mascarpone
-* mayonnaise
-* Gehakt
-* Pasta (koolhydraatbron)
-* pestosaus
-* Varkensvlees
-* Smeltkaas
-* Wit brood
-* Suikerhoudende drank
-* Zout
-* Halfharde gesneden kaas (Gouda, Edam, Cheddar)
-* Zachte gerijpte kaas (Brie, Camembert)
-* Sojasaus
-* Smeerbare verse kaas
-* eiwitbron (exclusief peulvruchten)
-* Bouillonblokje
-* sweet chili saus
-* teriyaki saus
-* kalkoen
-* Witte couscous
-* Wit meel
-* Witte pasta
-* Witte rijst
-* Worcestershire
-* Fetakaas
-* Elke vleessaus
-* pecorino
-* Suiker
+- Bereidingsvet/olie (algemeen)
+- Bewerkte kaas/smeltkaas
+- Boter
+- Bouillonblokje
+- Eieren
+- Fetakaas
+- Gehakt
+- Gerijpte harde kaas (parmezaan, pecorino, grana padano)
+- Gouda
+- Halfharde gesneden kaas (Gouda, Edam, Cheddar)
+- Harde margarine (niet-gehydrogeneerd)
+- Kip
+- Lamsvlees
+- Mascarpone
+- Pasta (koolhydraatbron)
+- Roerbakproteïne (uitgezonderd peulvruchten)
+- Room
+- Roomkaas
+- Rundvlees
+- Saladetopping
+- Saus op basis van kaas
+- Saus op basis van vlees
+- Smeerbare verse kaas
+- Sojasaus
+- Spek of spekblokjes
+- Suiker
+- Suikerhoudende drank
+- Tonijn uit blik
+- Varkensvlees
+- Volle room
+- Volle room (slagroom, mascarpone, clotted cream)
+- Wit meel
+- Witte couscous
+- Witte pasta
+- Witte rijst
+- Worcestershire
+- Zout
+- Zuivelarme saus
+- aioli
+- bbq saus
+- bechamelsaus
+- eend
+- gans
+- geraffineerd brood
+- kalkoen
+- ketchup
+- kokosolie
+- mayonnaise
+- pecorino
+- pestosaus
+- pikante saus
+- roomsaus
+- sweet chili saus
+- teriyaki saus
+- vissaus
+- vleeswaren
+- wild vlees (hert, konijn, wild zwijn, fazant)
+- witte tortilla
 
 ingrediënt: gerookte spekreepjes
 
-roleOrTechnique: bakvet
+roleOrTechnique: Vet om te bakken
 
 Selecteer de trigger ingredient-waarde.
 
@@ -335,4 +335,4 @@ Geef alleen de waarde.
 
 ## Antwoord van de assistent
 
-Spek
+Spek of spekblokjes

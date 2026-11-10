@@ -6,26 +6,26 @@ Kontekstas: ši klasifikacija naudojama paieškos sistemoje, kuri pateikia iš a
 
 Jums bus pateikta:
 
-* leistinų trigger ingredient reikšmių sąrašas
-* ingrediento pavadinimas
-* ingrediento vaidmuo / naudojimo būdas recepte
+- leistinų trigger ingredient reikšmių sąrašas
+- ingrediento pavadinimas
+- ingrediento vaidmuo / naudojimo būdas recepte
 
 Turite pasirinkti vieną geriausiai tinkančią reikšmę iš leistinų trigger ingredient reikšmių sąrašo.
 
 Griežtos išvesties taisyklės:
 
-* Pateikite TIKSLIAI vieną reikšmę iš leistino sąrašo.
-* Pateikite tik reikšmę.
-* Nepateikite paaiškinimų.
-* Nepateikite skyrybos ženklų ar kabučių.
-* Nepateikite kelių reikšmių.
-* Neišgalvokite naujų reikšmių.
-* Jei nė viena reikšmė aiškiai netinka, pateikite: unknown.
-* Jei ingredientas yra vanduo, pateikite: unknown.
-* Jei ingredientas yra daržovė, pateikite: unknown.
-* Jei ingredientas yra pomidorų tyrė, pomidorų pasata arba pomidorų pasta, pateikite: unknown.
-* Jei ingredientas yra prieskoninė žolelė, papuošimas arba aromatinis ingredientas, pateikite: unknown.
-* Jei ingredientas yra alyvuogių aliejus, ypač tyras alyvuogių aliejus, kepimo purškalas (alyvuogių aliejus), lengvas alyvuogių aliejus arba bet kuri kita alyvuogių aliejaus rūšis, pateikite: unknown.
+- Pateikite TIKSLIAI vieną reikšmę iš leistino sąrašo.
+- Pateikite tik reikšmę.
+- Nepateikite paaiškinimų.
+- Nepateikite skyrybos ženklų ar kabučių.
+- Nepateikite kelių reikšmių.
+- Neišgalvokite naujų reikšmių.
+- Jei nė viena reikšmė aiškiai netinka, pateikite: unknown.
+- Jei ingredientas yra vanduo, pateikite: unknown.
+- Jei ingredientas yra daržovė, pateikite: unknown.
+- Jei ingredientas yra pomidorų tyrė, pomidorų pasata arba pomidorų pasta, pateikite: unknown.
+- Jei ingredientas yra prieskoninė žolelė, papuošimas arba aromatinis ingredientas, pateikite: unknown.
+- Jei ingredientas yra alyvuogių aliejus, ypač tyras alyvuogių aliejus, kepimo purškalas (alyvuogių aliejus), lengvas alyvuogių aliejus arba bet kuri kita alyvuogių aliejaus rūšis, pateikite: unknown.
 
 Štai keli pavyzdžiai:
 
@@ -34,69 +34,68 @@ Griežtos išvesties taisyklės:
 ## Naudotojo žinutė
 
 Leistinos trigger ingredient reikšmės:
-
-* Brandintas kietasis sūris pagardams
-* „Aioli“ padažas
-* Barbekiu padažas
-* Šoninė/Šoninės kubeliai
-* Bešamelio padažas
-* Jautiena
-* Sūryme brandintas sūris
-* Sviestas
-* Konservuotas tunas
-* Padažai sūrio pagrindu
-* Vištiena
-* Bendri riebalai
-* Grietinėlė
-* Padažai grietinėlės pagrindu
-* Tepamasis sūris
-* Antiena
-* Kiaušiniai
-* Žuvies padažas
-* Riebi grietinėlė
-* Žvieriena
-* Žasiena
-* Gouda sūris
-* Kulinariniai riebūs pieno produktai (plakamoji grietinėlė, maskarponės sūris)
-* Aštrus madažas
-* Kečiupas
-* Ėriena
-* Mažai pieno produktų turintys pusryčiai
-* Mažai pieno produktų turintis padažas
-* Mėsos gaminiai
-* Margarinas be hidrintų riebalų
-* Maskarponės sūris
-* Majonezas
-* Malta mėsa
-* Makaronų patiekalas
-* Pesto padažas
-* Kiauliena
-* Lydytas sūris
-* Šviesi duona
-* Saldintas gėrimas
-* Druska
-* Puskietis pjaustytas sūris
-* Minkstasis brandintas sūris
-* Sojų padažas
-* Sūrio užtepėlė
-* Greitai paruošiami, daug baltymų turintys ingridientai, skirti kepti maišant
-* Sultinio kubelis
-* Saldus aitriųjų paprikų padažas
-* Terijakio padažas
-* Kalakutiena
-* Baltas kuskusas
-* Balti miltai
-* Balti makaronai
-* Baltieji ryžiai
-* Vorčesterio padažas
-* Fetos sūris
-* Bet koks mėsos padažas
-* Avių pieno kietasis sūris
-* Cukrus
+- Aliejai / Riebalai
+- Antiena
+- Aštrus padažas
+- Baltasis kuskusas
+- Balti makaronai
+- Balti miltai
+- Baltieji ryžiai
+- Baltymų šaltinis kepimui wok keptuvėje (ne ankštinis)
+- Barbekiu padažas
+- Bešamelio padažas
+- Brandintas kietasis pagardinamasis sūris (parmezanas, pekorinas, grana padano)
+- Cukrus
+- Druska
+- Fetos sūris
+- Gouda sūris
+- Grietinėlė
+- Jautiena
+- Kalakutiena
+- Kečiupas
+- Kiauliena
+- Kiaušiniai
+- Kokosų aliejus
+- Konservuota malta mėsa
+- Konservuotas tunas
+- Lydytas sūris
+- Majonezas
+- Malta mėsa
+- Margarinas be hidrintų riebalų
+- Maskarponės sūris
+- Mažai pieno produktų turintis padažas
+- Padažai grietinėlės pagrindu
+- Padažai sūrio pagrindu
+- Padažas mėsos pagrindu
+- Pagrindiniame patiekale nėra daržovių
+- Pekorinas (itališkas kietasis avies pieno sūris)
+- Pesto padažas
+- Puskietis pjaustymui skirtas sūris (pvz., gouda, edamas, čederis)
+- Riebi grietinėlė
+- Riebi grietinėlė (pvz., plakamoji grietinėlė, maskarponė, sutirštinta grietinėlė)
+- Saldintas gėrimas
+- Saldus aitriųjų paprikų padažas
+- Salotų pagardas
+- Sojų padažas
+- Sultinio kubelis
+- Sviestas
+- Tepamasis sūris
+- Tepamasis šviežias sūris
+- Terijakio padažas
+- Tortilija, pagaminta iš rafinuotų miltų
+- Vištiena
+- Vorčesterio padažas
+- Ėriena
+- Šoninė / Spirgučiai
+- Šviesi duona
+- Žasiena
+- Žuvies padažas
+- Žvėriena
+- „Aioli“ padažas
 
 ingredientas: malta jautiena
 
-roleOrTechnique: Sumalta padaže
+roleOrTechnique: Malta padaže
 
 Pasirinkite trigger ingredient reikšmę.
 
@@ -111,68 +110,68 @@ Malta mėsa
 ## Naudotojo žinutė
 
 Leistinos trigger ingredient reikšmės:
-* Brandintas kietasis sūris pagardams
-* „Aioli“ padažas
-* Barbekiu padažas
-* Šoninė/Šoninės kubeliai
-* Bešamelio padažas
-* Jautiena
-* Sūryme brandintas sūris
-* Sviestas
-* Konservuotas tunas
-* Padažai sūrio pagrindu
-* Vištiena
-* Bendri riebalai
-* Grietinėlė
-* Padažai grietinėlės pagrindu
-* Tepamasis sūris
-* Antiena
-* Kiaušiniai
-* Žuvies padažas
-* Riebi grietinėlė
-* Žvieriena
-* Žasiena
-* Gouda sūris
-* Kulinariniai riebūs pieno produktai (plakamoji grietinėlė, maskarponės sūris)
-* Aštrus madažas
-* Kečiupas
-* Ėriena
-* Mažai pieno produktų turintys pusryčiai
-* Mažai pieno produktų turintis padažas
-* Mėsos gaminiai
-* Margarinas be hidrintų riebalų
-* Maskarponės sūris
-* Majonezas
-* Malta mėsa
-* Makaronų patiekalas
-* Pesto padažas
-* Kiauliena
-* Lydytas sūris
-* Šviesi duona
-* Saldintas gėrimas
-* Druska
-* Puskietis pjaustytas sūris
-* Minkstasis brandintas sūris
-* Sojų padažas
-* Sūrio užtepėlė
-* Greitai paruošiami, daug baltymų turintys ingridientai, skirti kepti maišant
-* Sultinio kubelis
-* Saldus aitriųjų paprikų padažas
-* Terijakio padažas
-* Kalakutiena
-* Baltas kuskusas
-* Balti miltai
-* Balti makaronai
-* Baltieji ryžiai
-* Vorčesterio padažas
-* Fetos sūris
-* Bet koks mėsos padažas
-* Avių pieno kietasis sūris
-* Cukrus
+- Aliejai / Riebalai
+- Antiena
+- Aštrus padažas
+- Baltasis kuskusas
+- Balti makaronai
+- Balti miltai
+- Baltieji ryžiai
+- Baltymų šaltinis kepimui wok keptuvėje (ne ankštinis)
+- Barbekiu padažas
+- Bešamelio padažas
+- Brandintas kietasis pagardinamasis sūris (parmezanas, pekorinas, grana padano)
+- Cukrus
+- Druska
+- Fetos sūris
+- Gouda sūris
+- Grietinėlė
+- Jautiena
+- Kalakutiena
+- Kečiupas
+- Kiauliena
+- Kiaušiniai
+- Kokosų aliejus
+- Konservuota malta mėsa
+- Konservuotas tunas
+- Lydytas sūris
+- Majonezas
+- Malta mėsa
+- Margarinas be hidrintų riebalų
+- Maskarponės sūris
+- Mažai pieno produktų turintis padažas
+- Padažai grietinėlės pagrindu
+- Padažai sūrio pagrindu
+- Padažas mėsos pagrindu
+- Pagrindiniame patiekale nėra daržovių
+- Pekorinas (itališkas kietasis avies pieno sūris)
+- Pesto padažas
+- Puskietis pjaustymui skirtas sūris (pvz., gouda, edamas, čederis)
+- Riebi grietinėlė
+- Riebi grietinėlė (pvz., plakamoji grietinėlė, maskarponė, sutirštinta grietinėlė)
+- Saldintas gėrimas
+- Saldus aitriųjų paprikų padažas
+- Salotų pagardas
+- Sojų padažas
+- Sultinio kubelis
+- Sviestas
+- Tepamasis sūris
+- Tepamasis šviežias sūris
+- Terijakio padažas
+- Tortilija, pagaminta iš rafinuotų miltų
+- Vištiena
+- Vorčesterio padažas
+- Ėriena
+- Šoninė / Spirgučiai
+- Šviesi duona
+- Žasiena
+- Žuvies padažas
+- Žvėriena
+- „Aioli“ padažas
 
 ingredientas: ypač tyras alyvuogių aliejus
 
-roleOrTechnique: Sauté riebalai
+roleOrTechnique: Riebalai kepimui
 
 Pasirinkite trigger ingredient reikšmę.
 
@@ -187,68 +186,68 @@ unknown
 ## Naudotojo žinutė
 
 Leistinos trigger ingredient reikšmės:
-* Brandintas kietasis sūris pagardams
-* „Aioli“ padažas
-* Barbekiu padažas
-* Šoninė/Šoninės kubeliai
-* Bešamelio padažas
-* Jautiena
-* Sūryme brandintas sūris
-* Sviestas
-* Konservuotas tunas
-* Padažai sūrio pagrindu
-* Vištiena
-* Bendri riebalai
-* Grietinėlė
-* Padažai grietinėlės pagrindu
-* Tepamasis sūris
-* Antiena
-* Kiaušiniai
-* Žuvies padažas
-* Riebi grietinėlė
-* Žvieriena
-* Žasiena
-* Gouda sūris
-* Kulinariniai riebūs pieno produktai (plakamoji grietinėlė, maskarponės sūris)
-* Aštrus madažas
-* Kečiupas
-* Ėriena
-* Mažai pieno produktų turintys pusryčiai
-* Mažai pieno produktų turintis padažas
-* Mėsos gaminiai
-* Margarinas be hidrintų riebalų
-* Maskarponės sūris
-* Majonezas
-* Malta mėsa
-* Makaronų patiekalas
-* Pesto padažas
-* Kiauliena
-* Lydytas sūris
-* Šviesi duona
-* Saldintas gėrimas
-* Druska
-* Puskietis pjaustytas sūris
-* Minkstasis brandintas sūris
-* Sojų padažas
-* Sūrio užtepėlė
-* Greitai paruošiami, daug baltymų turintys ingridientai, skirti kepti maišant
-* Sultinio kubelis
-* Saldus aitriųjų paprikų padažas
-* Terijakio padažas
-* Kalakutiena
-* Baltas kuskusas
-* Balti miltai
-* Balti makaronai
-* Baltieji ryžiai
-* Vorčesterio padažas
-* Fetos sūris
-* Bet koks mėsos padažas
-* Avių pieno kietasis sūris
-* Cukrus
+- Aliejai / Riebalai
+- Antiena
+- Aštrus padažas
+- Baltasis kuskusas
+- Balti makaronai
+- Balti miltai
+- Baltieji ryžiai
+- Baltymų šaltinis kepimui wok keptuvėje (ne ankštinis)
+- Barbekiu padažas
+- Bešamelio padažas
+- Brandintas kietasis pagardinamasis sūris (parmezanas, pekorinas, grana padano)
+- Cukrus
+- Druska
+- Fetos sūris
+- Gouda sūris
+- Grietinėlė
+- Jautiena
+- Kalakutiena
+- Kečiupas
+- Kiauliena
+- Kiaušiniai
+- Kokosų aliejus
+- Konservuota malta mėsa
+- Konservuotas tunas
+- Lydytas sūris
+- Majonezas
+- Malta mėsa
+- Margarinas be hidrintų riebalų
+- Maskarponės sūris
+- Mažai pieno produktų turintis padažas
+- Padažai grietinėlės pagrindu
+- Padažai sūrio pagrindu
+- Padažas mėsos pagrindu
+- Pagrindiniame patiekale nėra daržovių
+- Pekorinas (itališkas kietasis avies pieno sūris)
+- Pesto padažas
+- Puskietis pjaustymui skirtas sūris (pvz., gouda, edamas, čederis)
+- Riebi grietinėlė
+- Riebi grietinėlė (pvz., plakamoji grietinėlė, maskarponė, sutirštinta grietinėlė)
+- Saldintas gėrimas
+- Saldus aitriųjų paprikų padažas
+- Salotų pagardas
+- Sojų padažas
+- Sultinio kubelis
+- Sviestas
+- Tepamasis sūris
+- Tepamasis šviežias sūris
+- Terijakio padažas
+- Tortilija, pagaminta iš rafinuotų miltų
+- Vištiena
+- Vorčesterio padažas
+- Ėriena
+- Šoninė / Spirgučiai
+- Šviesi duona
+- Žasiena
+- Žuvies padažas
+- Žvėriena
+- „Aioli“ padažas
 
 ingredientas: 3 maži cukinijų vaisiai
 
-roleOrTechnique: Kvapiosios medžiagos
+roleOrTechnique: Skonio suteikiantis ingredientas
 
 Pasirinkite trigger ingredient reikšmę.
 
@@ -263,68 +262,68 @@ unknown
 ## Naudotojo žinutė
 
 Leistinos trigger ingredient reikšmės:
-* Brandintas kietasis sūris pagardams
-* „Aioli“ padažas
-* Barbekiu padažas
-* Šoninė/Šoninės kubeliai
-* Bešamelio padažas
-* Jautiena
-* Sūryme brandintas sūris
-* Sviestas
-* Konservuotas tunas
-* Padažai sūrio pagrindu
-* Vištiena
-* Bendri riebalai
-* Grietinėlė
-* Padažai grietinėlės pagrindu
-* Tepamasis sūris
-* Antiena
-* Kiaušiniai
-* Žuvies padažas
-* Riebi grietinėlė
-* Žvieriena
-* Žasiena
-* Gouda sūris
-* Kulinariniai riebūs pieno produktai (plakamoji grietinėlė, maskarponės sūris)
-* Aštrus madažas
-* Kečiupas
-* Ėriena
-* Mažai pieno produktų turintys pusryčiai
-* Mažai pieno produktų turintis padažas
-* Mėsos gaminiai
-* Margarinas be hidrintų riebalų
-* Maskarponės sūris
-* Majonezas
-* Malta mėsa
-* Makaronų patiekalas
-* Pesto padažas
-* Kiauliena
-* Lydytas sūris
-* Šviesi duona
-* Saldintas gėrimas
-* Druska
-* Puskietis pjaustytas sūris
-* Minkstasis brandintas sūris
-* Sojų padažas
-* Sūrio užtepėlė
-* Greitai paruošiami, daug baltymų turintys ingridientai, skirti kepti maišant
-* Sultinio kubelis
-* Saldus aitriųjų paprikų padažas
-* Terijakio padažas
-* Kalakutiena
-* Baltas kuskusas
-* Balti miltai
-* Balti makaronai
-* Baltieji ryžiai
-* Vorčesterio padažas
-* Fetos sūris
-* Bet koks mėsos padažas
-* Avių pieno kietasis sūris
-* Cukrus
+- Aliejai / Riebalai
+- Antiena
+- Aštrus padažas
+- Baltasis kuskusas
+- Balti makaronai
+- Balti miltai
+- Baltieji ryžiai
+- Baltymų šaltinis kepimui wok keptuvėje (ne ankštinis)
+- Barbekiu padažas
+- Bešamelio padažas
+- Brandintas kietasis pagardinamasis sūris (parmezanas, pekorinas, grana padano)
+- Cukrus
+- Druska
+- Fetos sūris
+- Gouda sūris
+- Grietinėlė
+- Jautiena
+- Kalakutiena
+- Kečiupas
+- Kiauliena
+- Kiaušiniai
+- Kokosų aliejus
+- Konservuota malta mėsa
+- Konservuotas tunas
+- Lydytas sūris
+- Majonezas
+- Malta mėsa
+- Margarinas be hidrintų riebalų
+- Maskarponės sūris
+- Mažai pieno produktų turintis padažas
+- Padažai grietinėlės pagrindu
+- Padažai sūrio pagrindu
+- Padažas mėsos pagrindu
+- Pagrindiniame patiekale nėra daržovių
+- Pekorinas (itališkas kietasis avies pieno sūris)
+- Pesto padažas
+- Puskietis pjaustymui skirtas sūris (pvz., gouda, edamas, čederis)
+- Riebi grietinėlė
+- Riebi grietinėlė (pvz., plakamoji grietinėlė, maskarponė, sutirštinta grietinėlė)
+- Saldintas gėrimas
+- Saldus aitriųjų paprikų padažas
+- Salotų pagardas
+- Sojų padažas
+- Sultinio kubelis
+- Sviestas
+- Tepamasis sūris
+- Tepamasis šviežias sūris
+- Terijakio padažas
+- Tortilija, pagaminta iš rafinuotų miltų
+- Vištiena
+- Vorčesterio padažas
+- Ėriena
+- Šoninė / Spirgučiai
+- Šviesi duona
+- Žasiena
+- Žuvies padažas
+- Žvėriena
+- „Aioli“ padažas
 
 ingredientas: rūkytos šoninės juostelės
 
-roleOrTechnique: Sauté riebalai
+roleOrTechnique: Riebalai kepimui
 
 Pasirinkite trigger ingredient reikšmę.
 
@@ -332,4 +331,4 @@ Pateikite tik reikšmę.
 
 ## Modelio atsakymas
 
-Šoninė/Šoninės kubeliai
+Šoninė / Spirgučiai

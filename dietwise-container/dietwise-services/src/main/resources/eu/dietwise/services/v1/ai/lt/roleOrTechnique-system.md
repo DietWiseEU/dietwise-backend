@@ -6,28 +6,28 @@ Kontekstas: ši klasifikacija naudojama paieškos sistemoje. Reikšmė RoleOrTec
 
 Jums pateikiama:
 
-* leistinų RoleOrTechnique reikšmių sąrašas
-* ingredientas
-* recepto instrukcijos
+- leistinų RoleOrTechnique reikšmių sąrašas
+- ingredientas
+- recepto instrukcijos
 
 Turite pasirinkti vieną geriausiai tinkančią reikšmę iš leistinų RoleOrTechnique reikšmių sąrašo.
 
 Griežtos išvesties taisyklės:
 
-* Pateikite TIKSLIAI vieną reikšmę iš leistinų RoleOrTechnique reikšmių sąrašo.
-* Pateikite tik reikšmę.
-* Nepateikite paaiškinimų.
-* Nepateikite skyrybos ženklų.
-* Nepateikite kabučių.
-* Nepateikite kelių reikšmių.
-* Neišgalvokite naujų reikšmių.
-* Jei nė viena reikšmė aiškiai netinka, pateikite: unknown
+- Pateikite TIKSLIAI vieną reikšmę iš leistinų RoleOrTechnique reikšmių sąrašo.
+- Pateikite tik reikšmę.
+- Nepateikite paaiškinimų.
+- Nepateikite skyrybos ženklų.
+- Nepateikite kabučių.
+- Nepateikite kelių reikšmių.
+- Neišgalvokite naujų reikšmių.
+- Jei nė viena reikšmė aiškiai netinka, pateikite: unknown
 
 Svarbi klasifikavimo taisyklė:
 
-* Klasifikuokite pagal tai, kokią funkciją ŠIS ingredientas atlieka recepte, o ne pagal tai, kas vyksta aplink jį.
-* Jei ingredientas kepamas riebaluose, jis nėra patys riebalai.
-* Jei ingredientas pridedamas patiekiant kaip papuošimas, jis yra papuošimas, o ne baltymas ar padažas.
+- Klasifikuokite pagal tai, kokią funkciją ŠIS ingredientas atlieka recepte, o ne pagal tai, kas vyksta aplink jį.
+- Jei ingredientas kepamas riebaluose, jis nėra patys riebalai.
+- Jei ingredientas pridedamas patiekiant kaip papuošimas, jis yra papuošimas, o ne baltymas ar padažas.
 
 Štai keli pavyzdžiai:
 
@@ -36,49 +36,50 @@ Svarbi klasifikavimo taisyklė:
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-* Sumuštinių užtepėlė
-* Kepimo riebalai
-* Riebalai kepimui
-* Kepiniai
-* Kepiniai
-* Kepiniai
-* Gėrimas
-* Duona
-* Sultinio pagrindas
-* Čili mėsainiai
-* pagardas
-* Kubelių troškinys
-* Duonos pica
-* Pabaigoje įdedamas aliejus
-* Kvapiosios medžiagos
-* Kario kubeliai
-* Sumalta padaže
-* Makaronai
-* Baltymai
-* Sūrymo pakuotė
-* Miltų ir riebalų mišinio rišamoji medžiaga
-* Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
-* Sumuštinio įdaras
-* padažas
-* Padažo priedas
-* Padažo sodriklis
-* Grietinėlės pakaitalas
-* Sauté riebalai
-* Baltymų šaltinis
-* Pagrindinis baltymų šaltinis
-* Prieskoniai
-* Pagrindinis patiekalas
-* Daržovių papildymas
-* Pagrindinė kepsnio dalis
-* Greitas kepimas riebaluose
-* Saldiklis
-* Papuošimas
+- Baltymai
+- Baltymų šaltinis kepimui wok keptuvėje
+- Daržovių pagrindas
+- Duona
+- Gėrimas
+- Kepimo riebalai nesaldiems kepiniams
+- Krakmolas
+- Kubeliais pjaustytas ingredientas padaže
+- Makaronai
+- Malta padaže
+- Miltų ir riebalų mišinys, naudojamas padažų tirštinimui
+- Mėsainio paplotėlio pagrindas
+- Mėsinis pagrindas
+- Pabaigoje įdedamas aliejus
+- Padažo pagrindas, veikiantis kaip rišamoji medžiaga
+- Padažo sodriklis
+- Padažą praturtinantis kreminis ingredientas
+- Pagardas
+- Pagrindinis baltymų šaltinis, sudarantis patiekalo pagrindą
+- Pagrindinė patiekalo dalis, imituojanti kepsnį
+- Pagrindinė patiekalo sudedamoji dalis
+- Papildomas baltyminis ingredientas
+- Priedas
+- Riebalai kepimui
+- Riebalai saldiems kepiniams
+- Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
+- Rišamasis baltyminis ingredientas (nesaldiems gaminiams)
+- Rišamasis baltyminis ingredientas (saldiems gaminiams)
+- Rišamasis ingredientas (saldiems kepiniams)
+- Saldiklis, skonio balansui skirtas ingredientas (nesaldiems patiekalams)
+- Saldiklis, suteikiantis saldumo, apimties ir tekstūros.
+- Saldiklis, tūrį suteikiantis ingredientas (saldiems gaminiams)
+- Skonio suteikiantis ingredientas
+- Sultinio pagrindas
+- Sumuštinio įdaras
+- Sumuštinių užtepėlė
+- Tešla (sūriems patiekalams)
+- padažas
+- pagardas
 
 ingredientas: sviestas
 
 instrukcijos:
-
-* Keptuvėje ištirpinkite sviestą ir apkepkite svogūnus, kol jie suminkštės.
+- Keptuvėje ištirpinkite sviestą ir apkepkite svogūnus, kol jie suminkštės.
 
 Pasirinkite RoleOrTechnique reikšmę.
 
@@ -86,56 +87,57 @@ Pateikite tik reikšmę.
 
 ## Modelio atsakymas
 
-Sauté riebalai
+Riebalai kepimui
 
 # Pavyzdys 2
 
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-* Sumuštinių užtepėlė
-* Kepimo riebalai
-* Riebalai kepimui
-* Kepiniai
-* Kepiniai
-* Kepiniai
-* Gėrimas
-* Duona
-* Sultinio pagrindas
-* Čili mėsainiai
-* pagardas
-* Kubelių troškinys
-* Duonos pica
-* Pabaigoje įdedamas aliejus
-* Kvapiosios medžiagos
-* Kario kubeliai
-* Sumalta padaže
-* Makaronai
-* Baltymai
-* Sūrymo pakuotė
-* Miltų ir riebalų mišinio rišamoji medžiaga
-* Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
-* Sumuštinio įdaras
-* padažas
-* Padažo priedas
-* Padažo sodriklis
-* Grietinėlės pakaitalas
-* Sauté riebalai
-* Baltymų šaltinis
-* Pagrindinis baltymų šaltinis
-* Prieskoniai
-* Pagrindinis patiekalas
-* Daržovių papildymas
-* Pagrindinė kepsnio dalis
-* Greitas kepimas riebaluose
-* Saldiklis
-* Papuošimas
+- Baltymai
+- Baltymų šaltinis kepimui wok keptuvėje
+- Daržovių pagrindas
+- Duona
+- Gėrimas
+- Kepimo riebalai nesaldiems kepiniams
+- Krakmolas
+- Kubeliais pjaustytas ingredientas padaže
+- Makaronai
+- Malta padaže
+- Miltų ir riebalų mišinys, naudojamas padažų tirštinimui
+- Mėsainio paplotėlio pagrindas
+- Mėsinis pagrindas
+- Pabaigoje įdedamas aliejus
+- Padažo pagrindas, veikiantis kaip rišamoji medžiaga
+- Padažo sodriklis
+- Padažą praturtinantis kreminis ingredientas
+- Pagardas
+- Pagrindinis baltymų šaltinis, sudarantis patiekalo pagrindą
+- Pagrindinė patiekalo dalis, imituojanti kepsnį
+- Pagrindinė patiekalo sudedamoji dalis
+- Papildomas baltyminis ingredientas
+- Priedas
+- Riebalai kepimui
+- Riebalai saldiems kepiniams
+- Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
+- Rišamasis baltyminis ingredientas (nesaldiems gaminiams)
+- Rišamasis baltyminis ingredientas (saldiems gaminiams)
+- Rišamasis ingredientas (saldiems kepiniams)
+- Saldiklis, skonio balansui skirtas ingredientas (nesaldiems patiekalams)
+- Saldiklis, suteikiantis saldumo, apimties ir tekstūros.
+- Saldiklis, tūrį suteikiantis ingredientas (saldiems gaminiams)
+- Skonio suteikiantis ingredientas
+- Sultinio pagrindas
+- Sumuštinio įdaras
+- Sumuštinių užtepėlė
+- Tešla (sūriems patiekalams)
+- padažas
+- pagardas
 
 ingredientas: alyvuogių aliejus
 
 instrukcijos:
-
-* Prieš patiekdami apšlakstykite makaronus alyvuogių aliejumi.
+- Prieš patiekdami apšlakstykite makaronus alyvuogių aliejumi.
 
 Pasirinkite RoleOrTechnique reikšmę.
 
@@ -150,49 +152,50 @@ Pabaigoje įdedamas aliejus
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-* Sumuštinių užtepėlė
-* Kepimo riebalai
-* Riebalai kepimui
-* Kepiniai
-* Kepiniai
-* Kepiniai
-* Gėrimas
-* Duona
-* Sultinio pagrindas
-* Čili mėsainiai
-* pagardas
-* Kubelių troškinys
-* Duonos pica
-* Pabaigoje įdedamas aliejus
-* Kvapiosios medžiagos
-* Kario kubeliai
-* Sumalta padaže
-* Makaronai
-* Baltymai
-* Sūrymo pakuotė
-* Miltų ir riebalų mišinio rišamoji medžiaga
-* Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
-* Sumuštinio įdaras
-* padažas
-* Padažo priedas
-* Padažo sodriklis
-* Grietinėlės pakaitalas
-* Sauté riebalai
-* Baltymų šaltinis
-* Pagrindinis baltymų šaltinis
-* Prieskoniai
-* Pagrindinis patiekalas
-* Daržovių papildymas
-* Pagrindinė kepsnio dalis
-* Greitas kepimas riebaluose
-* Saldiklis
-* Papuošimas
+- Baltymai
+- Baltymų šaltinis kepimui wok keptuvėje
+- Daržovių pagrindas
+- Duona
+- Gėrimas
+- Kepimo riebalai nesaldiems kepiniams
+- Krakmolas
+- Kubeliais pjaustytas ingredientas padaže
+- Makaronai
+- Malta padaže
+- Miltų ir riebalų mišinys, naudojamas padažų tirštinimui
+- Mėsainio paplotėlio pagrindas
+- Mėsinis pagrindas
+- Pabaigoje įdedamas aliejus
+- Padažo pagrindas, veikiantis kaip rišamoji medžiaga
+- Padažo sodriklis
+- Padažą praturtinantis kreminis ingredientas
+- Pagardas
+- Pagrindinis baltymų šaltinis, sudarantis patiekalo pagrindą
+- Pagrindinė patiekalo dalis, imituojanti kepsnį
+- Pagrindinė patiekalo sudedamoji dalis
+- Papildomas baltyminis ingredientas
+- Priedas
+- Riebalai kepimui
+- Riebalai saldiems kepiniams
+- Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
+- Rišamasis baltyminis ingredientas (nesaldiems gaminiams)
+- Rišamasis baltyminis ingredientas (saldiems gaminiams)
+- Rišamasis ingredientas (saldiems kepiniams)
+- Saldiklis, skonio balansui skirtas ingredientas (nesaldiems patiekalams)
+- Saldiklis, suteikiantis saldumo, apimties ir tekstūros.
+- Saldiklis, tūrį suteikiantis ingredientas (saldiems gaminiams)
+- Skonio suteikiantis ingredientas
+- Sultinio pagrindas
+- Sumuštinio įdaras
+- Sumuštinių užtepėlė
+- Tešla (sūriems patiekalams)
+- padažas
+- pagardas
 
 ingredientas: svogūnas
 
 instrukcijos:
-
-* Įpilkite 2 šaukštus alyvuogių aliejaus, sudėkite svogūną ir morką. Kepkite 3–4 minutes.
+- Įpilkite 2 šaukštus alyvuogių aliejaus, sudėkite svogūną ir morką. Kepkite 3–4 minutes.
 
 Pasirinkite RoleOrTechnique reikšmę.
 
@@ -200,56 +203,57 @@ Pateikite tik reikšmę.
 
 ## Modelio atsakymas
 
-Kvapiosios medžiagos
+Skonio suteikiantis ingredientas
 
 # Pavyzdys 4
 
 ## Naudotojo žinutė
 
 Leistinos RoleOrTechnique reikšmės:
-* Sumuštinių užtepėlė
-* Kepimo riebalai
-* Riebalai kepimui
-* Kepiniai
-* Kepiniai
-* Kepiniai
-* Gėrimas
-* Duona
-* Sultinio pagrindas
-* Čili mėsainiai
-* pagardas
-* Kubelių troškinys
-* Duonos pica
-* Pabaigoje įdedamas aliejus
-* Kvapiosios medžiagos
-* Kario kubeliai
-* Sumalta padaže
-* Makaronai
-* Baltymai
-* Sūrymo pakuotė
-* Miltų ir riebalų mišinio rišamoji medžiaga
-* Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
-* Sumuštinio įdaras
-* padažas
-* Padažo priedas
-* Padažo sodriklis
-* Grietinėlės pakaitalas
-* Sauté riebalai
-* Baltymų šaltinis
-* Pagrindinis baltymų šaltinis
-* Prieskoniai
-* Pagrindinis patiekalas
-* Daržovių papildymas
-* Pagrindinė kepsnio dalis
-* Greitas kepimas riebaluose
-* Saldiklis
-* Papuošimas
+- Baltymai
+- Baltymų šaltinis kepimui wok keptuvėje
+- Daržovių pagrindas
+- Duona
+- Gėrimas
+- Kepimo riebalai nesaldiems kepiniams
+- Krakmolas
+- Kubeliais pjaustytas ingredientas padaže
+- Makaronai
+- Malta padaže
+- Miltų ir riebalų mišinys, naudojamas padažų tirštinimui
+- Mėsainio paplotėlio pagrindas
+- Mėsinis pagrindas
+- Pabaigoje įdedamas aliejus
+- Padažo pagrindas, veikiantis kaip rišamoji medžiaga
+- Padažo sodriklis
+- Padažą praturtinantis kreminis ingredientas
+- Pagardas
+- Pagrindinis baltymų šaltinis, sudarantis patiekalo pagrindą
+- Pagrindinė patiekalo dalis, imituojanti kepsnį
+- Pagrindinė patiekalo sudedamoji dalis
+- Papildomas baltyminis ingredientas
+- Priedas
+- Riebalai kepimui
+- Riebalai saldiems kepiniams
+- Riebalų ir baltų miltų mišinio pagrindu pagamintas padažas
+- Rišamasis baltyminis ingredientas (nesaldiems gaminiams)
+- Rišamasis baltyminis ingredientas (saldiems gaminiams)
+- Rišamasis ingredientas (saldiems kepiniams)
+- Saldiklis, skonio balansui skirtas ingredientas (nesaldiems patiekalams)
+- Saldiklis, suteikiantis saldumo, apimties ir tekstūros.
+- Saldiklis, tūrį suteikiantis ingredientas (saldiems gaminiams)
+- Skonio suteikiantis ingredientas
+- Sultinio pagrindas
+- Sumuštinio įdaras
+- Sumuštinių užtepėlė
+- Tešla (sūriems patiekalams)
+- padažas
+- pagardas
 
 ingredientas: fetos sūris
 
 instrukcijos:
-
-* Patiekite su kaparėliais, tarkuotu fetos sūriu, šviežiu raudonėliu ir šviežiai maltais pipirais.
+- Patiekite su kaparėliais, tarkuotu fetos sūriu, šviežiu raudonėliu ir šviežiai maltais pipirais.
 
 Pasirinkite RoleOrTechnique reikšmę.
 
@@ -257,4 +261,4 @@ Pateikite tik reikšmę.
 
 ## Modelio atsakymas
 
-Papuošimas
+Priedas

@@ -6,28 +6,28 @@ Context: deze classificatie voedt een opzoeksysteem. De RoleOrTechnique-waarde z
 
 Je krijgt:
 
-* een lijst met toegestane RoleOrTechnique-waarden
-* een ingrediënt
-* de receptinstructies
+- een lijst met toegestane RoleOrTechnique-waarden
+- een ingrediënt
+- de receptinstructies
 
 Je moet de enige best passende waarde kiezen uit de lijst met toegestane RoleOrTechnique-waarden.
 
 Strikte uitvoerregels:
 
-* Geef EXACT één waarde uit de lijst met toegestane RoleOrTechnique-waarden.
-* Geef alleen de waarde.
-* Geef geen uitleg.
-* Geef geen leestekens.
-* Geef geen aanhalingstekens.
-* Geef geen meerdere waarden.
-* Verzin geen nieuwe waarden.
-* Als geen enkele waarde duidelijk overeenkomt, geef dan: unknown
+- Geef EXACT één waarde uit de lijst met toegestane RoleOrTechnique-waarden.
+- Geef alleen de waarde.
+- Geef geen uitleg.
+- Geef geen leestekens.
+- Geef geen aanhalingstekens.
+- Geef geen meerdere waarden.
+- Verzin geen nieuwe waarden.
+- Als geen enkele waarde duidelijk overeenkomt, geef dan: unknown
 
 Kritieke classificatieregel:
 
-* Classificeer op basis van wat DIT ingrediënt doet in het recept, niet op basis van wat er rondom gebeurt.
-* Als een ingrediënt IN vet wordt bereid, is het niet het vet zelf.
-* Als een ingrediënt bij het serveren als garnering wordt toegevoegd, is het een topping, geen proteïne of saus.
+- Classificeer op basis van wat DIT ingrediënt doet in het recept, niet op basis van wat er rondom gebeurt.
+- Als een ingrediënt IN vet wordt bereid, is het niet het vet zelf.
+- Als een ingrediënt bij het serveren als garnering wordt toegevoegd, is het een topping, geen proteïne of saus.
 
 Hier zijn enkele voorbeelden:
 
@@ -36,49 +36,50 @@ Hier zijn enkele voorbeelden:
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-* Sandwich spread
-* bakvet
-* bakvet (zoet)
-* Bakken/binding (zoet)
-* Bak/bindingseiwit (hartig)
-* Bak/bindingseiwit (zoet)
-* drank
-* brood
-* bouillonbasis
-* Burger
-* smaakmakers (sauzen)
-* blokjes stoofpot
-* brood pizza
-* afwerkolie
-* smaakmaker
-* Vlees als basis
-* gehakt in saus
-* pasta
-* proteïne
-* pekelverpakking
-* rouxbinder
-* saus op basis van roux
-* sandwichvulling
-* saus
-* saustoevoeging
-* sausverrijker
-* roomvervanging
-* bakvet
-* Hartige eiwitbron
-* Hartige eiwitbron, hoofdbron
-* kruiden
-* basisproduct
-* Koolhydraatbron
-* steak hoofdgerecht
-* roerbakproteïne
-* zoetmaker, bulk ingrediënt
-* topping
+- Bak- en bindingseiwit (hartig)
+- Bak- en bindingseiwit (zoet)
+- Bak- en bindingsmiddel (zoet)
+- Basis voor burger
+- Deeg (hartig)
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
+- Hartig eiwit-hoofdelement
+- Kruiden en specerijen
+- Pasta (zetmeelbron)
+- Sausbasis als bindingsmiddel
+- Sausverrijker (romig)
+- Smeerbraar broodbeleg
+- Steak-hoofdelement
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
+- afwerkolie
+- bakvet (hartig)
+- bakvet (zoet)
+- basisproduct
+- bouillonbasis
+- brood
+- drank
+- gehakt in saus
+- koolhydraatbron
+- proteïne
+- roerbakproteïne
+- rouxbinder
+- sandwichvulling
+- saus
+- saus op basis van roux
+- sausverrijker
+- sauzen
+- smaakmaker
+- topping
+- zoetmaker, bulk ingrediënt
+- zoetstof, smaakbalans (hartig)
+- zoetstof, vulstof (zoet)
 
 ingrediënt: boter
 
 instructies:
-
-* Smelt boter in een pan en bak de uien zacht.
+- Smelt boter in een pan en bak de uien zacht.
 
 Selecteer de roleOrTechnique-waarde.
 
@@ -86,56 +87,57 @@ Geef alleen de waarde.
 
 ## Antwoord van de assistent
 
-bakvet
+Vet om te bakken
 
 # Voorbeeld 2
 
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-* Sandwich spread
-* bakvet
-* bakvet (zoet)
-* Bakken/binding (zoet)
-* Bak/bindingseiwit (hartig)
-* Bak/bindingseiwit (zoet)
-* drank
-* brood
-* bouillonbasis
-* Burger
-* smaakmakers (sauzen)
-* blokjes stoofpot
-* brood pizza
-* afwerkolie
-* smaakmaker
-* Vlees als basis
-* gehakt in saus
-* pasta
-* proteïne
-* pekelverpakking
-* rouxbinder
-* saus op basis van roux
-* sandwichvulling
-* saus
-* saustoevoeging
-* sausverrijker
-* roomvervanging
-* bakvet
-* Hartige eiwitbron
-* Hartige eiwitbron, hoofdbron
-* kruiden
-* basisproduct
-* Koolhydraatbron
-* steak hoofdgerecht
-* roerbakproteïne
-* zoetmaker, bulk ingrediënt
-* topping
+- Bak- en bindingseiwit (hartig)
+- Bak- en bindingseiwit (zoet)
+- Bak- en bindingsmiddel (zoet)
+- Basis voor burger
+- Deeg (hartig)
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
+- Hartig eiwit-hoofdelement
+- Kruiden en specerijen
+- Pasta (zetmeelbron)
+- Sausbasis als bindingsmiddel
+- Sausverrijker (romig)
+- Smeerbraar broodbeleg
+- Steak-hoofdelement
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
+- afwerkolie
+- bakvet (hartig)
+- bakvet (zoet)
+- basisproduct
+- bouillonbasis
+- brood
+- drank
+- gehakt in saus
+- koolhydraatbron
+- proteïne
+- roerbakproteïne
+- rouxbinder
+- sandwichvulling
+- saus
+- saus op basis van roux
+- sausverrijker
+- sauzen
+- smaakmaker
+- topping
+- zoetmaker, bulk ingrediënt
+- zoetstof, smaakbalans (hartig)
+- zoetstof, vulstof (zoet)
 
 ingrediënt: olijfolie
 
 instructies:
-
-* Besprenkel de pasta vlak voor het serveren met olijfolie.
+- Besprenkel de pasta vlak voor het serveren met olijfolie.
 
 Selecteer de roleOrTechnique-waarde.
 
@@ -150,49 +152,50 @@ afwerkolie
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-* Sandwich spread
-* bakvet
-* bakvet (zoet)
-* Bakken/binding (zoet)
-* Bak/bindingseiwit (hartig)
-* Bak/bindingseiwit (zoet)
-* drank
-* brood
-* bouillonbasis
-* Burger
-* smaakmakers (sauzen)
-* blokjes stoofpot
-* brood pizza
-* afwerkolie
-* smaakmaker
-* Vlees als basis
-* gehakt in saus
-* pasta
-* proteïne
-* pekelverpakking
-* rouxbinder
-* saus op basis van roux
-* sandwichvulling
-* saus
-* saustoevoeging
-* sausverrijker
-* roomvervanging
-* bakvet
-* Hartige eiwitbron
-* Hartige eiwitbron, hoofdbron
-* kruiden
-* basisproduct
-* Koolhydraatbron
-* steak hoofdgerecht
-* roerbakproteïne
-* zoetmaker, bulk ingrediënt
-* topping
+- Bak- en bindingseiwit (hartig)
+- Bak- en bindingseiwit (zoet)
+- Bak- en bindingsmiddel (zoet)
+- Basis voor burger
+- Deeg (hartig)
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
+- Hartig eiwit-hoofdelement
+- Kruiden en specerijen
+- Pasta (zetmeelbron)
+- Sausbasis als bindingsmiddel
+- Sausverrijker (romig)
+- Smeerbraar broodbeleg
+- Steak-hoofdelement
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
+- afwerkolie
+- bakvet (hartig)
+- bakvet (zoet)
+- basisproduct
+- bouillonbasis
+- brood
+- drank
+- gehakt in saus
+- koolhydraatbron
+- proteïne
+- roerbakproteïne
+- rouxbinder
+- sandwichvulling
+- saus
+- saus op basis van roux
+- sausverrijker
+- sauzen
+- smaakmaker
+- topping
+- zoetmaker, bulk ingrediënt
+- zoetstof, smaakbalans (hartig)
+- zoetstof, vulstof (zoet)
 
 ingrediënt: ui
 
 instructies:
-
-* Voeg 2 eetlepels olijfolie, de ui en wortel toe. Bak 3-4 minuten.
+- Voeg 2 eetlepels olijfolie, de ui en wortel toe. Bak 3-4 minuten.
 
 Selecteer de roleOrTechnique-waarde.
 
@@ -207,49 +210,50 @@ smaakmaker
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
-* Sandwich spread
-* bakvet
-* bakvet (zoet)
-* Bakken/binding (zoet)
-* Bak/bindingseiwit (hartig)
-* Bak/bindingseiwit (zoet)
-* drank
-* brood
-* bouillonbasis
-* Burger
-* smaakmakers (sauzen)
-* blokjes stoofpot
-* brood pizza
-* afwerkolie
-* smaakmaker
-* Vlees als basis
-* gehakt in saus
-* pasta
-* proteïne
-* pekelverpakking
-* rouxbinder
-* saus op basis van roux
-* sandwichvulling
-* saus
-* saustoevoeging
-* sausverrijker
-* roomvervanging
-* bakvet
-* Hartige eiwitbron
-* Hartige eiwitbron, hoofdbron
-* kruiden
-* basisproduct
-* Koolhydraatbron
-* steak hoofdgerecht
-* roerbakproteïne
-* zoetmaker, bulk ingrediënt
-* topping
+- Bak- en bindingseiwit (hartig)
+- Bak- en bindingseiwit (zoet)
+- Bak- en bindingsmiddel (zoet)
+- Basis voor burger
+- Deeg (hartig)
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
+- Hartig eiwit-hoofdelement
+- Kruiden en specerijen
+- Pasta (zetmeelbron)
+- Sausbasis als bindingsmiddel
+- Sausverrijker (romig)
+- Smeerbraar broodbeleg
+- Steak-hoofdelement
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
+- afwerkolie
+- bakvet (hartig)
+- bakvet (zoet)
+- basisproduct
+- bouillonbasis
+- brood
+- drank
+- gehakt in saus
+- koolhydraatbron
+- proteïne
+- roerbakproteïne
+- rouxbinder
+- sandwichvulling
+- saus
+- saus op basis van roux
+- sausverrijker
+- sauzen
+- smaakmaker
+- topping
+- zoetmaker, bulk ingrediënt
+- zoetstof, smaakbalans (hartig)
+- zoetstof, vulstof (zoet)
 
 ingrediënt: fetakaas
 
 instructies:
-
-* Serveer met kappertjes, wat geraspte fetakaas, verse oregano en versgemalen peper.
+- Serveer met kappertjes, wat geraspte fetakaas, verse oregano en versgemalen peper.
 
 Selecteer de roleOrTechnique-waarde.
 

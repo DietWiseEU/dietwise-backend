@@ -37,12 +37,10 @@ Allowed trigger ingredient values:
 - Bacon/lardons
 - Bechamel sauce
 - Beef
-- Brined cheese (e.g. Feta, salad cheese, halloumi)
 - Butter
 - Canned tuna
 - Cheese based sauces
 - Chicken
-- Cooking oil/fat (general)
 - Cream
 - Cream based sauces
 - Cream cheese
@@ -57,22 +55,21 @@ Allowed trigger ingredient values:
 - Hot sauce
 - Ketchup
 - Lamb
-- Low-dairy breakfast
 - Low-dairy sauce
 - Luncheon meat
 - Margarine (non-HO)
 - Mascarpone
 - Mayonnaise
 - Minced meat
-- Pasta (starch base)
+- No vegetables in main dish
 - Pesto sauce
 - Pork
 - Processed cheese
 - Refined bread
 - SSB
+- Salad topping
 - Salt
 - Semi-hard sliced cheese (e.g. Gouda, Edam, Cheddar)
-- Soft ripened cheese (brie, camembert)
 - Soy sauce
 - Spreadable fresh cheese
 - Stir-fry protein (non-legume)
@@ -85,10 +82,13 @@ Allowed trigger ingredient values:
 - White pasta
 - White rice
 - Worcestershire
+- coconut oil
 - feta cheese
 - meat-based sauce
+- oil/fat
 - pecorino
 - sugar
+- white tortilla
 
 ingredient: beef mince
 
@@ -112,12 +112,10 @@ Allowed trigger ingredient values:
 - Bacon/lardons
 - Bechamel sauce
 - Beef
-- Brined cheese (e.g. Feta, salad cheese, halloumi)
 - Butter
 - Canned tuna
 - Cheese based sauces
 - Chicken
-- Cooking oil/fat (general)
 - Cream
 - Cream based sauces
 - Cream cheese
@@ -132,22 +130,21 @@ Allowed trigger ingredient values:
 - Hot sauce
 - Ketchup
 - Lamb
-- Low-dairy breakfast
 - Low-dairy sauce
 - Luncheon meat
 - Margarine (non-HO)
 - Mascarpone
 - Mayonnaise
 - Minced meat
-- Pasta (starch base)
+- No vegetables in main dish
 - Pesto sauce
 - Pork
 - Processed cheese
 - Refined bread
 - SSB
+- Salad topping
 - Salt
 - Semi-hard sliced cheese (e.g. Gouda, Edam, Cheddar)
-- Soft ripened cheese (brie, camembert)
 - Soy sauce
 - Spreadable fresh cheese
 - Stir-fry protein (non-legume)
@@ -160,10 +157,13 @@ Allowed trigger ingredient values:
 - White pasta
 - White rice
 - Worcestershire
+- coconut oil
 - feta cheese
 - meat-based sauce
+- oil/fat
 - pecorino
 - sugar
+- white tortilla
 
 ingredient: extra virgin olive oil
 
@@ -187,12 +187,10 @@ Allowed trigger ingredient values:
 - Bacon/lardons
 - Bechamel sauce
 - Beef
-- Brined cheese (e.g. Feta, salad cheese, halloumi)
 - Butter
 - Canned tuna
 - Cheese based sauces
 - Chicken
-- Cooking oil/fat (general)
 - Cream
 - Cream based sauces
 - Cream cheese
@@ -207,22 +205,21 @@ Allowed trigger ingredient values:
 - Hot sauce
 - Ketchup
 - Lamb
-- Low-dairy breakfast
 - Low-dairy sauce
 - Luncheon meat
 - Margarine (non-HO)
 - Mascarpone
 - Mayonnaise
 - Minced meat
-- Pasta (starch base)
+- No vegetables in main dish
 - Pesto sauce
 - Pork
 - Processed cheese
 - Refined bread
 - SSB
+- Salad topping
 - Salt
 - Semi-hard sliced cheese (e.g. Gouda, Edam, Cheddar)
-- Soft ripened cheese (brie, camembert)
 - Soy sauce
 - Spreadable fresh cheese
 - Stir-fry protein (non-legume)
@@ -235,10 +232,13 @@ Allowed trigger ingredient values:
 - White pasta
 - White rice
 - Worcestershire
+- coconut oil
 - feta cheese
 - meat-based sauce
+- oil/fat
 - pecorino
 - sugar
+- white tortilla
 
 ingredient: 3 small zucchini
 
@@ -262,12 +262,10 @@ Allowed trigger ingredient values:
 - Bacon/lardons
 - Bechamel sauce
 - Beef
-- Brined cheese (e.g. Feta, salad cheese, halloumi)
 - Butter
 - Canned tuna
 - Cheese based sauces
 - Chicken
-- Cooking oil/fat (general)
 - Cream
 - Cream based sauces
 - Cream cheese
@@ -282,22 +280,21 @@ Allowed trigger ingredient values:
 - Hot sauce
 - Ketchup
 - Lamb
-- Low-dairy breakfast
 - Low-dairy sauce
 - Luncheon meat
 - Margarine (non-HO)
 - Mascarpone
 - Mayonnaise
 - Minced meat
-- Pasta (starch base)
+- No vegetables in main dish
 - Pesto sauce
 - Pork
 - Processed cheese
 - Refined bread
 - SSB
+- Salad topping
 - Salt
 - Semi-hard sliced cheese (e.g. Gouda, Edam, Cheddar)
-- Soft ripened cheese (brie, camembert)
 - Soy sauce
 - Spreadable fresh cheese
 - Stir-fry protein (non-legume)
@@ -310,10 +307,13 @@ Allowed trigger ingredient values:
 - White pasta
 - White rice
 - Worcestershire
+- coconut oil
 - feta cheese
 - meat-based sauce
+- oil/fat
 - pecorino
 - sugar
+- white tortilla
 
 ingredient: smoked bacon strips
 
