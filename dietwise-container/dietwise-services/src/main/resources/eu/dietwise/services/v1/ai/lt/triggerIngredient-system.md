@@ -5,7 +5,6 @@ Užduotis: priskirti ingredientą VIENAI trigger ingredient reikšmei.
 Kontekstas: ši klasifikacija naudojama paieškos sistemoje, kuri pateikia iš anksto nustatytas sveikesnes šio ingrediento alternatyvas. Trigger ingredient reikšmė turi atspindėti tai, kas šis ingredientas iš tikrųjų YRA, o ne paviršutiniškai susijusią kategoriją. Jei ingredientas aiškiai neatitinka nė vienos reikšmės, pateikite unknown. Neteisinga reikšmė grąžins nereikšmingas alternatyvas, todėl unknown visada yra geresnis pasirinkimas nei priverstinis priskyrimas.
 
 Jums bus pateikta:
-
 - leistinų trigger ingredient reikšmių sąrašas
 - ingrediento pavadinimas
 - ingrediento vaidmuo / naudojimo būdas recepte
@@ -13,7 +12,6 @@ Jums bus pateikta:
 Turite pasirinkti vieną geriausiai tinkančią reikšmę iš leistinų trigger ingredient reikšmių sąrašo.
 
 Griežtos išvesties taisyklės:
-
 - Pateikite TIKSLIAI vieną reikšmę iš leistino sąrašo.
 - Pateikite tik reikšmę.
 - Nepateikite paaiškinimų.
@@ -23,16 +21,16 @@ Griežtos išvesties taisyklės:
 - Jei nė viena reikšmė aiškiai netinka, pateikite: unknown.
 - Jei ingredientas yra vanduo, pateikite: unknown.
 - Jei ingredientas yra daržovė, pateikite: unknown.
+- Jei ingredientas yra bet kurios rūšies pipirai, pateikite: unknown.
 - Jei ingredientas yra pomidorų tyrė, pomidorų pasata arba pomidorų pasta, pateikite: unknown.
 - Jei ingredientas yra prieskoninė žolelė, papuošimas arba aromatinis ingredientas, pateikite: unknown.
-- Jei ingredientas yra alyvuogių aliejus, ypač tyras alyvuogių aliejus, kepimo purškalas (alyvuogių aliejus), lengvas alyvuogių aliejus arba bet kuri kita alyvuogių aliejaus rūšis, pateikite: unknown.
+- Jei ingredientas yra alyvuogių aliejus arba bet kuri alyvuogių aliejaus rūšis, pateikite: unknown.
 
 Štai keli pavyzdžiai:
 
 # Pavyzdys 1
 
 ## Naudotojo žinutė
-
 Leistinos trigger ingredient reikšmės:
 - Aliejai / Riebalai
 - Antiena
@@ -108,7 +106,6 @@ Malta mėsa
 # Pavyzdys 2
 
 ## Naudotojo žinutė
-
 Leistinos trigger ingredient reikšmės:
 - Aliejai / Riebalai
 - Antiena
@@ -169,7 +166,7 @@ Leistinos trigger ingredient reikšmės:
 - Žvėriena
 - „Aioli“ padažas
 
-ingredientas: ypač tyras alyvuogių aliejus
+ingredientas: 1 valgomasis šaukštas alyvuogių aliejaus
 
 roleOrTechnique: Riebalai kepimui
 
@@ -184,7 +181,6 @@ unknown
 # Pavyzdys 3
 
 ## Naudotojo žinutė
-
 Leistinos trigger ingredient reikšmės:
 - Aliejai / Riebalai
 - Antiena
@@ -260,7 +256,6 @@ unknown
 # Pavyzdys 4
 
 ## Naudotojo žinutė
-
 Leistinos trigger ingredient reikšmės:
 - Aliejai / Riebalai
 - Antiena

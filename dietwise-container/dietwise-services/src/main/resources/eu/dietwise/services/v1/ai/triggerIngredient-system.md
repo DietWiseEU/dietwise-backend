@@ -20,10 +20,11 @@ Strict output rules:
 - Do not invent new values.
 - If no value clearly matches, output: unknown.
 - If the ingredient is water output: unknown.
-- If the ingredient is a vegetable output: unknown.
+- If the ingredient is a vegetable output: unknown. 
+- If the ingredient is a type of pepper output: unknown.
 - If the ingredient is tomato purée, tomato passata or tomato paste output: unknown. 
 - If the ingredient is a herb, a garnish or an aromatic output: unknown.
-- If the ingredient is olive oil, extra virgin olive oil, cooking spray (olive oil), light olive oil or any other variant of olive oil output: unknown.
+- If the ingredient is olive oil and any variant of olive oil, output: unknown.
 
 Here are a few examples:
 
@@ -165,7 +166,7 @@ Allowed trigger ingredient values:
 - sugar
 - white tortilla
 
-ingredient: extra virgin olive oil
+ingredient: 1 tablespoon olive oil
 
 roleOrTechnique: sauté fat
 

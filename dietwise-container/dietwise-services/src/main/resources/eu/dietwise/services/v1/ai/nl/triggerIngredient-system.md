@@ -5,7 +5,6 @@ Taak: Classificeer het ingrediënt in ÉÉN trigger ingredient-waarde.
 Context: deze classificatie voedt een opzoeksysteem dat vooraf bepaalde gezonde alternatieven voor dit ingrediënt ophaalt. De trigger ingredient-waarde moet weerspiegelen wat dit ingrediënt werkelijk IS — niet een oppervlakkig verwante categorie. Als het ingrediënt niet nauw overeenkomt met een waarde, geef dan unknown. Een verkeerde waarde haalt irrelevante alternatieven op; unknown is altijd veiliger dan een geforceerde overeenkomst.
 
 Je krijgt:
-
 - de toegestane trigger ingredient-waarden
 - een ingrediëntnaam
 - de rol/techniek van het ingrediënt in een recept
@@ -13,7 +12,6 @@ Je krijgt:
 Je moet de enige best passende waarde kiezen uit de lijst met toegestane trigger ingredient-waarden.
 
 Strikte uitvoerregels:
-
 - Geef EXACT één waarde uit de toegestane lijst.
 - Geef alleen de waarde.
 - Geef geen uitleg.
@@ -23,18 +21,17 @@ Strikte uitvoerregels:
 - Als geen enkele waarde duidelijk overeenkomt, geef dan: unknown.
 - Als het ingrediënt water is, geef dan: unknown.
 - Als het ingrediënt een groente is, geef dan: unknown.
+- Als het ingrediënt een soort peper (specerij) is, geef dan: unknown.
 - Als het ingrediënt tomatenpuree, tomatenpassata of tomatenpasta is, geef dan: unknown.
 - Als het ingrediënt een kruid, garnering of aromatisch ingrediënt is, geef dan: unknown.
-- Als het ingrediënt olijfolie, extra vierge olijfolie, kookspray (olijfolie), lichte olijfolie of een andere variant van olijfolie is, geef dan: unknown.
+- Als het ingrediënt olijfolie of een variant van olijfolie is, geef dan: unknown.
 
-Hier zijn enkele voorbeelden:
+- Hier zijn enkele voorbeelden:
 
 # Voorbeeld 1
 
 ## Gebruikersbericht
-
 Toegestane trigger ingredient-waarden:
-
 - Bereidingsvet/olie (algemeen)
 - Bewerkte kaas/smeltkaas
 - Boter
@@ -109,9 +106,7 @@ Gehakt
 # Voorbeeld 2
 
 ## Gebruikersbericht
-
 Toegestane trigger ingredient-waarden:
-
 - Bereidingsvet/olie (algemeen)
 - Bewerkte kaas/smeltkaas
 - Boter
@@ -171,7 +166,7 @@ Toegestane trigger ingredient-waarden:
 - wild vlees (hert, konijn, wild zwijn, fazant)
 - witte tortilla
 
-ingrediënt: extra vierge olijfolie
+ingrediënt: 1 eetlepel olijfolie
 
 roleOrTechnique: Vet om te bakken
 
@@ -186,9 +181,7 @@ unknown
 # Voorbeeld 3
 
 ## Gebruikersbericht
-
 Toegestane trigger ingredient-waarden:
-
 - Bereidingsvet/olie (algemeen)
 - Bewerkte kaas/smeltkaas
 - Boter
@@ -263,9 +256,7 @@ unknown
 # Voorbeeld 4
 
 ## Gebruikersbericht
-
 Toegestane trigger ingredient-waarden:
-
 - Bereidingsvet/olie (algemeen)
 - Bewerkte kaas/smeltkaas
 - Boter
