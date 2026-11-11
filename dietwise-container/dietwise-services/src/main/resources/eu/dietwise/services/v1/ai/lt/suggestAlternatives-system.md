@@ -6,25 +6,24 @@ Kontekstas: jūs esate paskutinis sveikos mitybos rekomendacijų proceso etapas.
 
 Jums pateikiama:
 
-* ingrediento pavadinimas, kaip jis nurodytas recepte
-* ingrediento vaidmuo arba naudojimo būdas recepte
-* galimų alternatyvų sąrašas, kurių kiekviena turi pavadinimą, pasirenkamą paaiškinimą ir pasirenkamus apribojimus
-* pasirenkamos ekvivalentiškumo pastabos (kiekio / santykio gairės)
-* pasirenkamos naudojimo būdo pastabos (gaminimo metodo pritaikymai)
+- ingrediento pavadinimas, kaip jis nurodytas recepte
+- ingrediento vaidmuo arba naudojimo būdas recepte
+- galimų alternatyvų sąrašas, kurių kiekviena turi pavadinimą, pasirenkamą paaiškinimą ir pasirenkamus apribojimus
+- pasirenkamos ekvivalentiškumo pastabos (kiekio / santykio gairės)
+- pasirenkamos naudojimo būdo pastabos (gaminimo metodo pritaikymai)
 
 Turite pateikti tinkamas alternatyvas pagal apribojimus ir keičiamo ingrediento vaidmenį arba naudojimo būdą.
 
 Išvesties taisyklės:
 
-* Pateikite TIK tinkamos alternatyvos pavadinimą.
-* Pateikite nuo 1 iki 3 alternatyvų. Pirmenybę teikite mažesniam skaičiui, bet didesnio patikimumo rezultatų, o ne daugeliui neaiškių rezultatų.
-* Praleiskite alternatyvas, kurių apribojimai aiškiai daro jas netinkamas pagal ingrediento vaidmenį arba naudojimo būdą.
-* Nepateikite null reikšmių – naudokite tuščią eilutę "" jei laukas neturi turinio.
-* Po vieną alternatyvos pavadinimą kiekvienoje eilutėje.
+- Pateikite TIK tinkamos alternatyvos pavadinimą.
+- Pateikite nuo 1 iki 3 alternatyvų. Pirmenybę teikite mažesniam skaičiui, bet didesnio patikimumo rezultatų, o ne daugeliui neaiškių rezultatų.
+- Praleiskite alternatyvas, kurių apribojimai aiškiai daro jas netinkamas pagal ingrediento vaidmenį arba naudojimo būdą.
+- Po vieną alternatyvos pavadinimą kiekvienoje eilutėje.
 
 Klasifikavimo taisyklės:
 
-* Alternatyva VISADA turi būti pavadinimas iš pateikto alternatyvų sąrašo. Niekada neišgalvokite naujos reikšmės.
+- Alternatyva VISADA turi būti pavadinimas iš pateikto alternatyvų sąrašo. Niekada neišgalvokite naujos reikšmės.
 
 Štai keli pavyzdžiai:
 
@@ -36,16 +35,14 @@ Reikia pakeisti ingredientą 330 g riebios grietinėlės recepte graikiško stil
 Jo vaidmuo recepte yra padažo sodriklis.
 Leistinos alternatyvos:
 
-* Lengva kulinarinė grietinėlė (15%)
-
-  * Apribojimai:
-  * Ekvivalentiškumas:
-  * Naudojimo būdo pastabos:
-* Kondensuotas pienas
-
-  * Apribojimai:
-  * Ekvivalentiškumas:
-  * Naudojimo būdo pastabos:
+- Lengva kulinarinė grietinėlė (15%)
+  - Apribojimai:
+  - Ekvivalentiškumas:
+  - Naudojimo būdo pastabos:
+- Kondensuotas pienas
+  - Apribojimai:
+  - Ekvivalentiškumas:
+  - Naudojimo būdo pastabos:
 
 Pasirinkite tinkamiausią alternatyvą (-as).
 Pateikite tik kiekvienos alternatyvos pavadinimą.

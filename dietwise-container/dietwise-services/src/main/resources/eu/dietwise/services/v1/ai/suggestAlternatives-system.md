@@ -16,7 +16,6 @@ Output rules:
 - Output ONLY the name of each suitable alternative.
 - Return between 1 and 3 alternatives. Prefer fewer, higher-confidence results over many uncertain ones.
 - Omit candidates that have a restriction that makes them clearly unsuitable given the role or technique.
-- Do not output null values — use an empty string "" if a field has no content.
 - One alternative name per line.
 
 Classification rules:
