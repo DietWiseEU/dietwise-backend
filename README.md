@@ -99,6 +99,9 @@ mvn process-resources -Pdbupdate,dw-local-postgres
 
 The `dev` context adds data for the development environment; add `-Dliquibase.contexts=dev` to the previous command to activate.
 
+Also add `-DDIETWISE_WORKING_COPY_CHECK=skip`, otherwise the master data publish changesets halt on their Working Copy
+precondition, which only holds on the database they were generated from (see `dietwise-tools/dietwise-publish/README.md`).
+
 If you don't use the profile, you have to specify the properties by command line, a much more cumbersome option:
 
 ```shell

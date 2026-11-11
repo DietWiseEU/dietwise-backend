@@ -128,6 +128,20 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<!-- the tests run changelog.xml on fresh databases, never the one a publish changeset was generated from -->
+						<DIETWISE_WORKING_COPY_CHECK>skip</DIETWISE_WORKING_COPY_CHECK>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<profiles>
 		<profile>
 			<id>dbupdate</id>

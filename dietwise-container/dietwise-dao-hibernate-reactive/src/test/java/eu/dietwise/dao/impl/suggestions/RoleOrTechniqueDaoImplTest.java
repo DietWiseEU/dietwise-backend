@@ -86,7 +86,7 @@ class RoleOrTechniqueDaoImplTest {
 				.findFirst()
 				.orElseThrow();
 
-		assertThat(role.getName()).isEqualTo("steak hoofdgerecht");
+		assertThat(role.getName()).isEqualTo("Steak-hoofdelement");
 		assertThat(role.getExplanationForLlm()).contains("Hoofd ingrediënt dat zorgt voor bijt en fungeert als het middelpunt van het bord.");
 	}
 

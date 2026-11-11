@@ -4,7 +4,8 @@
 master data. It does not write to the database itself. It reads the database and prints to standard output a single
 Liquibase changeset that:
 
-1. checks that the Working Copy has not changed since the changeset was generated,
+1. checks that the Working Copy has not changed since the changeset was generated (only on the database it was
+   generated from, see *Applying the changeset to other databases*),
 2. applies every Staged Change to the master tables (inserts, updates, deletes),
 3. clears the Working Copy tables,
 4. carries an explicit rollback that restores both the master data and the Working Copy.
@@ -89,6 +90,24 @@ Working Copy changes after generation, the changeset's precondition fails and Li
 *"The Working Copy changed after this changeset was generated; regenerate and re-apply."* In that case delete the
 generated file, generate it again and re-apply.
 
+### Applying the changeset to other databases
+
+The precondition is meaningful only on the database the changeset was generated from. Every other database (a
+developer's, a test database, the gaia server) has a Working Copy of its own and would fail it. Such a database skips
+the check by setting the Liquibase changelog parameter `DIETWISE_WORKING_COPY_CHECK` to `skip`. Liquibase reads it from
+an environment variable, a system property or the parameters of the runner:
+
+| Runner                                     | How the parameter is set                                                                                    |
+|--------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| Application, `dev` profile                 | `%dev.quarkus.liquibase.change-log-parameters.DIETWISE_WORKING_COPY_CHECK=skip` in `application.properties` |
+| Application, any other profile             | Environment variable `DIETWISE_WORKING_COPY_CHECK=skip`, as in `dietwise-docker/src/main/docker-compose/compose.yml` |
+| `dbupdate` Maven profile                   | `-DDIETWISE_WORKING_COPY_CHECK=skip` on the command line                                                    |
+| Tests of `dietwise-dao-hibernate-reactive` | Surefire system property in the module's `pom.xml`                                                          |
+| Tests of this tool                         | Passed per call to `LiquibaseExtension.executeUpdate`                                                       |
+
+Never set it on the database the changeset was generated from. There the check is what stops the publish from
+clearing Staged Changes made after generation, which the rollback cannot restore.
+
 ### Rolling back
 
 The changeset carries its own `<rollback>`, so a publish is undone with a regular Liquibase rollback of one changeset
@@ -155,7 +174,7 @@ The precondition compares a fingerprint of the Working Copy at apply time with i
 fingerprint is the sum, over all Working Copy tables, of the row count plus, for tables with a `version` column, the
 sum of the `version` values. It detects added or removed rows and any edit that increments `version`. It does not
 detect a change that leaves both unchanged, e.g. flipping `present` on a link row of the `LINK_DELTA` table (which has
-no `version`).
+no `version`). The comparison is skipped when the changelog parameter `DIETWISE_WORKING_COPY_CHECK` is `skip`.
 
 
 ## Maintaining the tool
@@ -175,10 +194,13 @@ The tests catch drift between the registry and the real schema:
 | `ChangelogRendererTest`              | The rendered XML.                                                                          |
 | `StringCleanupTest`                  | Text cleanup.                                                                              |
 | `RegistryNullabilityTest`            | Every master column's nullability in the registry against a real database.                 |
-| `PublishWorkingCopyRoundTripTest`    | End to end on a real database: generate, apply and roll back with Liquibase.               |
+| `PublishWorkingCopyRoundTripTest`    | End to end on a real database: generate, apply and roll back with Liquibase; the precondition halting on a changed Working Copy, unless skipped. |
 
 The last two run the application's Liquibase changelog on PostgreSQL through Testcontainers, so they need Docker:
 
 ```bash
 mvn -pl dietwise-tools/dietwise-publish -am verify
 ```
+
+Do not export `DIETWISE_WORKING_COPY_CHECK` in the shell that runs them: Liquibase picks it up from the environment,
+skips the check, and `PublishWorkingCopyRoundTripTest` fails because the precondition no longer halts.

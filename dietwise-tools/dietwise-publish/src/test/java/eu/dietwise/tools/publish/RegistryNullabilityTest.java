@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.TreeSet;
 
-import eu.dietwise.common.test.liquibase.LiquibaseExtension;
 import eu.dietwise.common.test.testcontainers.DockerImageNames;
 import eu.dietwise.tools.publish.schema.ColumnSpec;
 import eu.dietwise.tools.publish.schema.MirrorSpec;
@@ -34,8 +33,7 @@ class RegistryNullabilityTest {
 
 	@Test
 	void masterColumnNullabilityMatchesTheDatabase() throws Exception {
-		LiquibaseExtension.executeUpdate(
-				postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword(), "changelog.xml", null);
+		ApplicationChangelog.applyTo(postgres);
 
 		try (Connection connection = DriverManager.getConnection(
 				postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())) {

@@ -23,8 +23,15 @@ import eu.dietwise.tools.publish.schema.Tables;
  * (tab-indented, {@code dbchangelog-5.0}). The changeset guards itself with a precondition on the Working Copy
  * fingerprint, applies the plan, clears the Working Copy, and carries an explicit rollback that restores both the
  * master data and the Working Copy.
+ *
+ * <p>The fingerprint is only meaningful on the database the changeset was generated from. Any other database skips it
+ * by setting the Liquibase changelog parameter {@value #WORKING_COPY_CHECK_PARAMETER} to
+ * {@value #WORKING_COPY_CHECK_SKIP}, e.g. as an environment variable or a system property.
  */
 public final class ChangelogRenderer {
+
+	public static final String WORKING_COPY_CHECK_PARAMETER = "DIETWISE_WORKING_COPY_CHECK";
+	public static final String WORKING_COPY_CHECK_SKIP = "skip";
 
 	private static final String NEWLINE = "\n";
 
@@ -61,8 +68,12 @@ public final class ChangelogRenderer {
 	private void renderPrecondition(StringBuilder out, PublishPlan plan) {
 		line(out, 2, "<preConditions onFail=\"HALT\" onFailMessage=\""
 				+ "The Working Copy changed after this changeset was generated; regenerate and re-apply.\">");
-		line(out, 3, "<sqlCheck expectedResult=\"" + plan.workingCopyFingerprint() + "\">"
+		line(out, 3, "<or>");
+		line(out, 4, "<changeLogPropertyDefined property=\"" + WORKING_COPY_CHECK_PARAMETER + "\" value=\""
+				+ WORKING_COPY_CHECK_SKIP + "\"/>");
+		line(out, 4, "<sqlCheck expectedResult=\"" + plan.workingCopyFingerprint() + "\">"
 				+ xmlText(fingerprintSql()) + "</sqlCheck>");
+		line(out, 3, "</or>");
 		line(out, 2, "</preConditions>");
 	}
 

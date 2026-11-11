@@ -1,7 +1,11 @@
 package eu.dietwise.tools.publish;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,18 +13,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Map;
 
-import eu.dietwise.common.test.liquibase.LiquibaseExtension;
 import eu.dietwise.common.test.testcontainers.DockerImageNames;
 import eu.dietwise.tools.publish.schema.MirrorSpec;
 import eu.dietwise.tools.publish.schema.Tables;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
+import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.DirectoryResourceAccessor;
+import liquibase.ui.ConsoleUIService;
+import liquibase.ui.UIService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.testcontainers.junit.jupiter.Container;
@@ -31,6 +38,8 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * End-to-end: on a real PostgreSQL, apply the application schema, seed master data and a Working Copy, generate the
  * publish changeset with the tool, apply it with Liquibase and assert the publish took effect and the Working Copy was
  * cleared; then roll it back with Liquibase and assert both the master data and the Working Copy are fully restored.
+ * Also checks the changeset's Working Copy precondition: it halts when the Working Copy changed after generation, unless
+ * the database skips the check.
  */
 @Testcontainers
 class PublishWorkingCopyRoundTripTest {
@@ -46,24 +55,21 @@ class PublishWorkingCopyRoundTripTest {
 
 	private static final String CHANGELOG_FILE = "publish.xml";
 
+	private static final Map<String, String> ENFORCE_WORKING_COPY_CHECK = Map.of();
+
 	@Container
 	@SuppressWarnings("rawtypes")
 	private final PostgreSQLContainer postgres = new PostgreSQLContainer(DockerImageNames.POSTGRES_IMAGE);
 
 	@Test
 	void publishesTheWorkingCopyAndRollsBackToTheOriginalState(@TempDir Path changelogDir) throws Exception {
-		LiquibaseExtension.executeUpdate(
-				postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword(), "changelog.xml", null);
+		ApplicationChangelog.applyTo(postgres);
 
 		try (Connection connection = newConnection()) {
 			seedMasterAndWorkingCopy(connection);
+			generateChangelog(connection, changelogDir);
 
-			String changelog = PublishWorkingCopy.generate(connection, "publish_working_copy_it", "test");
-			assertThat(changelog).isNotNull();
-			Path changelogFile = changelogDir.resolve(CHANGELOG_FILE);
-			Files.writeString(changelogFile, changelog, StandardCharsets.UTF_8);
-
-			liquibaseUpdate(changelogDir);
+			liquibaseUpdate(changelogDir, ENFORCE_WORKING_COPY_CHECK);
 
 			assertPublished(connection);
 
@@ -71,6 +77,53 @@ class PublishWorkingCopyRoundTripTest {
 
 			assertRestored(connection);
 		}
+	}
+
+	@Test
+	void haltsWhenTheWorkingCopyChangedAfterGeneration(@TempDir Path changelogDir) throws Exception {
+		ApplicationChangelog.applyTo(postgres);
+
+		try (Connection connection = newConnection()) {
+			seedMasterAndWorkingCopy(connection);
+			generateChangelog(connection, changelogDir);
+			stageAnotherEditOfTheRule(connection);
+
+			ByteArrayOutputStream liquibaseOutput = new ByteArrayOutputStream();
+			assertThatThrownBy(() -> Scope.child(Scope.Attr.ui, uiWritingTo(liquibaseOutput),
+					() -> liquibaseUpdate(changelogDir, ENFORCE_WORKING_COPY_CHECK)))
+					.hasStackTraceContaining("The Working Copy changed after this changeset was generated");
+			assertThat(liquibaseOutput.toString(StandardCharsets.UTF_8))
+					.contains("ERROR: Exception Details", "PreconditionFailedException");
+
+			assertThat(scalar(connection, "SELECT rationale FROM dw_rule WHERE id='" + RULE1 + "'"))
+					.isEqualTo("old rationale");
+			assertThat(count(connection, "SELECT count(*) FROM dw_trigger_ingredient WHERE id='" + TI2 + "'")).isZero();
+		}
+	}
+
+	@Test
+	void publishesDespiteAChangedWorkingCopyWhenTheCheckIsSkipped(@TempDir Path changelogDir) throws Exception {
+		ApplicationChangelog.applyTo(postgres);
+
+		try (Connection connection = newConnection()) {
+			seedMasterAndWorkingCopy(connection);
+			generateChangelog(connection, changelogDir);
+			stageAnotherEditOfTheRule(connection);
+
+			liquibaseUpdate(changelogDir, ApplicationChangelog.SKIP_WORKING_COPY_CHECK);
+
+			assertPublished(connection);
+		}
+	}
+
+	private static void generateChangelog(Connection connection, Path changelogDir) throws Exception {
+		String changelog = PublishWorkingCopy.generate(connection, "publish_working_copy_it", "test");
+		assertThat(changelog).isNotNull();
+		Files.writeString(changelogDir.resolve(CHANGELOG_FILE), changelog, StandardCharsets.UTF_8);
+	}
+
+	private static void stageAnotherEditOfTheRule(Connection connection) throws Exception {
+		exec(connection, "UPDATE dw_rule_wc SET rationale='newer rationale', version=3 WHERE id='" + RULE1 + "'");
 	}
 
 	private void seedMasterAndWorkingCopy(Connection connection) throws Exception {
@@ -172,12 +225,14 @@ class PublishWorkingCopyRoundTripTest {
 		return total;
 	}
 
-	private void liquibaseUpdate(Path changelogDir) throws Exception {
+	private void liquibaseUpdate(Path changelogDir, Map<String, String> changeLogParameters) throws Exception {
 		try (Connection connection = newConnection();
 				DirectoryResourceAccessor accessor = new DirectoryResourceAccessor(changelogDir)) {
 			Database database = DatabaseFactory.getInstance()
 					.findCorrectDatabaseImplementation(new JdbcConnection(connection));
-			new Liquibase(CHANGELOG_FILE, accessor, database).update(new Contexts());
+			Liquibase liquibase = new Liquibase(CHANGELOG_FILE, accessor, database);
+			changeLogParameters.forEach(liquibase::setChangeLogParameter);
+			liquibase.update(new Contexts());
 		}
 	}
 
@@ -188,6 +243,14 @@ class PublishWorkingCopyRoundTripTest {
 					.findCorrectDatabaseImplementation(new JdbcConnection(connection));
 			new Liquibase(CHANGELOG_FILE, accessor, database).rollback(1, new Contexts(), new LabelExpression());
 		}
+	}
+
+	private static UIService uiWritingTo(OutputStream output) {
+		PrintStream printStream = new PrintStream(output, true, StandardCharsets.UTF_8);
+		ConsoleUIService ui = new ConsoleUIService();
+		ui.setOutputStream(printStream);
+		ui.setErrorStream(printStream);
+		return ui;
 	}
 
 	private Connection newConnection() throws Exception {

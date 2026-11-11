@@ -133,6 +133,16 @@ class ChangelogRendererTest {
 	}
 
 	@Test
+	void rendersPreconditionThatTheWorkingCopyCheckParameterCanSkip() {
+		String xml = sut.render(new PublishPlan(List.of(), List.of(), List.of(), List.of(), 7L), ID, AUTHOR);
+
+		assertThat(xml).contains("<or>", "</or>");
+		String alternatives = xml.substring(xml.indexOf("<or>"), xml.indexOf("</or>"));
+		assertThat(alternatives).contains("<changeLogPropertyDefined property=\"DIETWISE_WORKING_COPY_CHECK\" value=\"skip\"/>");
+		assertThat(alternatives).contains("<sqlCheck expectedResult=\"7\">");
+	}
+
+	@Test
 	void escapesXmlSpecialCharactersInValues() {
 		PublishPlan plan = new PublishPlan(List.of(new InsertRow("DW_TRIGGER_INGREDIENT", List.of(
 				new Cell("name", ColumnType.STRING, "salt & pepper < \"spice\"")))),

@@ -36,6 +36,7 @@ services:
       QUARKUS_OIDC_AUTH_SERVER_URL: http://keycloak:8280/realms/dietwise
       QUARKUS_REST_CLIENT_RENDERER_URL: http://dietwise-renderer:3000/
       QUARKUS_LANGCHAIN4J_OLLAMA_BASE_URL: http://host.docker.internal:11434
+      DIETWISE_WORKING_COPY_CHECK: skip
     depends_on:
       - postgresql
       - dietwise-renderer
