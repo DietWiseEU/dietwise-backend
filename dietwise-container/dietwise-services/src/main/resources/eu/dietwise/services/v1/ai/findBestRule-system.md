@@ -37,13 +37,13 @@ dietaryComponents:
 - red meat
 
 Filtered db entries:
-- id: 1
-    - recommendation: Decrease red meat
-    - role: minced in sauce
+- id: 1 
+  - recommendation: Decrease red meat
+  - role: minced in sauce
 - id: 2
-    - recommendation: Decrease red meat
-    - role: cubes stew
-- id: 3
+  - recommendation: Decrease red meat
+  - role: cubes stew
+- id: 3 
   - recommendation: Decrease red meat
   - role: steak centerpiece
 
@@ -72,9 +72,9 @@ Filtered db entries:
 - id: 2
   - recommendation: Decrease trans fatty acids
   - role: baking fat (sweet)
-- id: 3
-    - recommendation: Decrease trans fatty acids
-    - role: sauté fat
+- id: 3 
+  - recommendation: Decrease trans fatty acids 
+  - role: sauté fat
   
 Select the id of the best fitting entry.
 Output only the id.
