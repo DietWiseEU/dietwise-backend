@@ -5,7 +5,6 @@ Taak: bepaal de rol of techniek van een ingrediënt in een recept.
 Context: deze classificatie voedt een opzoeksysteem. De RoleOrTechnique-waarde zal worden gebruikt om dit ingrediënt te koppelen aan een database met voedselalternatieven. Kies de waarde die het meest nauwkeurig beschrijft hoe DIT ingrediënt functioneert in het recept — niet de categorie van het gerecht, niet de omliggende ingrediënten. Nauwkeurigheid is belangrijk: een verkeerde rol zal irrelevante alternatieven opleveren.
 
 Je krijgt:
-
 - een lijst met toegestane RoleOrTechnique-waarden
 - een ingrediënt
 - de receptinstructies
@@ -13,7 +12,6 @@ Je krijgt:
 Je moet de enige best passende waarde kiezen uit de lijst met toegestane RoleOrTechnique-waarden.
 
 Strikte uitvoerregels:
-
 - Geef EXACT één waarde uit de lijst met toegestane RoleOrTechnique-waarden.
 - Geef alleen de waarde.
 - Geef geen uitleg.
@@ -24,7 +22,6 @@ Strikte uitvoerregels:
 - Als geen enkele waarde duidelijk overeenkomt, geef dan: unknown
 
 Kritieke classificatieregel:
-
 - Classificeer op basis van wat DIT ingrediënt doet in het recept, niet op basis van wat er rondom gebeurt.
 - Als een ingrediënt IN vet wordt bereid, is het niet het vet zelf.
 - Als een ingrediënt bij het serveren als garnering wordt toegevoegd, is het een topping, geen proteïne of saus.
@@ -36,42 +33,42 @@ Hier zijn enkele voorbeelden:
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
+- afwerkolie
 - Bak- en bindingseiwit (hartig)
 - Bak- en bindingseiwit (zoet)
 - Bak- en bindingsmiddel (zoet)
-- Basis voor burger
-- Deeg (hartig)
-- Eiwit in blokjes voor stoofpot
-- Eiwit in conservering
-- Hartig eiwit-hoofdelement
-- Kruiden en specerijen
-- Pasta (zetmeelbron)
-- Sausbasis als bindingsmiddel
-- Sausverrijker (romig)
-- Smeerbraar broodbeleg
-- Steak-hoofdelement
-- Vet om te bakken
-- Vlees als basis
-- Zetmeelbron
-- afwerkolie
 - bakvet (hartig)
 - bakvet (zoet)
+- Basis voor burger
 - basisproduct
 - bouillonbasis
 - brood
+- Deeg (hartig)
 - drank
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
 - gehakt in saus
+- Groentebasis
+- Hartig eiwit-hoofdelement
 - koolhydraatbron
+- Kruiden en specerijen
 - proteïne
 - roerbakproteïne
 - rouxbinder
 - sandwichvulling
 - saus
 - saus op basis van roux
+- Sausbasis als bindingsmiddel
 - sausverrijker
+- Sausverrijker (romig)
 - sauzen
 - smaakmaker
+- Smeerbaar broodbeleg
+- Steak-hoofdelement
 - topping
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
 - zoetmaker, bulk ingrediënt
 - zoetstof, smaakbalans (hartig)
 - zoetstof, vulstof (zoet)
@@ -94,42 +91,42 @@ Vet om te bakken
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
+- afwerkolie
 - Bak- en bindingseiwit (hartig)
 - Bak- en bindingseiwit (zoet)
 - Bak- en bindingsmiddel (zoet)
-- Basis voor burger
-- Deeg (hartig)
-- Eiwit in blokjes voor stoofpot
-- Eiwit in conservering
-- Hartig eiwit-hoofdelement
-- Kruiden en specerijen
-- Pasta (zetmeelbron)
-- Sausbasis als bindingsmiddel
-- Sausverrijker (romig)
-- Smeerbraar broodbeleg
-- Steak-hoofdelement
-- Vet om te bakken
-- Vlees als basis
-- Zetmeelbron
-- afwerkolie
 - bakvet (hartig)
 - bakvet (zoet)
+- Basis voor burger
 - basisproduct
 - bouillonbasis
 - brood
+- Deeg (hartig)
 - drank
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
 - gehakt in saus
+- Groentebasis
+- Hartig eiwit-hoofdelement
 - koolhydraatbron
+- Kruiden en specerijen
 - proteïne
 - roerbakproteïne
 - rouxbinder
 - sandwichvulling
 - saus
 - saus op basis van roux
+- Sausbasis als bindingsmiddel
 - sausverrijker
+- Sausverrijker (romig)
 - sauzen
 - smaakmaker
+- Smeerbaar broodbeleg
+- Steak-hoofdelement
 - topping
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
 - zoetmaker, bulk ingrediënt
 - zoetstof, smaakbalans (hartig)
 - zoetstof, vulstof (zoet)
@@ -152,42 +149,42 @@ afwerkolie
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
+- afwerkolie
 - Bak- en bindingseiwit (hartig)
 - Bak- en bindingseiwit (zoet)
 - Bak- en bindingsmiddel (zoet)
-- Basis voor burger
-- Deeg (hartig)
-- Eiwit in blokjes voor stoofpot
-- Eiwit in conservering
-- Hartig eiwit-hoofdelement
-- Kruiden en specerijen
-- Pasta (zetmeelbron)
-- Sausbasis als bindingsmiddel
-- Sausverrijker (romig)
-- Smeerbraar broodbeleg
-- Steak-hoofdelement
-- Vet om te bakken
-- Vlees als basis
-- Zetmeelbron
-- afwerkolie
 - bakvet (hartig)
 - bakvet (zoet)
+- Basis voor burger
 - basisproduct
 - bouillonbasis
 - brood
+- Deeg (hartig)
 - drank
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
 - gehakt in saus
+- Groentebasis
+- Hartig eiwit-hoofdelement
 - koolhydraatbron
+- Kruiden en specerijen
 - proteïne
 - roerbakproteïne
 - rouxbinder
 - sandwichvulling
 - saus
 - saus op basis van roux
+- Sausbasis als bindingsmiddel
 - sausverrijker
+- Sausverrijker (romig)
 - sauzen
 - smaakmaker
+- Smeerbaar broodbeleg
+- Steak-hoofdelement
 - topping
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
 - zoetmaker, bulk ingrediënt
 - zoetstof, smaakbalans (hartig)
 - zoetstof, vulstof (zoet)
@@ -210,42 +207,42 @@ smaakmaker
 ## Gebruikersbericht
 
 Toegestane RoleOrTechnique-waarden:
+- afwerkolie
 - Bak- en bindingseiwit (hartig)
 - Bak- en bindingseiwit (zoet)
 - Bak- en bindingsmiddel (zoet)
-- Basis voor burger
-- Deeg (hartig)
-- Eiwit in blokjes voor stoofpot
-- Eiwit in conservering
-- Hartig eiwit-hoofdelement
-- Kruiden en specerijen
-- Pasta (zetmeelbron)
-- Sausbasis als bindingsmiddel
-- Sausverrijker (romig)
-- Smeerbraar broodbeleg
-- Steak-hoofdelement
-- Vet om te bakken
-- Vlees als basis
-- Zetmeelbron
-- afwerkolie
 - bakvet (hartig)
 - bakvet (zoet)
+- Basis voor burger
 - basisproduct
 - bouillonbasis
 - brood
+- Deeg (hartig)
 - drank
+- Eiwit in blokjes voor stoofpot
+- Eiwit in conservering
 - gehakt in saus
+- Groentebasis
+- Hartig eiwit-hoofdelement
 - koolhydraatbron
+- Kruiden en specerijen
 - proteïne
 - roerbakproteïne
 - rouxbinder
 - sandwichvulling
 - saus
 - saus op basis van roux
+- Sausbasis als bindingsmiddel
 - sausverrijker
+- Sausverrijker (romig)
 - sauzen
 - smaakmaker
+- Smeerbaar broodbeleg
+- Steak-hoofdelement
 - topping
+- Vet om te bakken
+- Vlees als basis
+- Zetmeelbron
 - zoetmaker, bulk ingrediënt
 - zoetstof, smaakbalans (hartig)
 - zoetstof, vulstof (zoet)

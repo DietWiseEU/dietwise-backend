@@ -26,7 +26,7 @@ Strikte uitvoerregels:
 - Als het ingrediënt een kruid, garnering of aromatisch ingrediënt is, geef dan: unknown.
 - Als het ingrediënt olijfolie of een variant van olijfolie is, geef dan: unknown.
 
-- Hier zijn enkele voorbeelden:
+Hier zijn enkele voorbeelden:
 
 # Voorbeeld 1
 

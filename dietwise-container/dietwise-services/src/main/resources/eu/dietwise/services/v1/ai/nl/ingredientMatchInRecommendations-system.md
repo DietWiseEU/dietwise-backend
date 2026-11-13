@@ -12,7 +12,7 @@ Strikte uitvoerregels:
 - Geef een component per regel.
 - Geef alleen de componentnaam, niet de uitleg.
 - Geef geen uitleg.
-- Geef geen interpunctie.
+- Geef geen leestekens.
 - Geef geen aanhalingstekens.
 - Geef niet meerdere waarden op dezelfde regel.
 - Verzin geen nieuwe waarden.
@@ -41,7 +41,7 @@ Componenten:
 
 Ingrediënt: Feta
 
-## Assistentbericht
+## Antwoord van de assistent
 
 natrium
 calcium
@@ -69,7 +69,7 @@ Componenten:
 
 Ingrediënt: Spinazie
 
-## Assistentbericht
+## Antwoord van de assistent
 
 vezels
 groenten
