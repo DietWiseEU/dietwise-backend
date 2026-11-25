@@ -46,6 +46,7 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestResponse;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,10 +208,30 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 	}
 
 	private RecipeExtractedFromInput sanitizeRecipe(RecipeExtractedFromInput recipe) {
-		List<String> filteredIngredients = recipe.recipeIngredients().stream().filter(Objects::nonNull).filter(s -> !s.isBlank()).toList();
-		return filteredIngredients.size() == recipe.recipeIngredients().size()
-				? recipe
-				: new RecipeExtractedFromInput(recipe.name(), recipe.recipeYield(), filteredIngredients, recipe.recipeInstructions(), recipe.text());
+		return new RecipeExtractedFromInput(
+				toNonBlankPlainText(recipe.name()),
+				toNonBlankPlainText(recipe.recipeYield()),
+				toNonBlankPlainTexts(recipe.recipeIngredients()),
+				toNonBlankPlainTexts(recipe.recipeInstructions()),
+				toNonBlankPlainText(recipe.text())
+		);
+	}
+
+	private Optional<String> toNonBlankPlainText(Optional<String> html) {
+		return html.map(this::toPlainText).filter(text -> !text.isBlank());
+	}
+
+	private List<String> toNonBlankPlainTexts(List<String> htmls) {
+		return htmls.stream().filter(Objects::nonNull).map(this::toPlainText).filter(text -> !text.isBlank()).toList();
+	}
+
+	/**
+	 * Recipe texts in JSON-LD are HTML on many sites: they carry entities (e.g. {@code &#39;}, {@code &nbsp;}) and
+	 * sometimes markup (e.g. {@code <p>}, {@code <br>}). The content of a {@code <script>} element is never decoded,
+	 * so they arrive verbatim, both from the renderer and from the clients that read JSON-LD themselves.
+	 */
+	private String toPlainText(String html) {
+		return Jsoup.parseBodyFragment(html).text();
 	}
 
 	private Predicate<? super RecipeExtractedFromInput> keepRecipeWithValidIngredients(UUID correlationId, String url) {
