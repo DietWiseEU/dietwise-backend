@@ -476,9 +476,9 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 	private <T> Uni<Long> bumpStagedField(ReactivePersistenceTxContext tx, UUID templateId, SingularAttribute<SuggestionTemplateWcEntity, T> field, T value, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<SuggestionTemplateWcEntity> cu = cb.createCriteriaUpdate(SuggestionTemplateWcEntity.class);
-		Root<SuggestionTemplateWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(field), value);
-		cu.set(wc.get(SuggestionTemplateWcEntity_.version), cb.sum(wc.get(SuggestionTemplateWcEntity_.version), 1L));
+		Root<SuggestionTemplateWcEntity> wc = cu.from(SuggestionTemplateWcEntity.class);
+		cu.set(field, value);
+		cu.set(SuggestionTemplateWcEntity_.version, cb.sum(wc.get(SuggestionTemplateWcEntity_.version), 1L));
 		cu.where(cb.and(
 				cb.equal(wc.get(SuggestionTemplateWcEntity_.id), templateId),
 				cb.equal(wc.get(SuggestionTemplateWcEntity_.version), baseVersion)
@@ -491,7 +491,7 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 	private Uni<Void> deleteStagedRow(ReactivePersistenceTxContext tx, UUID templateId, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<SuggestionTemplateWcEntity> cd = cb.createCriteriaDelete(SuggestionTemplateWcEntity.class);
-		Root<SuggestionTemplateWcEntity> wc = cd.getRoot();
+		Root<SuggestionTemplateWcEntity> wc = cd.from(SuggestionTemplateWcEntity.class);
 		cd.where(cb.and(
 				cb.equal(wc.get(SuggestionTemplateWcEntity_.id), templateId),
 				cb.equal(wc.get(SuggestionTemplateWcEntity_.version), baseVersion)
@@ -595,9 +595,9 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 	private Uni<Void> bumpFieldTranslation(ReactivePersistenceTxContext tx, UUID templateId, RecipeLanguage lang, SingularAttribute<SuggestionTemplateTranslationWcEntity, String> field, String value, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<SuggestionTemplateTranslationWcEntity> cu = cb.createCriteriaUpdate(SuggestionTemplateTranslationWcEntity.class);
-		Root<SuggestionTemplateTranslationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(field), value);
-		cu.set(wc.get(SuggestionTemplateTranslationWcEntity_.version), cb.sum(wc.get(SuggestionTemplateTranslationWcEntity_.version), 1L));
+		Root<SuggestionTemplateTranslationWcEntity> wc = cu.from(SuggestionTemplateTranslationWcEntity.class);
+		cu.set(field, value);
+		cu.set(SuggestionTemplateTranslationWcEntity_.version, cb.sum(wc.get(SuggestionTemplateTranslationWcEntity_.version), 1L));
 		cu.where(translationRowAt(cb, wc, templateId, lang, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rowsAffected -> rowsAffected == 1
 				? Uni.createFrom().voidItem()
@@ -607,7 +607,7 @@ public class SuggestionTemplateDaoImpl implements SuggestionTemplateDao {
 	private Uni<Void> deleteStagedTranslation(ReactivePersistenceTxContext tx, UUID templateId, RecipeLanguage lang, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<SuggestionTemplateTranslationWcEntity> cd = cb.createCriteriaDelete(SuggestionTemplateTranslationWcEntity.class);
-		Root<SuggestionTemplateTranslationWcEntity> wc = cd.getRoot();
+		Root<SuggestionTemplateTranslationWcEntity> wc = cd.from(SuggestionTemplateTranslationWcEntity.class);
 		cd.where(translationRowAt(cb, wc, templateId, lang, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rowsAffected -> rowsAffected == 1
 				? Uni.createFrom().voidItem()

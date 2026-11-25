@@ -1,14 +1,12 @@
 package eu.dietwise.v1.types;
 
-import java.io.IOException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-
-public class CountryDeserializer extends JsonDeserializer<Country> {
+public class CountryDeserializer extends ValueDeserializer<Country> {
 	@Override
-	public Country deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+	public Country deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
 		return Country.fromCode2(jsonParser.getValueAsString());
 	}
 }

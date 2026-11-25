@@ -2,10 +2,10 @@ package eu.dietwise.services.v1.extraction.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dietwise.services.v1.extraction.RecipeJsonCoercionStrategy;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 class RecipeJsonCoercionStrategyTest {
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -62,6 +62,15 @@ class RecipeJsonCoercionStrategyTest {
 		String result = strategy.coerce(node, objectMapper);
 
 		assertThat(result).isEqualTo("1 2 true tsp");
+	}
+
+	@Test
+	void joinValuesCoercionHandlesContainersWithoutValues() throws Exception {
+		RecipeJsonCoercionStrategy strategy = new JoinValuesCoercionStrategy();
+
+		assertThat(strategy.coerce(objectMapper.readTree("{}"), objectMapper)).isEqualTo("");
+		assertThat(strategy.coerce(objectMapper.readTree("[]"), objectMapper)).isEqualTo("");
+		assertThat(strategy.coerce(objectMapper.readTree("{\"note\": null}"), objectMapper)).isEqualTo("");
 	}
 
 	@Test

@@ -151,10 +151,10 @@ public class SeasonalityCostDaoImpl implements SeasonalityCostDao {
 	private Uni<Void> bumpStagedSeasonality(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, Country country, Integer monthFrom, Integer monthTo, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<AlternativeIngredientSeasonalityWcEntity> cu = cb.createCriteriaUpdate(AlternativeIngredientSeasonalityWcEntity.class);
-		Root<AlternativeIngredientSeasonalityWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(AlternativeIngredientSeasonalityWcEntity_.monthFrom), monthFrom);
-		cu.set(wc.get(AlternativeIngredientSeasonalityWcEntity_.monthTo), monthTo);
-		cu.set(wc.get(AlternativeIngredientSeasonalityWcEntity_.version), cb.sum(wc.get(AlternativeIngredientSeasonalityWcEntity_.version), 1L));
+		Root<AlternativeIngredientSeasonalityWcEntity> wc = cu.from(AlternativeIngredientSeasonalityWcEntity.class);
+		cu.set(AlternativeIngredientSeasonalityWcEntity_.monthFrom, monthFrom);
+		cu.set(AlternativeIngredientSeasonalityWcEntity_.monthTo, monthTo);
+		cu.set(AlternativeIngredientSeasonalityWcEntity_.version, cb.sum(wc.get(AlternativeIngredientSeasonalityWcEntity_.version), 1L));
 		cu.where(seasonalityRowAt(cb, wc, alternativeIngredientId, country, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -164,7 +164,7 @@ public class SeasonalityCostDaoImpl implements SeasonalityCostDao {
 	private Uni<Void> deleteStagedSeasonality(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, Country country, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientSeasonalityWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientSeasonalityWcEntity.class);
-		Root<AlternativeIngredientSeasonalityWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientSeasonalityWcEntity> wc = cd.from(AlternativeIngredientSeasonalityWcEntity.class);
 		cd.where(seasonalityRowAt(cb, wc, alternativeIngredientId, country, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -213,9 +213,9 @@ public class SeasonalityCostDaoImpl implements SeasonalityCostDao {
 	private Uni<Void> bumpStagedCost(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, Country country, Cost cost, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<AlternativeIngredientCostWcEntity> cu = cb.createCriteriaUpdate(AlternativeIngredientCostWcEntity.class);
-		Root<AlternativeIngredientCostWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(AlternativeIngredientCostWcEntity_.cost), cost);
-		cu.set(wc.get(AlternativeIngredientCostWcEntity_.version), cb.sum(wc.get(AlternativeIngredientCostWcEntity_.version), 1L));
+		Root<AlternativeIngredientCostWcEntity> wc = cu.from(AlternativeIngredientCostWcEntity.class);
+		cu.set(AlternativeIngredientCostWcEntity_.cost, cost);
+		cu.set(AlternativeIngredientCostWcEntity_.version, cb.sum(wc.get(AlternativeIngredientCostWcEntity_.version), 1L));
 		cu.where(costRowAt(cb, wc, alternativeIngredientId, country, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -225,7 +225,7 @@ public class SeasonalityCostDaoImpl implements SeasonalityCostDao {
 	private Uni<Void> deleteStagedCost(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, Country country, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientCostWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientCostWcEntity.class);
-		Root<AlternativeIngredientCostWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientCostWcEntity> wc = cd.from(AlternativeIngredientCostWcEntity.class);
 		cd.where(costRowAt(cb, wc, alternativeIngredientId, country, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()

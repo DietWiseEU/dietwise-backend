@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dietwise.services.model.RecipeExtractedFromInput;
 import eu.dietwise.services.renderer.RenderResponse;
 import eu.dietwise.services.renderer.RendererClient;
@@ -45,6 +44,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class RecipeExtractionServiceImplTest {

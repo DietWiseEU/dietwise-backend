@@ -50,6 +50,11 @@
 			<groupId>org.hibernate.reactive</groupId>
 			<artifactId>hibernate-reactive-core</artifactId>
 		</dependency>
+		<!-- The quarkus-bom excludes this from hibernate-core; Hibernate needs it when bootstrapped outside Quarkus, as in HibernateReactiveExtension -->
+		<dependency>
+			<groupId>org.hibernate.accessor</groupId>
+			<artifactId>hibernate-accessor-bytebuddy</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>

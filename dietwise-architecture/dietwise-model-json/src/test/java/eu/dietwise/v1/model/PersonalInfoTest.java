@@ -4,14 +4,14 @@ import static eu.dietwise.v1.types.BiologicalGender.FEMALE;
 import static eu.dietwise.v1.types.Country.GREECE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dietwise.v1.json.ObjectMapperModelUtils;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 public class PersonalInfoTest {
 	@Test
 	void testDeserialization() throws Exception {
-		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(JsonMapper.builder()).build();
 		var json = """
 				{
 					"country": "GR",

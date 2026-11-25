@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import eu.dietwise.v1.json.ObjectMapperModelUtils;
 import eu.dietwise.v1.types.IngredientId;
 import eu.dietwise.v1.types.RecommendationComponentName;
@@ -15,6 +13,7 @@ import eu.dietwise.v1.types.TypeOfRecommendation;
 import eu.dietwise.v1.types.impl.GenericIngredientId;
 import eu.dietwise.v1.types.impl.RecommendationComponentNameImpl;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 public class ScoringDataTest {
 	@Test
@@ -31,8 +30,7 @@ public class ScoringDataTest {
 				.recommendationsPerIngredient(recommendationsPerIngredient)
 				.primaryComponentPerIngredient(Map.of(new GenericIngredientId("id"), new RecommendationComponentNameImpl("rec2")))
 				.build();
-		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
-		om.registerModule(new Jdk8Module()); // at runtime Quarkus provides this
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(JsonMapper.builder()).build();
 		var result = om.writeValueAsString(recipe);
 		assertThat(result).doesNotContain("RecommendationComponentNameImpl", "GenericIngredientId");
 		assertThat(result).contains("Eat less processed meat");

@@ -226,10 +226,10 @@ public class RoleOrTechniqueDaoImpl implements RoleOrTechniqueDao {
 	private Uni<Void> bumpStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, String name, String explanationForLlm, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<RoleOrTechniqueTranslationWcEntity> cu = cb.createCriteriaUpdate(RoleOrTechniqueTranslationWcEntity.class);
-		Root<RoleOrTechniqueTranslationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(RoleOrTechniqueTranslationWcEntity_.name), name);
-		cu.set(wc.get(RoleOrTechniqueTranslationWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(RoleOrTechniqueTranslationWcEntity_.version), cb.sum(wc.get(RoleOrTechniqueTranslationWcEntity_.version), 1L));
+		Root<RoleOrTechniqueTranslationWcEntity> wc = cu.from(RoleOrTechniqueTranslationWcEntity.class);
+		cu.set(RoleOrTechniqueTranslationWcEntity_.name, name);
+		cu.set(RoleOrTechniqueTranslationWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(RoleOrTechniqueTranslationWcEntity_.version, cb.sum(wc.get(RoleOrTechniqueTranslationWcEntity_.version), 1L));
 		cu.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -246,7 +246,7 @@ public class RoleOrTechniqueDaoImpl implements RoleOrTechniqueDao {
 	private Uni<Void> deleteStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<RoleOrTechniqueTranslationWcEntity> cd = cb.createCriteriaDelete(RoleOrTechniqueTranslationWcEntity.class);
-		Root<RoleOrTechniqueTranslationWcEntity> wc = cd.getRoot();
+		Root<RoleOrTechniqueTranslationWcEntity> wc = cd.from(RoleOrTechniqueTranslationWcEntity.class);
 		cd.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -290,10 +290,10 @@ public class RoleOrTechniqueDaoImpl implements RoleOrTechniqueDao {
 	private Uni<Void> bumpStaged(ReactivePersistenceTxContext tx, UUID id, String name, String explanationForLlm, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<RoleOrTechniqueWcEntity> cu = cb.createCriteriaUpdate(RoleOrTechniqueWcEntity.class);
-		Root<RoleOrTechniqueWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(RoleOrTechniqueWcEntity_.name), name);
-		cu.set(wc.get(RoleOrTechniqueWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(RoleOrTechniqueWcEntity_.version), cb.sum(wc.get(RoleOrTechniqueWcEntity_.version), 1L));
+		Root<RoleOrTechniqueWcEntity> wc = cu.from(RoleOrTechniqueWcEntity.class);
+		cu.set(RoleOrTechniqueWcEntity_.name, name);
+		cu.set(RoleOrTechniqueWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(RoleOrTechniqueWcEntity_.version, cb.sum(wc.get(RoleOrTechniqueWcEntity_.version), 1L));
 		cu.where(cb.and(
 				cb.equal(wc.get(RoleOrTechniqueWcEntity_.id), id),
 				cb.equal(wc.get(RoleOrTechniqueWcEntity_.version), baseVersion)
@@ -306,7 +306,7 @@ public class RoleOrTechniqueDaoImpl implements RoleOrTechniqueDao {
 	private Uni<Void> deleteStaged(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<RoleOrTechniqueWcEntity> cd = cb.createCriteriaDelete(RoleOrTechniqueWcEntity.class);
-		Root<RoleOrTechniqueWcEntity> wc = cd.getRoot();
+		Root<RoleOrTechniqueWcEntity> wc = cd.from(RoleOrTechniqueWcEntity.class);
 		cd.where(cb.and(
 				cb.equal(wc.get(RoleOrTechniqueWcEntity_.id), id),
 				cb.equal(wc.get(RoleOrTechniqueWcEntity_.version), baseVersion)

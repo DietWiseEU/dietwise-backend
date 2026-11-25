@@ -72,9 +72,7 @@ class RecipeAssessmentResourceTest extends CitizenResourceTest {
 				eq(ImmutableRecipeAssessmentParam.builder().url(RECIPE_URL).pageContent("Recipe text").lang(RecipeLanguage.EN).build()));
 		assertThat(body.lines()).containsExactly(
 				"{\"type\":\"MORE_THAN_ONE_RECIPE\",\"numberOfRecipes\":2}",
-				"{\"type\":\"SCORING\",\"scoringData\":{\"totalNumberOfRecomendations\":1,\"recommendationWeights\":{},"
-						+ "\"humanFriendlyDisplays\":{\"fruit\":\"Eat more fruit\"},\"recommendationsPerIngredient\":{\"apple\":[\"fruit\"]},"
-						+ "\"primaryComponentPerIngredient\":{\"apple\":\"fruit\"}}}"
+				"{\"type\":\"SCORING\",\"scoringData\":{\"humanFriendlyDisplays\":{\"fruit\":\"Eat more fruit\"},\"primaryComponentPerIngredient\":{\"apple\":\"fruit\"},\"recommendationWeights\":{},\"recommendationsPerIngredient\":{\"apple\":[\"fruit\"]},\"totalNumberOfRecomendations\":1}}"
 		);
 	}
 

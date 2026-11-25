@@ -5,15 +5,15 @@ import static eu.dietwise.v1.types.UiLanguage.EL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dietwise.v1.json.ObjectMapperModelUtils;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.json.JsonMapper;
 
 public class RecipeExtractionAndAssessmentParamTest {
 	@Test
 	void testDeserializationWithUiLang() throws Exception {
-		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(JsonMapper.builder()).build();
 		var json = """
 				{
 					"url": "https://example.test/recipe",
@@ -31,7 +31,7 @@ public class RecipeExtractionAndAssessmentParamTest {
 
 	@Test
 	void testDeserializationWithoutUiLang() throws Exception {
-		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(JsonMapper.builder()).build();
 		var json = """
 				{
 					"url": "https://example.test/recipe",
@@ -46,7 +46,7 @@ public class RecipeExtractionAndAssessmentParamTest {
 
 	@Test
 	void testDeserializationRejectsUnsupportedUiLang() {
-		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(JsonMapper.builder()).build();
 		var json = """
 				{
 					"url": "https://example.test/recipe",
@@ -56,13 +56,13 @@ public class RecipeExtractionAndAssessmentParamTest {
 				""";
 
 		assertThatThrownBy(() -> om.readValue(json, RecipeExtractionAndAssessmentParam.class))
-				.isInstanceOf(JsonMappingException.class)
+				.isInstanceOf(DatabindException.class)
 				.hasRootCauseInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
 	void testDeserializationRejectsBlankUiLang() {
-		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(new ObjectMapper());
+		var om = ObjectMapperModelUtils.applyDefaultObjectMapperConfiguration(JsonMapper.builder()).build();
 		var json = """
 				{
 					"url": "https://example.test/recipe",
@@ -72,7 +72,7 @@ public class RecipeExtractionAndAssessmentParamTest {
 				""";
 
 		assertThatThrownBy(() -> om.readValue(json, RecipeExtractionAndAssessmentParam.class))
-				.isInstanceOf(JsonMappingException.class)
+				.isInstanceOf(DatabindException.class)
 				.hasRootCauseInstanceOf(IllegalArgumentException.class);
 	}
 }

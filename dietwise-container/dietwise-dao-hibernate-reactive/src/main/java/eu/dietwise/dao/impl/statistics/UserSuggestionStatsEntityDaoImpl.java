@@ -8,10 +8,11 @@ import java.util.Set;
 import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.ComparableExpression;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.NumericExpression;
 import jakarta.persistence.criteria.Predicate;
 
 import eu.dietwise.common.dao.EntityNotFoundException;
@@ -45,10 +46,10 @@ public class UserSuggestionStatsEntityDaoImpl implements UserSuggestionStatsEnti
 		var cb = em.getCriteriaBuilder();
 		var q = cb.createTupleQuery();
 		var root = q.from(UserSuggestionStatsEntity.class);
-		Path<UUID> suggestionTemplateId = root.get(UserSuggestionStatsEntity_.suggestionTemplateId);
-		Path<Integer> timesSuggested = root.get(UserSuggestionStatsEntity_.timesSuggested);
-		Path<Integer> timesAccepted = root.get(UserSuggestionStatsEntity_.timesAccepted);
-		Path<Integer> timesRejected = root.get(UserSuggestionStatsEntity_.timesRejected);
+		ComparableExpression<UUID> suggestionTemplateId = root.get(UserSuggestionStatsEntity_.suggestionTemplateId);
+		NumericExpression<Integer> timesSuggested = root.get(UserSuggestionStatsEntity_.timesSuggested);
+		NumericExpression<Integer> timesAccepted = root.get(UserSuggestionStatsEntity_.timesAccepted);
+		NumericExpression<Integer> timesRejected = root.get(UserSuggestionStatsEntity_.timesRejected);
 		Expression<Integer> sumTimesSuggested = cb.sum(timesSuggested);
 		Expression<Integer> sumTimesAccepted = cb.sum(timesAccepted);
 		Expression<Integer> sumTimesRejected = cb.sum(timesRejected);
@@ -76,10 +77,10 @@ public class UserSuggestionStatsEntityDaoImpl implements UserSuggestionStatsEnti
 		var cb = em.getCriteriaBuilder();
 		var q = cb.createTupleQuery();
 		var root = q.from(UserSuggestionStatsEntity.class);
-		Path<UUID> suggestionTemplateId = root.get(UserSuggestionStatsEntity_.suggestionTemplateId);
-		Path<Integer> timesSuggested = root.get(UserSuggestionStatsEntity_.timesSuggested);
-		Path<Integer> timesAccepted = root.get(UserSuggestionStatsEntity_.timesAccepted);
-		Path<Integer> timesRejected = root.get(UserSuggestionStatsEntity_.timesRejected);
+		ComparableExpression<UUID> suggestionTemplateId = root.get(UserSuggestionStatsEntity_.suggestionTemplateId);
+		NumericExpression<Integer> timesSuggested = root.get(UserSuggestionStatsEntity_.timesSuggested);
+		NumericExpression<Integer> timesAccepted = root.get(UserSuggestionStatsEntity_.timesAccepted);
+		NumericExpression<Integer> timesRejected = root.get(UserSuggestionStatsEntity_.timesRejected);
 
 		q.select(cb.tuple(suggestionTemplateId, timesSuggested, timesAccepted, timesRejected));
 		UUID userIdUuid = UUID.fromString(userId.getId().asString());
@@ -155,7 +156,7 @@ public class UserSuggestionStatsEntityDaoImpl implements UserSuggestionStatsEnti
 		return tx.createDelete(delete).execute().replaceWithVoid();
 	}
 
-	private Predicate in(jakarta.persistence.criteria.CriteriaBuilder cb, Path<UUID> path, Set<SuggestionTemplateId> ids) {
+	private Predicate in(jakarta.persistence.criteria.CriteriaBuilder cb, Expression<UUID> path, Set<SuggestionTemplateId> ids) {
 		In<UUID> in = cb.in(path);
 		ids.forEach(id -> in.value(id.asUuid()));
 		return in;

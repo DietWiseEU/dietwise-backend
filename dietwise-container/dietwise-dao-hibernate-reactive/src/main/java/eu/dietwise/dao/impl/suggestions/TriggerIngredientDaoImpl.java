@@ -295,10 +295,10 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	private Uni<Void> bumpStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, String name, String explanationForLlm, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<TriggerIngredientTranslationWcEntity> cu = cb.createCriteriaUpdate(TriggerIngredientTranslationWcEntity.class);
-		Root<TriggerIngredientTranslationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(TriggerIngredientTranslationWcEntity_.name), name);
-		cu.set(wc.get(TriggerIngredientTranslationWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(TriggerIngredientTranslationWcEntity_.version), cb.sum(wc.get(TriggerIngredientTranslationWcEntity_.version), 1L));
+		Root<TriggerIngredientTranslationWcEntity> wc = cu.from(TriggerIngredientTranslationWcEntity.class);
+		cu.set(TriggerIngredientTranslationWcEntity_.name, name);
+		cu.set(TriggerIngredientTranslationWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(TriggerIngredientTranslationWcEntity_.version, cb.sum(wc.get(TriggerIngredientTranslationWcEntity_.version), 1L));
 		cu.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -315,7 +315,7 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	private Uni<Void> deleteStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<TriggerIngredientTranslationWcEntity> cd = cb.createCriteriaDelete(TriggerIngredientTranslationWcEntity.class);
-		Root<TriggerIngredientTranslationWcEntity> wc = cd.getRoot();
+		Root<TriggerIngredientTranslationWcEntity> wc = cd.from(TriggerIngredientTranslationWcEntity.class);
 		cd.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -359,10 +359,10 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	private Uni<Void> bumpStaged(ReactivePersistenceTxContext tx, UUID id, String name, String explanationForLlm, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<TriggerIngredientWcEntity> cu = cb.createCriteriaUpdate(TriggerIngredientWcEntity.class);
-		Root<TriggerIngredientWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(TriggerIngredientWcEntity_.name), name);
-		cu.set(wc.get(TriggerIngredientWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(TriggerIngredientWcEntity_.version), cb.sum(wc.get(TriggerIngredientWcEntity_.version), 1L));
+		Root<TriggerIngredientWcEntity> wc = cu.from(TriggerIngredientWcEntity.class);
+		cu.set(TriggerIngredientWcEntity_.name, name);
+		cu.set(TriggerIngredientWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(TriggerIngredientWcEntity_.version, cb.sum(wc.get(TriggerIngredientWcEntity_.version), 1L));
 		cu.where(cb.and(
 				cb.equal(wc.get(TriggerIngredientWcEntity_.id), id),
 				cb.equal(wc.get(TriggerIngredientWcEntity_.version), baseVersion)
@@ -375,7 +375,7 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	private Uni<Void> deleteStaged(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<TriggerIngredientWcEntity> cd = cb.createCriteriaDelete(TriggerIngredientWcEntity.class);
-		Root<TriggerIngredientWcEntity> wc = cd.getRoot();
+		Root<TriggerIngredientWcEntity> wc = cd.from(TriggerIngredientWcEntity.class);
 		cd.where(cb.and(
 				cb.equal(wc.get(TriggerIngredientWcEntity_.id), id),
 				cb.equal(wc.get(TriggerIngredientWcEntity_.version), baseVersion)
@@ -477,8 +477,8 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	private Uni<Void> updateStagedLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId, boolean present) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<TriggerIngredientComponentForScoringWcEntity> cu = cb.createCriteriaUpdate(TriggerIngredientComponentForScoringWcEntity.class);
-		Root<TriggerIngredientComponentForScoringWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(TriggerIngredientComponentForScoringWcEntity_.present), present);
+		Root<TriggerIngredientComponentForScoringWcEntity> wc = cu.from(TriggerIngredientComponentForScoringWcEntity.class);
+		cu.set(TriggerIngredientComponentForScoringWcEntity_.present, present);
 		cu.where(linkRowAt(cb, wc, triggerIngredientId, recommendationId));
 		return tx.createUpdate(cu).execute().replaceWithVoid();
 	}
@@ -486,7 +486,7 @@ public class TriggerIngredientDaoImpl implements TriggerIngredientDao {
 	private Uni<Void> deleteStagedLink(ReactivePersistenceTxContext tx, UUID triggerIngredientId, UUID recommendationId) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<TriggerIngredientComponentForScoringWcEntity> cd = cb.createCriteriaDelete(TriggerIngredientComponentForScoringWcEntity.class);
-		Root<TriggerIngredientComponentForScoringWcEntity> wc = cd.getRoot();
+		Root<TriggerIngredientComponentForScoringWcEntity> wc = cd.from(TriggerIngredientComponentForScoringWcEntity.class);
 		cd.where(linkRowAt(cb, wc, triggerIngredientId, recommendationId));
 		return tx.createDelete(cd).execute().replaceWithVoid();
 	}

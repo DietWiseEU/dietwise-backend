@@ -299,10 +299,10 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> bumpStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, String name, String explanationForLlm, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<AlternativeIngredientTranslationWcEntity> cu = cb.createCriteriaUpdate(AlternativeIngredientTranslationWcEntity.class);
-		Root<AlternativeIngredientTranslationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(AlternativeIngredientTranslationWcEntity_.name), name);
-		cu.set(wc.get(AlternativeIngredientTranslationWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(AlternativeIngredientTranslationWcEntity_.version), cb.sum(wc.get(AlternativeIngredientTranslationWcEntity_.version), 1L));
+		Root<AlternativeIngredientTranslationWcEntity> wc = cu.from(AlternativeIngredientTranslationWcEntity.class);
+		cu.set(AlternativeIngredientTranslationWcEntity_.name, name);
+		cu.set(AlternativeIngredientTranslationWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(AlternativeIngredientTranslationWcEntity_.version, cb.sum(wc.get(AlternativeIngredientTranslationWcEntity_.version), 1L));
 		cu.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -319,7 +319,7 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> deleteStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientTranslationWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientTranslationWcEntity.class);
-		Root<AlternativeIngredientTranslationWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientTranslationWcEntity> wc = cd.from(AlternativeIngredientTranslationWcEntity.class);
 		cd.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -363,10 +363,10 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> bumpStaged(ReactivePersistenceTxContext tx, UUID id, String name, String explanationForLlm, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<AlternativeIngredientWcEntity> cu = cb.createCriteriaUpdate(AlternativeIngredientWcEntity.class);
-		Root<AlternativeIngredientWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(AlternativeIngredientWcEntity_.name), name);
-		cu.set(wc.get(AlternativeIngredientWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(AlternativeIngredientWcEntity_.version), cb.sum(wc.get(AlternativeIngredientWcEntity_.version), 1L));
+		Root<AlternativeIngredientWcEntity> wc = cu.from(AlternativeIngredientWcEntity.class);
+		cu.set(AlternativeIngredientWcEntity_.name, name);
+		cu.set(AlternativeIngredientWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(AlternativeIngredientWcEntity_.version, cb.sum(wc.get(AlternativeIngredientWcEntity_.version), 1L));
 		cu.where(cb.and(
 				cb.equal(wc.get(AlternativeIngredientWcEntity_.id), id),
 				cb.equal(wc.get(AlternativeIngredientWcEntity_.version), baseVersion)
@@ -379,7 +379,7 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> deleteStaged(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientWcEntity.class);
-		Root<AlternativeIngredientWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientWcEntity> wc = cd.from(AlternativeIngredientWcEntity.class);
 		cd.where(cb.and(
 				cb.equal(wc.get(AlternativeIngredientWcEntity_.id), id),
 				cb.equal(wc.get(AlternativeIngredientWcEntity_.version), baseVersion)
@@ -481,8 +481,8 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> updateStagedLink(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, UUID recommendationId, boolean present) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<AlternativeIngredientComponentForScoringWcEntity> cu = cb.createCriteriaUpdate(AlternativeIngredientComponentForScoringWcEntity.class);
-		Root<AlternativeIngredientComponentForScoringWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(AlternativeIngredientComponentForScoringWcEntity_.present), present);
+		Root<AlternativeIngredientComponentForScoringWcEntity> wc = cu.from(AlternativeIngredientComponentForScoringWcEntity.class);
+		cu.set(AlternativeIngredientComponentForScoringWcEntity_.present, present);
 		cu.where(linkRowAt(cb, wc, alternativeIngredientId, recommendationId));
 		return tx.createUpdate(cu).execute().replaceWithVoid();
 	}
@@ -490,7 +490,7 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> deleteStagedLink(ReactivePersistenceTxContext tx, UUID alternativeIngredientId, UUID recommendationId) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientComponentForScoringWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientComponentForScoringWcEntity.class);
-		Root<AlternativeIngredientComponentForScoringWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientComponentForScoringWcEntity> wc = cd.from(AlternativeIngredientComponentForScoringWcEntity.class);
 		cd.where(linkRowAt(cb, wc, alternativeIngredientId, recommendationId));
 		return tx.createDelete(cd).execute().replaceWithVoid();
 	}
@@ -504,7 +504,7 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> deleteStagedLinksFor(ReactivePersistenceTxContext tx, UUID id) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientComponentForScoringWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientComponentForScoringWcEntity.class);
-		Root<AlternativeIngredientComponentForScoringWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientComponentForScoringWcEntity> wc = cd.from(AlternativeIngredientComponentForScoringWcEntity.class);
 		cd.where(cb.equal(wc.get(AlternativeIngredientComponentForScoringWcEntity_.alternativeIngredientId), id));
 		return tx.createDelete(cd).execute().replaceWithVoid();
 	}
@@ -512,7 +512,7 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> deleteStagedTranslationsFor(ReactivePersistenceTxContext tx, UUID id) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientTranslationWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientTranslationWcEntity.class);
-		Root<AlternativeIngredientTranslationWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientTranslationWcEntity> wc = cd.from(AlternativeIngredientTranslationWcEntity.class);
 		cd.where(cb.equal(wc.get(AlternativeIngredientTranslationWcEntity_.alternativeIngredientId), id));
 		return tx.createDelete(cd).execute().replaceWithVoid();
 	}
@@ -520,7 +520,7 @@ public class AlternativeIngredientDaoImpl implements AlternativeIngredientDao {
 	private Uni<Void> deleteWorkingCopyRow(ReactivePersistenceTxContext tx, UUID id) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<AlternativeIngredientWcEntity> cd = cb.createCriteriaDelete(AlternativeIngredientWcEntity.class);
-		Root<AlternativeIngredientWcEntity> wc = cd.getRoot();
+		Root<AlternativeIngredientWcEntity> wc = cd.from(AlternativeIngredientWcEntity.class);
 		cd.where(cb.equal(wc.get(AlternativeIngredientWcEntity_.id), id));
 		return tx.createDelete(cd).execute().replaceWithVoid();
 	}

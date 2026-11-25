@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Fetch;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
 import eu.dietwise.common.dao.reactive.ReactivePersistenceContext;
@@ -348,7 +348,7 @@ public class SuggestionDaoImpl implements SuggestionDao {
 		return ImmutableSeasonality.builder().monthFrom(seasonality.getMonthFrom()).monthTo(seasonality.getMonthTo()).build();
 	}
 
-	private static In<UUID> in(CriteriaBuilder cb, Path<UUID> path, Set<UUID> ids) {
+	private static In<UUID> in(CriteriaBuilder cb, Expression<UUID> path, Set<UUID> ids) {
 		In<UUID> in = cb.in(path);
 		ids.forEach(in::value);
 		return in;

@@ -118,9 +118,9 @@ public class RuleDaoImpl implements RuleDao {
 	private <T> Uni<Long> bumpStagedField(ReactivePersistenceTxContext tx, UUID ruleId, SingularAttribute<RuleWcEntity, T> field, T value, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<RuleWcEntity> cu = cb.createCriteriaUpdate(RuleWcEntity.class);
-		Root<RuleWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(field), value);
-		cu.set(wc.get(RuleWcEntity_.version), cb.sum(wc.get(RuleWcEntity_.version), 1L));
+		Root<RuleWcEntity> wc = cu.from(RuleWcEntity.class);
+		cu.set(field, value);
+		cu.set(RuleWcEntity_.version, cb.sum(wc.get(RuleWcEntity_.version), 1L));
 		cu.where(cb.and(
 				cb.equal(wc.get(RuleWcEntity_.id), ruleId),
 				cb.equal(wc.get(RuleWcEntity_.version), baseVersion)
@@ -145,7 +145,7 @@ public class RuleDaoImpl implements RuleDao {
 	private Uni<Void> deleteStagedRow(ReactivePersistenceTxContext tx, UUID ruleId, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<RuleWcEntity> cd = cb.createCriteriaDelete(RuleWcEntity.class);
-		Root<RuleWcEntity> wc = cd.getRoot();
+		Root<RuleWcEntity> wc = cd.from(RuleWcEntity.class);
 		cd.where(cb.and(
 				cb.equal(wc.get(RuleWcEntity_.id), ruleId),
 				cb.equal(wc.get(RuleWcEntity_.version), baseVersion)
@@ -479,9 +479,9 @@ public class RuleDaoImpl implements RuleDao {
 	private Uni<Void> bumpStagedTranslation(ReactivePersistenceTxContext tx, UUID ruleId, RecipeLanguage lang, String rationale, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<RuleTranslationWcEntity> cu = cb.createCriteriaUpdate(RuleTranslationWcEntity.class);
-		Root<RuleTranslationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(RuleTranslationWcEntity_.rationale), rationale);
-		cu.set(wc.get(RuleTranslationWcEntity_.version), cb.sum(wc.get(RuleTranslationWcEntity_.version), 1L));
+		Root<RuleTranslationWcEntity> wc = cu.from(RuleTranslationWcEntity.class);
+		cu.set(RuleTranslationWcEntity_.rationale, rationale);
+		cu.set(RuleTranslationWcEntity_.version, cb.sum(wc.get(RuleTranslationWcEntity_.version), 1L));
 		cu.where(translationRowAt(cb, wc, ruleId, lang, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -498,7 +498,7 @@ public class RuleDaoImpl implements RuleDao {
 	private Uni<Void> deleteStagedTranslation(ReactivePersistenceTxContext tx, UUID ruleId, RecipeLanguage lang, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<RuleTranslationWcEntity> cd = cb.createCriteriaDelete(RuleTranslationWcEntity.class);
-		Root<RuleTranslationWcEntity> wc = cd.getRoot();
+		Root<RuleTranslationWcEntity> wc = cd.from(RuleTranslationWcEntity.class);
 		cd.where(translationRowAt(cb, wc, ruleId, lang, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()

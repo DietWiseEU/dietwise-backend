@@ -13,9 +13,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dietwise.services.model.RecipeExtractedFromInput;
 import eu.dietwise.services.renderer.RenderRequest;
 import eu.dietwise.services.renderer.RendererClient;
@@ -45,6 +42,9 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
 public class RecipeExtractionServiceImpl implements RecipeExtractionService {
@@ -149,7 +149,7 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 		return Uni.createFrom().item(() -> {
 			try {
 				return parseJsonLdRecipes(jsonLdContent);
-			} catch (JsonProcessingException e) {
+			} catch (JacksonException e) {
 				LOG.warn("JSON-LD content was not usable, will fall back to page content <{}> for {}", correlationId, param.getUrl(), e);
 				return List.of();
 			}
@@ -231,7 +231,7 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 		};
 	}
 
-	private List<RecipeExtractedFromInput> parseJsonLdRecipes(String jsonLdContent) throws JsonProcessingException {
+	private List<RecipeExtractedFromInput> parseJsonLdRecipes(String jsonLdContent) throws JacksonException {
 		JsonNode root = objectMapper.readTree(jsonLdContent);
 		List<JsonNode> recipeNodes = new ArrayList<>();
 		collectRecipeNodes(root, recipeNodes);
@@ -260,12 +260,12 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 		if (typeNode == null || typeNode.isNull()) {
 			return false;
 		}
-		if (typeNode.isTextual()) {
-			return isRecipeType(typeNode.textValue());
+		if (typeNode.isString()) {
+			return isRecipeType(typeNode.stringValue());
 		}
 		if (typeNode.isArray()) {
 			for (JsonNode item : typeNode) {
-				if (item.isTextual() && isRecipeType(item.textValue())) {
+				if (item.isString() && isRecipeType(item.stringValue())) {
 					return true;
 				}
 			}

@@ -1,14 +1,12 @@
 package eu.dietwise.v1.types;
 
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
-public class CountrySerializer extends JsonSerializer<Country> {
+public class CountrySerializer extends ValueSerializer<Country> {
 	@Override
-	public void serialize(Country country, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+	public void serialize(Country country, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
 		jsonGenerator.writeString(country.getCode2());
 	}
 }

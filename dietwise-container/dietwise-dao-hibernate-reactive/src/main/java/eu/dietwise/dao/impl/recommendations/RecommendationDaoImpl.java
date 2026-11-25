@@ -19,7 +19,7 @@ import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.NumericExpression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -29,6 +29,7 @@ import eu.dietwise.common.dao.reactive.ReactivePersistenceContext;
 import eu.dietwise.common.dao.reactive.ReactivePersistenceTxContext;
 import eu.dietwise.common.types.RecommendationTranslationDetails;
 import eu.dietwise.common.types.ReferenceOption;
+import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.dao.jpa.recommendations.AgeGroupEntity_;
 import eu.dietwise.dao.jpa.recommendations.RecommendationEntity;
 import eu.dietwise.dao.jpa.recommendations.RecommendationEntity_;
@@ -38,16 +39,15 @@ import eu.dietwise.dao.jpa.recommendations.RecommendationTranslationEntity_;
 import eu.dietwise.dao.jpa.recommendations.RecommendationTranslationWcEntity;
 import eu.dietwise.dao.jpa.recommendations.RecommendationTranslationWcEntityId;
 import eu.dietwise.dao.jpa.recommendations.RecommendationTranslationWcEntity_;
-import eu.dietwise.dao.jpa.recommendations.RecommendationWeightEntity;
-import eu.dietwise.dao.jpa.recommendations.RecommendationWeightEntity_;
 import eu.dietwise.dao.jpa.recommendations.RecommendationWcEntity;
 import eu.dietwise.dao.jpa.recommendations.RecommendationWcEntity_;
+import eu.dietwise.dao.jpa.recommendations.RecommendationWeightEntity;
+import eu.dietwise.dao.jpa.recommendations.RecommendationWeightEntity_;
 import eu.dietwise.dao.recommendations.RecommendationDao;
 import eu.dietwise.services.model.recommendations.BackofficeRecommendation;
 import eu.dietwise.services.model.recommendations.ImmutableRecommendationComponent;
 import eu.dietwise.services.model.recommendations.MasterOverride;
 import eu.dietwise.services.model.recommendations.RecommendationComponent;
-import eu.dietwise.dao.impl.translations.GridTranslations;
 import eu.dietwise.services.model.suggestions.TranslationLangs;
 import eu.dietwise.v1.types.BiologicalGender;
 import eu.dietwise.v1.types.RecipeLanguage;
@@ -71,7 +71,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 		var recommendationWeight = q.from(RecommendationWeightEntity.class);
 		var recommendation = recommendationWeight.join(RecommendationWeightEntity_.recommendation);
 		var ageGroup = recommendationWeight.join(RecommendationWeightEntity_.ageGroup);
-		Path<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
+		NumericExpression<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
 
 		q.select(cb.tuple(recommendation.get(RecommendationEntity_.name), weight));
 		q.where(
@@ -93,7 +93,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 		var q = cb.createTupleQuery();
 		var recommendationWeight = q.from(RecommendationWeightEntity.class);
 		var recommendation = recommendationWeight.join(RecommendationWeightEntity_.recommendation);
-		Path<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
+		NumericExpression<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
 		Expression<Double> average = cb.avg(weight);
 
 		q.select(cb.tuple(recommendation.get(RecommendationEntity_.name), average));
@@ -112,7 +112,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 		var recommendationWeight = q.from(RecommendationWeightEntity.class);
 		var recommendation = recommendationWeight.join(RecommendationWeightEntity_.recommendation);
 		var ageGroup = recommendationWeight.join(RecommendationWeightEntity_.ageGroup);
-		Path<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
+		NumericExpression<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
 		Expression<Double> average = cb.avg(weight);
 
 		q.select(cb.tuple(recommendation.get(RecommendationEntity_.name), average));
@@ -135,7 +135,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 		var q = cb.createTupleQuery();
 		var recommendationWeight = q.from(RecommendationWeightEntity.class);
 		var recommendation = recommendationWeight.join(RecommendationWeightEntity_.recommendation);
-		Path<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
+		NumericExpression<BigDecimal> weight = recommendationWeight.get(RecommendationWeightEntity_.weight);
 		Expression<Double> average = cb.avg(weight);
 
 		q.select(cb.tuple(recommendation.get(RecommendationEntity_.name), average));
@@ -267,10 +267,10 @@ public class RecommendationDaoImpl implements RecommendationDao {
 	private Uni<Long> bumpStaged(ReactivePersistenceTxContext tx, UUID id, String explanationForLlm, String humanFriendlyDisplay, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<RecommendationWcEntity> cu = cb.createCriteriaUpdate(RecommendationWcEntity.class);
-		Root<RecommendationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(RecommendationWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(RecommendationWcEntity_.humanFriendlyDisplay), humanFriendlyDisplay);
-		cu.set(wc.get(RecommendationWcEntity_.version), cb.sum(wc.get(RecommendationWcEntity_.version), 1L));
+		Root<RecommendationWcEntity> wc = cu.from(RecommendationWcEntity.class);
+		cu.set(RecommendationWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(RecommendationWcEntity_.humanFriendlyDisplay, humanFriendlyDisplay);
+		cu.set(RecommendationWcEntity_.version, cb.sum(wc.get(RecommendationWcEntity_.version), 1L));
 		cu.where(cb.and(
 				cb.equal(wc.get(RecommendationWcEntity_.id), id),
 				cb.equal(wc.get(RecommendationWcEntity_.version), baseVersion)
@@ -290,7 +290,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 	private Uni<Void> deleteStaged(ReactivePersistenceTxContext tx, UUID id, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<RecommendationWcEntity> cd = cb.createCriteriaDelete(RecommendationWcEntity.class);
-		Root<RecommendationWcEntity> wc = cd.getRoot();
+		Root<RecommendationWcEntity> wc = cd.from(RecommendationWcEntity.class);
 		cd.where(cb.and(
 				cb.equal(wc.get(RecommendationWcEntity_.id), id),
 				cb.equal(wc.get(RecommendationWcEntity_.version), baseVersion)
@@ -387,12 +387,12 @@ public class RecommendationDaoImpl implements RecommendationDao {
 	private Uni<Void> bumpStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, String name, String componentForScoring, String explanationForLlm, String humanFriendlyDisplay, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaUpdate<RecommendationTranslationWcEntity> cu = cb.createCriteriaUpdate(RecommendationTranslationWcEntity.class);
-		Root<RecommendationTranslationWcEntity> wc = cu.getRoot();
-		cu.set(wc.get(RecommendationTranslationWcEntity_.name), name);
-		cu.set(wc.get(RecommendationTranslationWcEntity_.componentForScoring), componentForScoring);
-		cu.set(wc.get(RecommendationTranslationWcEntity_.explanationForLlm), explanationForLlm);
-		cu.set(wc.get(RecommendationTranslationWcEntity_.humanFriendlyDisplay), humanFriendlyDisplay);
-		cu.set(wc.get(RecommendationTranslationWcEntity_.version), cb.sum(wc.get(RecommendationTranslationWcEntity_.version), 1L));
+		Root<RecommendationTranslationWcEntity> wc = cu.from(RecommendationTranslationWcEntity.class);
+		cu.set(RecommendationTranslationWcEntity_.name, name);
+		cu.set(RecommendationTranslationWcEntity_.componentForScoring, componentForScoring);
+		cu.set(RecommendationTranslationWcEntity_.explanationForLlm, explanationForLlm);
+		cu.set(RecommendationTranslationWcEntity_.humanFriendlyDisplay, humanFriendlyDisplay);
+		cu.set(RecommendationTranslationWcEntity_.version, cb.sum(wc.get(RecommendationTranslationWcEntity_.version), 1L));
 		cu.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createUpdate(cu).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()
@@ -409,7 +409,7 @@ public class RecommendationDaoImpl implements RecommendationDao {
 	private Uni<Void> deleteStagedTranslation(ReactivePersistenceTxContext tx, UUID id, RecipeLanguage lang, long baseVersion) {
 		var cb = tx.getCriteriaBuilder();
 		CriteriaDelete<RecommendationTranslationWcEntity> cd = cb.createCriteriaDelete(RecommendationTranslationWcEntity.class);
-		Root<RecommendationTranslationWcEntity> wc = cd.getRoot();
+		Root<RecommendationTranslationWcEntity> wc = cd.from(RecommendationTranslationWcEntity.class);
 		cd.where(translationRowAt(cb, wc, id, lang, baseVersion));
 		return tx.createDelete(cd).execute().flatMap(rows -> rows == 1
 				? Uni.createFrom().voidItem()

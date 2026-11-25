@@ -1,15 +1,13 @@
 package eu.dietwise.v1.types;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import eu.dietwise.common.types.RepresentableAsString;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-public class RepresentableAsStringSerializer extends JsonSerializer<RepresentableAsString> {
+public class RepresentableAsStringSerializer extends ValueSerializer<RepresentableAsString> {
 	@Override
-	public void serialize(RepresentableAsString representableAsString, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+	public void serialize(RepresentableAsString representableAsString, JsonGenerator jsonGenerator, SerializationContext serializationContext) {
 		// Remember: representableAsString is never null, as per the specs of Jackson
 		jsonGenerator.writeString(representableAsString.asString());
 	}

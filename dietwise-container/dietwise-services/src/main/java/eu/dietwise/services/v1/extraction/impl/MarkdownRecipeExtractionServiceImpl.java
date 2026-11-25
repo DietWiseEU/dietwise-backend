@@ -6,8 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntPredicate;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dietwise.services.model.RecipeExtractedFromInput;
 import eu.dietwise.services.v1.extraction.MarkdownRecipeExtractionService;
 import eu.dietwise.services.v1.extraction.RecipeExtractionAiFacade;
@@ -16,6 +14,8 @@ import eu.dietwise.v1.types.RecipeLanguage;
 import io.smallrye.mutiny.Uni;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @ApplicationScoped
 public class MarkdownRecipeExtractionServiceImpl implements MarkdownRecipeExtractionService {
@@ -44,13 +44,13 @@ public class MarkdownRecipeExtractionServiceImpl implements MarkdownRecipeExtrac
 	private RecipeExtractedFromInput parseRecipeWithRepair(String response) {
 		try {
 			return parseRecipe(jsonNormalizer.normalize(response));
-		} catch (JsonProcessingException e) {
+		} catch (JacksonException e) {
 			String repaired = repairJson(response);
 			if (!repaired.equals(response)) {
 				try {
 					LOG.debug("Repaired malformed recipe JSON from LLM");
 					return parseRecipe(jsonNormalizer.normalize(repaired));
-				} catch (JsonProcessingException ignored) {
+				} catch (JacksonException ignored) {
 					// fall through to throw the original exception
 				}
 			}
@@ -58,7 +58,7 @@ public class MarkdownRecipeExtractionServiceImpl implements MarkdownRecipeExtrac
 		}
 	}
 
-	private RecipeExtractedFromInput parseRecipe(String json) throws JsonProcessingException {
+	private RecipeExtractedFromInput parseRecipe(String json) throws JacksonException {
 		return objectMapper.readValue(json, RecipeExtractedFromInput.class);
 	}
 

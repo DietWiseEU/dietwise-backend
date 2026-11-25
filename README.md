@@ -234,6 +234,15 @@ git push --tags origin master:master develop:develop
 
 ### OWASP library checks
 
+The configuration in pom.xml requires a server in e.g. your settings.xml, configured as:
+
+```xml
+<server>
+    <id>nvd</id>
+    <password>YOUR_API_KEY</password>
+</server>
+```
+
 ```bash
 mvn verify -Powasp -DskipTests
 ```

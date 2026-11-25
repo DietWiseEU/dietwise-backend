@@ -1,6 +1,5 @@
 package eu.dietwise.v1.json;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import eu.dietwise.common.types.RepresentableAsString;
 import eu.dietwise.v1.model.AppliesTo;
 import eu.dietwise.v1.model.AppliesToMixin;
@@ -40,6 +39,7 @@ import eu.dietwise.v1.types.SuggestionTemplateId;
 import eu.dietwise.v1.types.SuggestionTemplateIdMixin;
 import eu.dietwise.v1.types.UiLanguage;
 import eu.dietwise.v1.types.UiLanguageDeserializer;
+import tools.jackson.databind.module.SimpleModule;
 
 public class DietwiseJacksonModule extends SimpleModule {
 	public DietwiseJacksonModule() {
