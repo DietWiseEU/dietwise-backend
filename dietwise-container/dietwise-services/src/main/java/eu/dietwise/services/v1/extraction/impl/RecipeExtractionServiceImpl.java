@@ -6,22 +6,18 @@ import static eu.dietwise.services.v1.types.RecipeDetectionType.JSONLD;
 import static eu.dietwise.services.v1.types.RecipeDetectionType.LLM_FROM_TEXT;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dietwise.common.utils.UniComprehensions;
 import eu.dietwise.services.model.RecipeExtractedFromInput;
 import eu.dietwise.services.renderer.RenderRequest;
-import eu.dietwise.services.renderer.RenderResponse;
 import eu.dietwise.services.renderer.RendererClient;
 import eu.dietwise.services.v1.extraction.MarkdownRecipeExtractionService;
 import eu.dietwise.services.v1.extraction.NoIngredientsInRecipeException;
@@ -79,24 +75,8 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 
 	@Override
 	public Uni<RecipeExtractionRecipeAssessmentMessage> extractRecipeFromJsonLdOrMarkdown(UUID correlationId, RecipeAssessmentParam param) {
-		String jsonLdContent = param.getJsonLdContent();
-		if (jsonLdContent == null || jsonLdContent.isBlank()) {
-			return useAiToExtractRecipeFromMarkdown(correlationId, param.getUrl(), param.getLang(), param.getPageContent());
-		}
-		LOG.info("Will try JSON-LD content first <{}> for {}", correlationId, param.getUrl());
-		return extractRecipesFromJsonLd(correlationId, param)
-				.onFailure().recoverWithUni(error -> {
-					LOG.warn("JSON-LD content was not usable, will fall back to page content <{}> for {}", correlationId, param.getUrl(), error);
-					return useAiToExtractRecipeFromMarkdown(correlationId, param.getUrl(), param.getLang(), param.getPageContent());
-				})
-				.flatMap(message -> {
-					if (message.recipes() == null || message.recipes().isEmpty()) {
-						LOG.info("JSON-LD content produced no recipes, will fall back to page content <{}> for {}", correlationId, param.getUrl());
-						return useAiToExtractRecipeFromMarkdown(correlationId, param.getUrl(), param.getLang(), param.getPageContent());
-					} else {
-						return Uni.createFrom().item(message);
-					}
-				});
+		return parseJsonLdContent(correlationId, param)
+				.flatMap(jsonLdRecipes -> useJsonLdRecipesOrAi(correlationId, param.getUrl(), param.getLang(), jsonLdRecipes, param.getPageContent()));
 	}
 
 	@Override
@@ -112,11 +92,32 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 	public Uni<RecipeExtractionRecipeAssessmentMessage> extractRecipeFromUrl(UUID correlationId, RecipeExtractionAndAssessmentParam param) {
 		RecipeSourceUrlValidator.validateHttpPublicUrl(param.getUrl(), allowCachedTestPages);
 		var renderRequest = new RenderRequest(param.getUrl(), true, true, 30000, param.getViewport().orElse(null), false, true);
-		return UniComprehensions.forc(
-				rendererClient.render(renderRequest),
-				sanitizeRenderResponse(correlationId, param),
-				extractRecipesEitherFromJsonLdOrFromAi(correlationId, param)
-		);
+		return rendererClient.render(renderRequest)
+				.map(RestResponse::getEntity)
+				.flatMap(renderResponse -> useJsonLdRecipesOrAi(
+						correlationId,
+						param.getUrl(),
+						param.getLang(),
+						Objects.requireNonNullElse(renderResponse.jsonLdRecipes(), List.of()),
+						renderResponse.output()
+				));
+	}
+
+	private Uni<RecipeExtractionRecipeAssessmentMessage> useJsonLdRecipesOrAi(
+			UUID correlationId, String url, RecipeLanguage lang, List<RecipeExtractedFromInput> jsonLdRecipes, String markdown) {
+		List<RecipeExtractedFromInput> sanitizedJsonLdRecipes = sanitizeRecipes(correlationId, url, jsonLdRecipes);
+		if (sanitizedJsonLdRecipes.isEmpty()) {
+			LOG.info("No usable JSON-LD recipes, will use AI <{}> for {}", correlationId, url);
+			LOG.debug("Page content: (length {}): {}", markdown.length(), limit(markdown, 1000));
+			return useAiToExtractRecipeFromMarkdown(correlationId, url, lang, markdown);
+		}
+		LOG.info("Found JSON-LD format recipes <{}> in {} ({} in total)", correlationId, url, sanitizedJsonLdRecipes.size());
+		LOG.debug("JSON-LD recipes: {}", sanitizedJsonLdRecipes);
+		var recipes = sanitizedJsonLdRecipes.stream()
+				.map(this::toRecipeWithOnlyIngredientNames)
+				.map(r -> new RecipeAndDetectionType(r, JSONLD))
+				.toList();
+		return Uni.createFrom().item(new RecipeExtractionRecipeAssessmentMessage(recipes, markdown));
 	}
 
 	private Uni<String> keepOnlyRelevantPageContent(String pageTextAsMarkdown, RecipeLanguage lang) {
@@ -139,23 +140,19 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 				.map(this::toRecipeWithOnlyIngredientNames);
 	}
 
-	private Uni<RecipeExtractionRecipeAssessmentMessage> extractRecipesFromJsonLd(UUID correlationId, RecipeAssessmentParam param) {
+	private Uni<List<RecipeExtractedFromInput>> parseJsonLdContent(UUID correlationId, RecipeAssessmentParam param) {
+		String jsonLdContent = param.getJsonLdContent();
+		if (jsonLdContent == null || jsonLdContent.isBlank()) {
+			return Uni.createFrom().item(List.of());
+		}
+		LOG.info("Will try JSON-LD content first <{}> for {}", correlationId, param.getUrl());
 		return Uni.createFrom().item(() -> {
-			List<RecipeExtractedFromInput> jsonLdRecipes;
 			try {
-				jsonLdRecipes = sanitizeRecipes(correlationId, param.getUrl(), parseJsonLdRecipes(param.getJsonLdContent()));
+				return parseJsonLdRecipes(jsonLdContent);
 			} catch (JsonProcessingException e) {
-				throw new IllegalArgumentException("Invalid JSON-LD", e);
+				LOG.warn("JSON-LD content was not usable, will fall back to page content <{}> for {}", correlationId, param.getUrl(), e);
+				return List.of();
 			}
-			if (!jsonLdRecipes.isEmpty()) {
-				LOG.info("Found JSON-LD format recipes <{}> in {} ({} in total)", correlationId, param.getUrl(), jsonLdRecipes.size());
-				LOG.debug("JSON-LD recipes: {}", jsonLdRecipes);
-			}
-			var recipes = jsonLdRecipes.stream()
-					.map(this::toRecipeWithOnlyIngredientNames)
-					.map(r -> new RecipeAndDetectionType(r, JSONLD))
-					.toList();
-			return new RecipeExtractionRecipeAssessmentMessage(recipes, param.getPageContent());
 		});
 	}
 
@@ -187,17 +184,6 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 
 	private RecipeExtractionRecipeAssessmentMessage convertLlmResponseToRecipes(Recipe recipe, String pageText) {
 		return new RecipeExtractionRecipeAssessmentMessage(List.of(new RecipeAndDetectionType(recipe, LLM_FROM_TEXT)), pageText);
-	}
-
-	private Function<? super RestResponse<RenderResponse>, Uni<? extends RenderResponse>> sanitizeRenderResponse(
-			UUID correlationId, RecipeExtractionAndAssessmentParam param) {
-		return restRenderResponse -> {
-			RenderResponse renderResponse = restRenderResponse.getEntity();
-			List<RecipeExtractedFromInput> sanitizedJsonLdRecipes = renderResponse.jsonLdRecipes() == null
-					? Collections.emptyList()
-					: sanitizeRecipes(correlationId, param.getUrl(), renderResponse.jsonLdRecipes());
-			return Uni.createFrom().item(new RenderResponse(renderResponse.output(), sanitizedJsonLdRecipes, renderResponse.finalUrl(), renderResponse.screenshot()));
-		};
 	}
 
 	private List<RecipeExtractedFromInput> sanitizeRecipes(UUID correlationId, String url, List<RecipeExtractedFromInput> recipes) {
@@ -337,25 +323,5 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 		}
 		String value = recipeJsonCoercionStrategy.coerce(node, objectMapper).trim();
 		return value.isEmpty() ? List.of() : List.of(value);
-	}
-
-	private Function<? super RenderResponse, Uni<? extends RecipeExtractionRecipeAssessmentMessage>> extractRecipesEitherFromJsonLdOrFromAi(
-			UUID correlationId, RecipeExtractionAndAssessmentParam param) {
-		return renderResponse -> {
-			if (renderResponse.jsonLdRecipes() != null && !renderResponse.jsonLdRecipes().isEmpty()) {
-				LOG.info("Found JSON-LD format recipes <{}> in {} ({} in total)", correlationId, param.getUrl(), renderResponse.jsonLdRecipes().size());
-				LOG.debug("JSON-LD recipes: {}", renderResponse.jsonLdRecipes());
-				var recipes = renderResponse.jsonLdRecipes().stream()
-						.map(this::toRecipeWithOnlyIngredientNames)
-						.map(r -> new RecipeAndDetectionType(r, JSONLD))
-						.toList();
-				return Uni.createFrom().item(new RecipeExtractionRecipeAssessmentMessage(recipes, renderResponse.output()));
-			} else {
-				LOG.info("No JSON-LD content, will use AI <{}> for {}", correlationId, param.getUrl());
-				String markdown = renderResponse.output();
-				LOG.debug("Page content: (length {}): {}", markdown.length(), limit(markdown, 1000));
-				return useAiToExtractRecipeFromMarkdown(correlationId, param.getUrl(), param.getLang(), markdown);
-			}
-		};
 	}
 }

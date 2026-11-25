@@ -106,6 +106,12 @@ public class RecipeExtractionServiceImplTest {
 			"recipeInstructions":["Pork: <BR>1) Preheat oven to 160C/Gas 3. <BR><BR>2) Pour beer in bottom of baking pan.","Bake 12 minutes (don&#39;t turn)."],\
 			"description":"<p>Chicken Pot Pie Soup.</p>\\n<p>From <em>Barefoot Contessa</em>.</p>"}
 			""";
+	private static final String JSONLD_CONTENT_WITHOUT_RECIPE = """
+			{"@context":"https://schema.org","@type":"WebPage","name":"Simple Pasta"}
+			""";
+	private static final String JSONLD_CONTENT_WITH_RECIPE_WITHOUT_INGREDIENTS = """
+			{"@context":"https://schema.org","@type":"Recipe","name":"Ingredient-less recipe","recipeInstructions":["Step one"]}
+			""";
 	private static final String INVALID_JSONLD_CONTENT = "{this is not valid json-ld}";
 	private static final RecipeAssessmentParam MARKDOWN_PARAM = ImmutableRecipeAssessmentParam.builder()
 			.url(URL)
@@ -204,6 +210,27 @@ public class RecipeExtractionServiceImplTest {
 		assertThat(extractionMessage.pageText()).isEqualTo(MARKDOWN);
 		assertThat(extractionMessage.recipes()).hasSize(1);
 		assertThat(extractionMessage.recipes().getFirst().detectionType()).isEqualTo(LLM_FROM_TEXT);
+
+		verify(filterAiFacade).filterRecipeBlock(RecipeLanguage.EN, MARKDOWN);
+		verify(extractionService).extractRecipeFromMarkdown(RecipeLanguage.EN, MARKDOWN);
+	}
+
+	@ParameterizedTest
+	@NullAndEmptySource
+	@ValueSource(strings = {" ", JSONLD_CONTENT_WITHOUT_RECIPE, JSONLD_CONTENT_WITH_RECIPE_WITHOUT_INGREDIENTS})
+	void extractRecipeFromJsonLdOrMarkdownFallsBackToAiWhenJsonLdContentHasNoUsableRecipes(String jsonLdContent) {
+		var sut = makeSut();
+		var param = ImmutableRecipeAssessmentParam.copyOf(MARKDOWN_PARAM).withJsonLdContent(jsonLdContent);
+		when(filterAiFacade.filterRecipeBlock(RecipeLanguage.EN, MARKDOWN)).thenReturn(Uni.createFrom().item("KEEP"));
+		when(extractionService.extractRecipeFromMarkdown(RecipeLanguage.EN, MARKDOWN)).thenReturn(Uni.createFrom().item(RECIPE_SIMPLE_PASTA));
+
+		RecipeExtractionRecipeAssessmentMessage extractionMessage =
+				sut.extractRecipeFromJsonLdOrMarkdown(CORRELATION_ID, param).await().atMost(Duration.ofSeconds(5L));
+
+		assertThat(extractionMessage.pageText()).isEqualTo(MARKDOWN);
+		assertThat(extractionMessage.recipes()).hasSize(1);
+		assertThat(extractionMessage.recipes().getFirst().detectionType()).isEqualTo(LLM_FROM_TEXT);
+		assertThat(extractionMessage.recipes().getFirst().recipe().getName()).contains("Simple Pasta");
 
 		verify(filterAiFacade).filterRecipeBlock(RecipeLanguage.EN, MARKDOWN);
 		verify(extractionService).extractRecipeFromMarkdown(RecipeLanguage.EN, MARKDOWN);
