@@ -85,6 +85,22 @@ public class RecipeExtractionServiceImplTest {
 			List.of("<br>", "Cook pasta"),
 			Optional.of("<p> </p>")
 	);
+	private static final RecipeExtractedFromInput RECIPE_WITH_REPEATED_INGREDIENTS = new RecipeExtractedFromInput(
+			Optional.of("Pasta with repeated ingredients"),
+			Optional.empty(),
+			List.of("salt", "200g pasta", "  Salt ", "SALT", "olive oil", "salt"),
+			List.of("Boil water", "Cook pasta"),
+			Optional.empty()
+	);
+	private static final List<String> DISTINCT_INGREDIENTS = List.of("salt", "200g pasta", "olive oil");
+	private static final RecipeExtractedFromInput RECIPE_WITH_INGREDIENTS_DIFFERING_IN_ACCENTS = new RecipeExtractedFromInput(
+			Optional.of("Γεμιστά"),
+			Optional.empty(),
+			List.of("Πιπεριά", "ΠΙΠΕΡΙΆ", "πιπέρια"),
+			List.of("Γεμίζουμε τις πιπεριές"),
+			Optional.empty()
+	);
+	private static final List<String> INGREDIENTS_DISTINCT_BY_ACCENT = List.of("Πιπεριά", "πιπέρια");
 	private static final String PLAIN_NAME = "Chef John's Italian Meatballs";
 	private static final String PLAIN_YIELD = "4 servings";
 	private static final List<String> PLAIN_INGREDIENTS = List.of("1/2 c. (60 g.) all-purpose flour", "2 jars Tomato & Basil sauce");
@@ -177,6 +193,20 @@ public class RecipeExtractionServiceImplTest {
 
 		verify(filterAiFacade).filterRecipeBlock(RecipeLanguage.EN, MARKDOWN);
 		verify(extractionService).extractRecipeFromMarkdown(RecipeLanguage.EN, MARKDOWN);
+	}
+
+	@Test
+	void useAiToExtractRecipeFromMarkdownKeepsTheFirstOfRepeatedIngredients() {
+		var sut = makeSut();
+		when(filterAiFacade.filterRecipeBlock(RecipeLanguage.EN, MARKDOWN)).thenReturn(Uni.createFrom().item("KEEP"));
+		when(extractionService.extractRecipeFromMarkdown(RecipeLanguage.EN, MARKDOWN)).thenReturn(Uni.createFrom().item(RECIPE_WITH_REPEATED_INGREDIENTS));
+
+		RecipeExtractionRecipeAssessmentMessage extractionMessage =
+				sut.useAiToExtractRecipeFromMarkdown(CORRELATION_ID, URL, RecipeLanguage.EN, MARKDOWN).await().atMost(Duration.ofSeconds(5L));
+
+		assertThat(extractionMessage.recipes().getFirst().recipe().getRecipeIngredients())
+				.extracting(Ingredient::getNameInRecipe)
+				.containsExactlyElementsOf(DISTINCT_INGREDIENTS);
 	}
 
 	@Test
@@ -315,6 +345,34 @@ public class RecipeExtractionServiceImplTest {
 				arguments("less than < 5 g sugar", "less than < 5 g sugar"),
 				arguments("&lt;p&gt; is decoded once", "<p> is decoded once")
 		);
+	}
+
+	@Test
+	void extractRecipeFromUrlKeepsTheFirstOfRepeatedIngredients() {
+		var sut = makeSut();
+		var restResponse = makeRenderResponseForRecipes(List.of(RECIPE_WITH_REPEATED_INGREDIENTS));
+		when(rendererClient.render(any())).thenReturn(Uni.createFrom().item(restResponse));
+
+		RecipeExtractionRecipeAssessmentMessage extractionMessage =
+				sut.extractRecipeFromUrl(CORRELATION_ID, URL_EXTRACTION_PARAM).await().atMost(Duration.ofSeconds(5L));
+
+		assertThat(extractionMessage.recipes().getFirst().recipe().getRecipeIngredients())
+				.extracting(Ingredient::getNameInRecipe)
+				.containsExactlyElementsOf(DISTINCT_INGREDIENTS);
+	}
+
+	@Test
+	void extractRecipeFromUrlKeepsIngredientsThatDifferInAccents() {
+		var sut = makeSut();
+		var restResponse = makeRenderResponseForRecipes(List.of(RECIPE_WITH_INGREDIENTS_DIFFERING_IN_ACCENTS));
+		when(rendererClient.render(any())).thenReturn(Uni.createFrom().item(restResponse));
+
+		RecipeExtractionRecipeAssessmentMessage extractionMessage =
+				sut.extractRecipeFromUrl(CORRELATION_ID, URL_EXTRACTION_PARAM).await().atMost(Duration.ofSeconds(5L));
+
+		assertThat(extractionMessage.recipes().getFirst().recipe().getRecipeIngredients())
+				.extracting(Ingredient::getNameInRecipe)
+				.containsExactlyElementsOf(INGREDIENTS_DISTINCT_BY_ACCENT);
 	}
 
 	@Test

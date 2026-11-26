@@ -6,9 +6,12 @@ import static eu.dietwise.services.v1.types.RecipeDetectionType.JSONLD;
 import static eu.dietwise.services.v1.types.RecipeDetectionType.LLM_FROM_TEXT;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -160,10 +163,20 @@ public class RecipeExtractionServiceImpl implements RecipeExtractionService {
 		return ImmutableRecipe.builder()
 				.name(inputRecipe.name())
 				.recipeYield(inputRecipe.recipeYield())
-				.recipeIngredients(inputRecipe.recipeIngredients().stream().map(this::fromName).toList())
+				.recipeIngredients(distinctIngredientNames(inputRecipe.recipeIngredients()).stream().map(this::fromName).toList())
 				.recipeInstructions(inputRecipe.recipeInstructions())
 				.text(inputRecipe.text())
 				.build();
+	}
+
+	/**
+	 * Recipes often repeat an ingredient, e.g. "salt" for the dough and for the sauce; keep the first of the names that
+	 * differ only in case or surrounding whitespace. Accents are significant, they distinguish words, e.g. the Greek
+	 * "πιπεριά" and "πιπέρια".
+	 */
+	private List<String> distinctIngredientNames(List<String> names) {
+		Set<String> seen = new HashSet<>();
+		return names.stream().filter(name -> seen.add(name.strip().toLowerCase(Locale.ROOT))).toList();
 	}
 
 	private Ingredient fromName(String name) {
