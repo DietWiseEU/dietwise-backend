@@ -17,6 +17,7 @@ or placed in a local Maven profile in `~/.m2/settings.xml`.
 - `database.dietwise.reactive.url`: The Hibernate *reactive* URL of the database
 - `database.dietwise.username`: The DB username
 - `database.dietwise.password`: The DB password
+- `ollama.api-key`: The Ollama API key (if you are using an external Ollama)
 - **(TODO)** `db.env` (default: `dev`): Needed only by Liquibase to indicate which environment-specific
 [contexts](https://www.liquibase.org/documentation/contexts.html) will it activate; e.g. `dev` will activate the `data-dev` context
 
@@ -32,6 +33,7 @@ or placed in a local Maven profile in `~/.m2/settings.xml`.
 				<database.dietwise.reactive.url>vertx-reactive:postgresql://localhost/dietwise</database.dietwise.reactive.url>
 				<database.dietwise.username>dietwise</database.dietwise.username>
 				<database.dietwise.password>dietwise</database.dietwise.password>
+				<ollama.api-key>...</ollama.api-key>
 			</properties>
 		</profile>
 		<profile>
@@ -41,6 +43,7 @@ or placed in a local Maven profile in `~/.m2/settings.xml`.
 				<database.dietwise.reactive.url>vertx-reactive:postgresql://postgres/dietwise</database.dietwise.reactive.url>
 				<database.dietwise.username>dietwise</database.dietwise.username>
 				<database.dietwise.password>dietwise</database.dietwise.password>
+				<ollama.api-key>...</ollama.api-key>
 			</properties>
 		</profile>
 	</profiles>
@@ -183,6 +186,9 @@ Until then running Ollama locally is ver easy: download, extract and run `./bin/
 
 For bigger context (default is 4096): `OLLAMA_CONTEXT_LENGTH=8192 ./bin/ollama serve`
 
+You can use your API key and ollama.com in parallel with a local installation. Simply point any
+`quarkus.langchain4j.ollama.xxx.base-url`property in `application.properties` to `https://ollama.com`.
+
 ### From IDE
 
 Create a Quarkus run configuration. You need to specify the DB connection parameters (and any other runtime parameters)
@@ -202,9 +208,10 @@ The table would look like (see [Quarkus configuration reference](https://quarkus
 | QUARKUS_DATASOURCE_PASSWORD     | dietwise                                       |
 | QUARKUS_DATASOURCE_REACTIVE_URL | vertx-reactive:postgresql://localhost/dietwise |
 | QUARKUS_DATASOURCE_JDBC_URL     | jdbc:postgresql://localhost/dietwise           |
+| OLLAMA_API_KEY                  | (your key from https://ollama.com)              |
 
 Or define them inline using semicolon as the separator:
-`QUARKUS_DATASOURCE_USERNAME=dietwise;QUARKUS_DATASOURCE_PASSWORD=dietwise;QUARKUS_DATASOURCE_REACTIVE_URL=vertx-reactive:postgresql://localhost/dietwise;QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://localhost/dietwise`
+`QUARKUS_DATASOURCE_USERNAME=dietwise;QUARKUS_DATASOURCE_PASSWORD=dietwise;QUARKUS_DATASOURCE_REACTIVE_URL=vertx-reactive:postgresql://localhost/dietwise;QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://localhost/dietwise;OLLAMA_API_KEY=...`
 
 You need to make sure the IDE runner resolves workspace artifacts.
 
